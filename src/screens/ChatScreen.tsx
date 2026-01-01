@@ -8,10 +8,14 @@ import { mockPriorities } from '@/data/mockData';
 import { TodayPriority } from '@/types/claru';
 import { supabase } from '@/integrations/supabase/client';
 import { useChatMessages } from '@/hooks/useChatMessages';
-import { Loader2 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { Loader2, Info } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export function ChatScreen() {
-  const { messages, loading, addMessage } = useChatMessages();
+  const { messages, loading, addMessage, isAuthenticated } = useChatMessages();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [priorities, setPriorities] = useState<TodayPriority[]>(mockPriorities);
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -28,7 +32,6 @@ export function ChatScreen() {
   const handleSend = async (content: string) => {
     await addMessage('user', content);
 
-    // Get AI response
     setIsTyping(true);
     
     try {
@@ -80,6 +83,22 @@ export function ChatScreen() {
 
   return (
     <div className="flex flex-col h-full">
+      {/* Trial mode banner */}
+      {!isAuthenticated && (
+        <div className="bg-primary/10 border-b border-primary/20 px-4 py-2 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm text-foreground">
+            <Info className="w-4 h-4 text-primary" />
+            <span>Try mode – </span>
+            <button 
+              onClick={() => navigate('/auth')}
+              className="text-primary font-medium hover:underline"
+            >
+              Sign up to save your progress
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Scrollable content */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
         <div className="p-4 space-y-4">

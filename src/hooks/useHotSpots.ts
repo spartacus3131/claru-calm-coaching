@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
 import { startOfWeek, format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
 export interface HotSpot {
   id: string;
@@ -32,7 +33,7 @@ export function useHotSpots() {
 
   const currentWeekStart = format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd');
 
-  // Load ratings from database
+  // Load ratings from database if logged in
   useEffect(() => {
     if (!user) {
       setLoading(false);
@@ -49,7 +50,6 @@ export function useHotSpots() {
       if (error) {
         console.error('Error loading hotspot ratings:', error);
       } else if (data && data.length > 0) {
-        // Update ratings from database
         setHotSpots(prev => prev.map(spot => {
           const dbRating = data.find(d => d.area === spot.id);
           return dbRating ? { ...spot, rating: dbRating.rating } : spot;
@@ -68,14 +68,19 @@ export function useHotSpots() {
     );
   };
 
-  const saveCheckin = async () => {
+  const saveCheckin = async (): Promise<boolean> => {
     if (!user) {
-      toast.error('Please sign in to save your check-in');
-      return;
+      // Not logged in - prompt to sign up
+      toast.error('Create an account to save your check-in', {
+        action: {
+          label: 'Sign up',
+          onClick: () => window.location.href = '/auth'
+        }
+      });
+      return false;
     }
 
     try {
-      // Upsert all ratings for this week
       const upserts = hotSpots.map(spot => ({
         user_id: user.id,
         week_start: currentWeekStart,
@@ -95,11 +100,13 @@ export function useHotSpots() {
       toast.success('Hot Spots check-in saved!', {
         description: 'Great job reflecting on your life balance.'
       });
+      return true;
     } catch (error) {
       console.error('Error saving check-in:', error);
       toast.error('Failed to save check-in');
+      return false;
     }
   };
 
-  return { hotSpots, loading, lastCheckin, updateRating, saveCheckin };
+  return { hotSpots, loading, lastCheckin, updateRating, saveCheckin, isAuthenticated: !!user };
 }

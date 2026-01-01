@@ -8,9 +8,10 @@ export function useChatMessages() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Load messages from database
+  // Load messages from database if logged in
   useEffect(() => {
     if (!user) {
+      // Not logged in - start fresh with local state
       setMessages([]);
       setLoading(false);
       return;
@@ -47,10 +48,10 @@ export function useChatMessages() {
       timestamp: new Date()
     };
 
-    // Optimistically update local state
+    // Always update local state
     setMessages(prev => [...prev, newMessage]);
 
-    // Persist to database
+    // Only persist to database if logged in
     if (user) {
       const { data, error } = await supabase
         .from('chat_messages')
@@ -79,5 +80,5 @@ export function useChatMessages() {
     return newMessage;
   };
 
-  return { messages, loading, addMessage };
+  return { messages, loading, addMessage, isAuthenticated: !!user };
 }

@@ -15,7 +15,7 @@ export function useParkingLot() {
   const [items, setItems] = useState<ParkingItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Load items from database
+  // Load items from database if logged in
   useEffect(() => {
     if (!user) {
       setItems([]);
@@ -46,10 +46,15 @@ export function useParkingLot() {
     loadItems();
   }, [user]);
 
-  const addItem = async (content: string) => {
+  const addItem = async (content: string): Promise<boolean> => {
     if (!user) {
-      toast.error('Please sign in to add items');
-      return;
+      toast.error('Create an account to save your ideas', {
+        action: {
+          label: 'Sign up',
+          onClick: () => window.location.href = '/auth'
+        }
+      });
+      return false;
     }
 
     const tempId = Date.now().toString();
@@ -60,7 +65,6 @@ export function useParkingLot() {
       createdAt: new Date()
     };
 
-    // Optimistically add
     setItems(prev => [newItem, ...prev]);
 
     const { data, error } = await supabase
@@ -77,18 +81,21 @@ export function useParkingLot() {
       console.error('Error adding item:', error);
       setItems(prev => prev.filter(i => i.id !== tempId));
       toast.error('Failed to add item');
+      return false;
     } else if (data) {
       setItems(prev =>
         prev.map(i => i.id === tempId ? { ...i, id: data.id } : i)
       );
     }
+    return true;
   };
 
   const toggleItem = async (id: string) => {
+    if (!user) return;
+    
     const item = items.find(i => i.id === id);
     if (!item) return;
 
-    // Optimistically update
     setItems(prev =>
       prev.map(i => i.id === id ? { ...i, isCompleted: !i.isCompleted } : i)
     );
@@ -100,7 +107,6 @@ export function useParkingLot() {
 
     if (error) {
       console.error('Error toggling item:', error);
-      // Revert on error
       setItems(prev =>
         prev.map(i => i.id === id ? { ...i, isCompleted: item.isCompleted } : i)
       );
@@ -108,9 +114,10 @@ export function useParkingLot() {
   };
 
   const deleteItem = async (id: string) => {
+    if (!user) return;
+    
     const item = items.find(i => i.id === id);
     
-    // Optimistically remove
     setItems(prev => prev.filter(i => i.id !== id));
 
     const { error } = await supabase
@@ -120,12 +127,11 @@ export function useParkingLot() {
 
     if (error) {
       console.error('Error deleting item:', error);
-      // Revert on error
       if (item) {
         setItems(prev => [...prev, item]);
       }
     }
   };
 
-  return { items, loading, addItem, toggleItem, deleteItem };
+  return { items, loading, addItem, toggleItem, deleteItem, isAuthenticated: !!user };
 }
