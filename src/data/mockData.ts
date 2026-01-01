@@ -59,7 +59,8 @@ const CHALLENGE_TITLES: Record<number, { title: string; description: string }> =
 
 export const mockChallenges: Challenge[] = CHALLENGE_RESEARCH.map((research, index) => {
   const titleData = CHALLENGE_TITLES[research.challengeNumber];
-  const status: Challenge['status'] = index < 3 ? 'completed' : index === 3 ? 'current' : 'locked';
+  // All challenges are unlocked - only mark first 3 as completed for demo
+  const status: Challenge['status'] = index < 3 ? 'completed' : 'current';
   
   return {
     id: research.challengeNumber,
