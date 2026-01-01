@@ -1,7 +1,7 @@
 import { Challenge } from '@/types/claru';
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from '@/components/ui/drawer';
-import { Play, Check, BookOpen } from 'lucide-react';
+import { Play, Check, Clock, Zap, Target, BookOpen, Lightbulb } from 'lucide-react';
 
 interface ChallengeDetailDrawerProps {
   challenge: Challenge | null;
@@ -13,19 +13,19 @@ interface ChallengeDetailDrawerProps {
 export function ChallengeDetailDrawer({ challenge, open, onOpenChange, onStart }: ChallengeDetailDrawerProps) {
   if (!challenge) return null;
 
-  const { id, title, description, status, relevantResearch, researchInsight, actionableTip, citation } = challenge;
+  const { id, title, description, status, time, energy, value, whatYouGet, steps, tips, worksheetPrompts, researchInsight, actionableTip, citation } = challenge;
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[85vh]">
+      <DrawerContent className="max-h-[90vh]">
         <div className="overflow-y-auto px-4 pb-6">
           <DrawerHeader className="px-0">
             <div className="flex items-center gap-3 mb-2">
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-semibold ${
                   status === 'completed'
-                    ? 'bg-primary/20 text-primary'
-                    : 'bg-primary text-primary-foreground'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted text-foreground'
                 }`}
               >
                 {status === 'completed' ? <Check className="w-5 h-5" /> : id}
@@ -37,39 +37,72 @@ export function ChallengeDetailDrawer({ challenge, open, onOpenChange, onStart }
             </DrawerDescription>
           </DrawerHeader>
 
-          {relevantResearch && relevantResearch.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mb-4">
-              {relevantResearch.map((topic) => (
-                <span
-                  key={topic}
-                  className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary/80"
-                >
-                  {topic}
-                </span>
-              ))}
+          {/* Stats */}
+          <div className="flex items-center gap-4 mb-4 text-sm">
+            <span className="flex items-center gap-1.5 text-muted-foreground">
+              <Clock className="w-4 h-4" /> {time}
+            </span>
+            <span className="flex items-center gap-1.5 text-muted-foreground">
+              <Zap className="w-4 h-4" /> Energy: {energy}/10
+            </span>
+            <span className="flex items-center gap-1.5 text-muted-foreground">
+              <Target className="w-4 h-4" /> Value: {value}/10
+            </span>
+          </div>
+
+          <div className="space-y-5">
+            {/* What You'll Get */}
+            <div>
+              <h4 className="text-sm font-medium text-foreground mb-2">What You'll Get</h4>
+              <p className="text-sm text-muted-foreground leading-relaxed">{whatYouGet}</p>
             </div>
-          )}
 
-          <div className="space-y-4">
+            {/* Steps */}
+            <div>
+              <h4 className="text-sm font-medium text-foreground mb-2">The Challenge</h4>
+              <ol className="space-y-2">
+                {steps.map((step, i) => (
+                  <li key={i} className="flex gap-3 text-sm">
+                    <span className="w-5 h-5 rounded-full bg-muted flex items-center justify-center text-xs flex-shrink-0 mt-0.5">
+                      {i + 1}
+                    </span>
+                    <span className="text-foreground/90">{step.content}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+
+            {/* Tips */}
+            {tips && tips.length > 0 && (
+              <div className="bg-muted/50 rounded-lg p-3">
+                <h4 className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1.5">
+                  <Lightbulb className="w-3.5 h-3.5" /> Tips
+                </h4>
+                <ul className="space-y-1.5">
+                  {tips.map((tip, i) => (
+                    <li key={i} className="text-sm text-foreground/80">• {tip}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Research Insight */}
             {researchInsight && (
-              <div className="rounded-lg border border-border/50 p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <BookOpen className="w-4 h-4 text-muted-foreground" />
-                  <p className="text-sm font-medium text-muted-foreground">Research Insight</p>
-                </div>
-                <p className="text-sm text-foreground/90 leading-relaxed">{researchInsight}</p>
+              <div className="rounded-lg border border-border/50 p-3">
+                <h4 className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                  <BookOpen className="w-3.5 h-3.5" /> Research Insight
+                </h4>
+                <p className="text-sm text-foreground/90">{researchInsight}</p>
+                {citation && <p className="text-xs text-muted-foreground mt-2 italic">— {citation}</p>}
               </div>
             )}
 
+            {/* Actionable Tip */}
             {actionableTip && (
-              <div className="bg-primary/5 rounded-lg p-4">
+              <div className="bg-primary/5 rounded-lg p-3">
                 <p className="text-xs font-medium text-primary mb-1">Try This</p>
-                <p className="text-sm text-foreground/90 leading-relaxed">{actionableTip}</p>
+                <p className="text-sm text-foreground/90">{actionableTip}</p>
               </div>
-            )}
-
-            {citation && (
-              <p className="text-xs text-muted-foreground italic">{citation}</p>
             )}
           </div>
 
