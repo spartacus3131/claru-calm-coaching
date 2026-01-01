@@ -11,6 +11,10 @@ export interface Challenge {
   title: string;
   description: string;
   status: 'completed' | 'current' | 'locked';
+  relevantResearch?: string[];
+  researchInsight?: string;
+  actionableTip?: string;
+  citation?: string;
 }
 
 export interface Reflection {
