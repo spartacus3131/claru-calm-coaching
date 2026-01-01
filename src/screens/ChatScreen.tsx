@@ -13,7 +13,7 @@ import { Message } from '@/types/claru';
 const WELCOME_MESSAGE: Message = {
   id: 'welcome',
   role: 'assistant',
-  content: "Hey, let's get started with your daily check-in. Tell me everything on your mind that you need to get done - work projects, personal stuff, anything rolling around in your head right now. I'll help you sort through it all.",
+  content: "Hey, let's do your daily check-in. Tell me everything on your mind - work stuff, personal projects, random thoughts. Just dump it all out and I'll help you sort through it.\n\nAs we work together, I'll also introduce you to some challenges that'll help you get clearer on what matters most and how to actually get things done. But first - what's on your plate today?",
   timestamp: new Date(),
 };
 
