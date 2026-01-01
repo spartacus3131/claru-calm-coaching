@@ -2,32 +2,39 @@ import { useState, useRef, useEffect } from 'react';
 import { MessageBubble } from '@/components/chat/MessageBubble';
 import { TypingIndicator } from '@/components/chat/TypingIndicator';
 import { QuickReplies } from '@/components/chat/QuickReplies';
-import { TodayPlan } from '@/components/chat/TodayPlan';
 import { ChatComposer } from '@/components/chat/ChatComposer';
-import { mockPriorities } from '@/data/mockData';
-import { TodayPriority } from '@/types/claru';
 import { supabase } from '@/integrations/supabase/client';
 import { useChatMessages } from '@/hooks/useChatMessages';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Message } from '@/types/claru';
+
+const WELCOME_MESSAGE: Message = {
+  id: 'welcome',
+  role: 'assistant',
+  content: "Hey! Getting started can feel hard. Just tell me everything that's on your mind — all the stuff you have to get done — and we'll go from there.",
+  timestamp: new Date(),
+};
 
 export function ChatScreen() {
   const { messages, loading, addMessage, isAuthenticated } = useChatMessages();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [priorities, setPriorities] = useState<TodayPriority[]>(mockPriorities);
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const lastMessage = messages[messages.length - 1];
+  // Show welcome message if no messages yet
+  const displayMessages = messages.length === 0 ? [WELCOME_MESSAGE] : messages;
+
+  const lastMessage = displayMessages[displayMessages.length - 1];
   const showQuickReplies = lastMessage?.role === 'assistant' && lastMessage?.quickReplies;
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, isTyping]);
+  }, [displayMessages, isTyping]);
 
   const handleSend = async (content: string) => {
     await addMessage('user', content);
@@ -35,10 +42,10 @@ export function ChatScreen() {
     setIsTyping(true);
     
     try {
-      const conversationHistory = messages.map(m => ({
-        role: m.role,
-        content: m.content
-      }));
+      // Include welcome context if this is the first message
+      const conversationHistory = messages.length === 0 
+        ? [{ role: 'assistant' as const, content: WELCOME_MESSAGE.content }]
+        : messages.map(m => ({ role: m.role, content: m.content }));
       
       const { data, error } = await supabase.functions.invoke('coach-reply', {
         body: { 
@@ -65,12 +72,6 @@ export function ChatScreen() {
 
   const handleQuickReply = (reply: string) => {
     handleSend(reply);
-  };
-
-  const handleTogglePriority = (id: string) => {
-    setPriorities((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, completed: !p.completed } : p))
-    );
   };
 
   if (loading) {
@@ -102,17 +103,9 @@ export function ChatScreen() {
       {/* Scrollable content */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
         <div className="p-4 space-y-4">
-          {/* Today Plan */}
-          <TodayPlan priorities={priorities} onToggle={handleTogglePriority} />
-
           {/* Messages */}
-          <div className="space-y-4 pt-2">
-            {messages.length === 0 && (
-              <div className="text-center py-8 text-muted-foreground">
-                <p className="text-sm">Start a conversation with your coach</p>
-              </div>
-            )}
-            {messages.map((message) => (
+          <div className="space-y-4">
+            {displayMessages.map((message) => (
               <MessageBubble key={message.id} message={message} />
             ))}
 
