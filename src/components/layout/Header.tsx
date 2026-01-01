@@ -1,4 +1,4 @@
-import { User, LogOut, LogIn } from 'lucide-react';
+import { User, LogOut, LogIn, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
@@ -9,13 +9,34 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-export function Header() {
+interface HeaderProps {
+  showBackToHome?: boolean;
+}
+
+export function Header({ showBackToHome }: HeaderProps) {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
   return (
     <header className="flex items-center justify-between px-4 py-3 glass border-b border-border/50">
-      <h1 className="text-xl font-semibold text-foreground tracking-tight">Claru</h1>
+      <div className="flex items-center gap-2">
+        {showBackToHome && (
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => navigate('/')}
+            className="text-muted-foreground -ml-2"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+        )}
+        <h1 
+          className="text-xl font-semibold text-foreground tracking-tight cursor-pointer"
+          onClick={() => showBackToHome ? navigate('/') : null}
+        >
+          Claru
+        </h1>
+      </div>
       {user ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
