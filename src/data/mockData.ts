@@ -1,4 +1,4 @@
-import { Message, Challenge, Reflection, Insight, TodayPriority } from '@/types/claru';
+import { Message, Reflection, Insight, TodayPriority } from '@/types/claru';
 
 export const mockMessages: Message[] = [
   {
@@ -28,51 +28,6 @@ export const mockPriorities: TodayPriority[] = [
   { id: '2', text: 'Call with Sarah at 2pm', completed: false },
   { id: '3', text: '30 min deep work on report', completed: true },
 ];
-
-import { CHALLENGE_RESEARCH } from './challenge-research';
-
-// Challenge titles based on Chris Bailey's "The Productivity Project"
-const CHALLENGE_TITLES: Record<number, { title: string; description: string }> = {
-  1: { title: 'Values Challenge', description: 'Define what productivity means to you personally' },
-  2: { title: 'Impact Challenge', description: 'Identify your highest-impact tasks' },
-  3: { title: 'Rule of 3', description: 'Choose only three priorities each day' },
-  4: { title: 'Prime-Time Challenge', description: 'Discover your biological peak hours' },
-  5: { title: 'Flipping Challenge', description: 'Overcome procrastination with small wins' },
-  6: { title: 'Time-Traveling', description: 'Connect with your future self' },
-  7: { title: 'Disconnecting', description: 'Go offline for focused work periods' },
-  8: { title: 'Shrink Your Work', description: 'Use time constraints strategically' },
-  9: { title: 'Working in Prime Time', description: 'Protect your peak energy for important work' },
-  10: { title: 'Maintenance Challenge', description: 'Batch low-value tasks efficiently' },
-  11: { title: 'Zenning Out', description: 'Find calm in low-impact activities' },
-  12: { title: 'Delegation Challenge', description: 'Free time by delegating wisely' },
-  13: { title: 'Capture Challenge', description: 'Empty your mind with a brain dump' },
-  14: { title: 'Hot Spot Challenge', description: 'Balance attention across life domains' },
-  15: { title: 'Wandering Challenge', description: 'Let your mind wander for creativity' },
-  16: { title: 'Notification Challenge', description: 'Reclaim attention from interruptions' },
-  17: { title: 'Single-Tasking', description: 'Focus on one thing at a time' },
-  18: { title: 'Meditation Challenge', description: 'Train your attention muscle' },
-  19: { title: 'Lamest Diet Challenge', description: 'Fuel your brain with better food' },
-  20: { title: 'Water Challenge', description: 'Stay hydrated for optimal cognition' },
-  21: { title: 'Heart Rate Challenge', description: 'Move your body to boost your mind' },
-  22: { title: 'Sleeping Challenge', description: 'Protect your sleep for peak performance' },
-};
-
-export const mockChallenges: Challenge[] = CHALLENGE_RESEARCH.map((research, index) => {
-  const titleData = CHALLENGE_TITLES[research.challengeNumber];
-  // All challenges are unlocked - only mark first 3 as completed for demo
-  const status: Challenge['status'] = index < 3 ? 'completed' : 'current';
-  
-  return {
-    id: research.challengeNumber,
-    title: titleData.title,
-    description: titleData.description,
-    status,
-    relevantResearch: research.relevantResearch,
-    researchInsight: research.researchInsight,
-    actionableTip: research.actionableTip,
-    citation: research.citation,
-  };
-});
 
 export const mockReflections: Reflection[] = [
   {
