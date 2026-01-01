@@ -3,10 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/layout/Header';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { ChatScreen } from '@/screens/ChatScreen';
-import { ChallengesScreen } from '@/screens/ChallengesScreen';
-import { InsightsScreen } from '@/screens/InsightsScreen';
+import { ImpactScreen } from '@/screens/ImpactScreen';
+import { ParkingLotScreen } from '@/screens/ParkingLotScreen';
 import { HotSpotsScreen } from '@/screens/HotSpotsScreen';
-import { ParkingLot } from '@/components/ParkingLot';
 import { HeroSection } from '@/components/landing/HeroSection';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -25,12 +24,12 @@ const Index = () => {
     switch (activeTab) {
       case 'chat':
         return <ChatScreen />;
-      case 'challenges':
-        return <ChallengesScreen />;
+      case 'impact':
+        return <ImpactScreen />;
+      case 'parking':
+        return <ParkingLotScreen />;
       case 'hotspots':
         return <HotSpotsScreen />;
-      case 'insights':
-        return <InsightsScreen />;
       default:
         return <ChatScreen />;
     }
@@ -43,7 +42,6 @@ const Index = () => {
         {renderScreen()}
       </main>
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
-      <ParkingLot />
     </div>
   );
 };
