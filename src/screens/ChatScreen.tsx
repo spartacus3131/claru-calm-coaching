@@ -13,7 +13,7 @@ import { Message } from '@/types/claru';
 const WELCOME_MESSAGE: Message = {
   id: 'welcome',
   role: 'assistant',
-  content: "Do you feel overwhelmed by what you have to get done and uncertain of how to go do it? Do you want to feel more fulfilled in your daily life and more productive? I'm here to help.",
+  content: "Good morning! I'm so glad you're here for our check-in today.\n\nWhat's on your mind this morning? Just let everything spill out - all the thoughts, worries, tasks, or feelings that are swirling around in your head right now. I'm here to listen and help you sort through it all.\n\nWhat's coming up for you?",
   timestamp: new Date(),
 };
 
