@@ -6,6 +6,7 @@ import { TodayPlan } from '@/components/chat/TodayPlan';
 import { ChatComposer } from '@/components/chat/ChatComposer';
 import { mockMessages, mockPriorities } from '@/data/mockData';
 import { Message, TodayPriority } from '@/types/claru';
+import { supabase } from '@/integrations/supabase/client';
 
 export function ChatScreen() {
   const [messages, setMessages] = useState<Message[]>(mockMessages);
@@ -22,7 +23,7 @@ export function ChatScreen() {
     }
   }, [messages, isTyping]);
 
-  const handleSend = (content: string) => {
+  const handleSend = async (content: string) => {
     const newMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
@@ -31,19 +32,63 @@ export function ChatScreen() {
     };
     setMessages((prev) => [...prev, newMessage]);
 
-    // Simulate assistant response
+    // Get AI response
     setIsTyping(true);
-    setTimeout(() => {
-      setIsTyping(false);
+    
+    try {
+      const conversationHistory = messages.map(m => ({
+        role: m.role,
+        content: m.content
+      }));
+      
+      const { data, error } = await supabase.functions.invoke('coach-reply', {
+        body: { 
+          message: content,
+          conversationHistory 
+        }
+      });
+      
+      if (error) throw error;
+      
       const response: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: "I hear you. Let's work through this together. Would you like to start with a quick brain dump to clear your head?",
+        content: data.reply,
         timestamp: new Date(),
-        quickReplies: ['Yes, let\'s do it', 'Maybe later', 'Show me how'],
       };
       setMessages((prev) => [...prev, response]);
-    }, 1500);
+    } catch (err) {
+      console.error('Error getting response:', err);
+      const response: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: "I'm having trouble responding right now. Let's try again in a moment.",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, response]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
+
+  const handleVoiceMessage = (transcription: string, reply: string) => {
+    // Add user's transcribed message
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: transcription,
+      timestamp: new Date(),
+    };
+    
+    // Add AI reply
+    const assistantMessage: Message = {
+      id: (Date.now() + 1).toString(),
+      role: 'assistant',
+      content: reply,
+      timestamp: new Date(),
+    };
+    
+    setMessages((prev) => [...prev, userMessage, assistantMessage]);
   };
 
   const handleQuickReply = (reply: string) => {
@@ -83,7 +128,11 @@ export function ChatScreen() {
       </div>
 
       {/* Composer */}
-      <ChatComposer onSend={handleSend} disabled={isTyping} />
+      <ChatComposer 
+        onSend={handleSend} 
+        onVoiceMessage={handleVoiceMessage}
+        disabled={isTyping} 
+      />
     </div>
   );
 }
