@@ -5,6 +5,8 @@ import { ChatScreen } from '@/screens/ChatScreen';
 import { ChallengesScreen } from '@/screens/ChallengesScreen';
 import { ReflectionsScreen } from '@/screens/ReflectionsScreen';
 import { InsightsScreen } from '@/screens/InsightsScreen';
+import { HotSpotsScreen } from '@/screens/HotSpotsScreen';
+import { ParkingLot } from '@/components/ParkingLot';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('chat');
@@ -15,6 +17,8 @@ const Index = () => {
         return <ChatScreen />;
       case 'challenges':
         return <ChallengesScreen />;
+      case 'hotspots':
+        return <HotSpotsScreen />;
       case 'reflections':
         return <ReflectionsScreen />;
       case 'insights':
@@ -31,6 +35,7 @@ const Index = () => {
         {renderScreen()}
       </main>
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
+      <ParkingLot />
     </div>
   );
 };
