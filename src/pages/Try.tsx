@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/layout/Header';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { ChatScreen } from '@/screens/ChatScreen';
@@ -7,20 +6,10 @@ import { ChallengesScreen } from '@/screens/ChallengesScreen';
 import { InsightsScreen } from '@/screens/InsightsScreen';
 import { HotSpotsScreen } from '@/screens/HotSpotsScreen';
 import { ParkingLot } from '@/components/ParkingLot';
-import { HeroSection } from '@/components/landing/HeroSection';
-import { useAuth } from '@/hooks/useAuth';
 
-const Index = () => {
+const Try = () => {
   const [activeTab, setActiveTab] = useState('chat');
-  const { user } = useAuth();
-  const navigate = useNavigate();
 
-  // If user is not logged in, show the landing page
-  if (!user) {
-    return <HeroSection onStart={() => navigate('/try')} />;
-  }
-
-  // Logged in users go straight to the app
   const renderScreen = () => {
     switch (activeTab) {
       case 'chat':
@@ -38,7 +27,7 @@ const Index = () => {
 
   return (
     <div className="flex flex-col h-screen bg-background">
-      <Header />
+      <Header showBackToHome />
       <main className="flex-1 flex flex-col overflow-hidden pb-20">
         {renderScreen()}
       </main>
@@ -48,4 +37,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Try;
