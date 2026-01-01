@@ -1,4 +1,4 @@
-import { MessageCircle, Trophy, BookOpen, Sparkles, Target } from 'lucide-react';
+import { MessageCircle, Trophy, Sparkles, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -11,7 +11,6 @@ const tabs = [
   { id: 'chat', label: 'Chat', icon: MessageCircle },
   { id: 'challenges', label: 'Challenges', icon: Trophy },
   { id: 'hotspots', label: 'Hot Spots', icon: Target },
-  { id: 'reflections', label: 'Reflect', icon: BookOpen },
   { id: 'insights', label: 'Insights', icon: Sparkles },
 ];
 

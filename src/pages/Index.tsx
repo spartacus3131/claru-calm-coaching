@@ -3,7 +3,6 @@ import { Header } from '@/components/layout/Header';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { ChatScreen } from '@/screens/ChatScreen';
 import { ChallengesScreen } from '@/screens/ChallengesScreen';
-import { ReflectionsScreen } from '@/screens/ReflectionsScreen';
 import { InsightsScreen } from '@/screens/InsightsScreen';
 import { HotSpotsScreen } from '@/screens/HotSpotsScreen';
 import { ParkingLot } from '@/components/ParkingLot';
@@ -19,8 +18,6 @@ const Index = () => {
         return <ChallengesScreen />;
       case 'hotspots':
         return <HotSpotsScreen />;
-      case 'reflections':
-        return <ReflectionsScreen />;
       case 'insights':
         return <InsightsScreen />;
       default:
