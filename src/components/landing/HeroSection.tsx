@@ -30,7 +30,7 @@ export function HeroSection({ onStart }: HeroSectionProps) {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center justify-center px-6 text-center max-w-2xl mx-auto">
+      <main className="flex-1 flex flex-col items-center justify-center px-6 text-center max-w-xl mx-auto">
         {/* Greeting */}
         <div className="mb-8 animate-fade-in">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
@@ -43,43 +43,30 @@ export function HeroSection({ onStart }: HeroSectionProps) {
           </h1>
         </div>
 
-        {/* The Problem */}
+        {/* The Hook */}
         <div className="space-y-4 text-lg text-muted-foreground mb-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
           <p>
-            Here's something I've noticed: most people feel like they're <span className="text-foreground font-medium">constantly behind</span>.
+            Do you feel <span className="text-foreground font-medium">overwhelmed</span> by what you have to get done and uncertain of how to do it?
           </p>
           <p>
-            Too many tabs open. Too many things pulling at your attention. And at the end of the day, you're not even sure what you actually accomplished.
+            Do you want to feel more <span className="text-foreground font-medium">fulfilled</span> in your daily life and more <span className="text-foreground font-medium">productive</span>?
           </p>
         </div>
 
-        {/* The Solution */}
-        <div className="space-y-4 text-lg mb-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-          <p className="text-foreground font-medium">
-            It doesn't have to be that way.
-          </p>
-          <p className="text-muted-foreground">
-            Every morning, we spend a few minutes getting clear on what actually matters. Every evening, we close the loop.
-          </p>
-          <p className="text-muted-foreground">
-            And over time, I'll walk you through <span className="text-foreground font-medium">22 practices</span> backed by decades of research on how humans actually focus, build habits, and get meaningful work done.
-          </p>
-        </div>
-
-        {/* The Vibe */}
-        <p className="text-sm text-muted-foreground mb-10 animate-fade-in" style={{ animationDelay: '0.6s' }}>
-          No hacks. No hustle culture. Just the stuff that works.
+        {/* The Promise */}
+        <p className="text-xl text-foreground font-medium mb-10 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+          I'm here to help.
         </p>
 
         {/* CTA */}
-        <div className="animate-fade-in" style={{ animationDelay: '0.8s' }}>
+        <div className="animate-fade-in" style={{ animationDelay: '0.6s' }}>
           <Button
             size="lg"
             variant="calm"
             onClick={onStart}
             className="text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all"
           >
-            Ready to start?
+            Let's start
           </Button>
         </div>
 
