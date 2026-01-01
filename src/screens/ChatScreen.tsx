@@ -13,7 +13,7 @@ import { Message } from '@/types/claru';
 const WELCOME_MESSAGE: Message = {
   id: 'welcome',
   role: 'assistant',
-  content: "Hey! Getting started can feel hard. Just tell me everything that's on your mind — all the stuff you have to get done — and we'll go from there.",
+  content: "Hey! Getting started is easier than you think. Tell me everything on your mind, and I'll help you organize it. Together, we'll work through the challenges and set you up for success.",
   timestamp: new Date(),
 };
 
