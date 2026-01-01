@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { VoiceRecorder } from './VoiceRecorder';
 
 interface ChatComposerProps {
   onSend: (message: string) => void;
+  onVoiceMessage?: (transcription: string, reply: string) => void;
   disabled?: boolean;
 }
 
-export function ChatComposer({ onSend, disabled }: ChatComposerProps) {
+export function ChatComposer({ onSend, onVoiceMessage, disabled }: ChatComposerProps) {
   const [message, setMessage] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -19,7 +21,9 @@ export function ChatComposer({ onSend, disabled }: ChatComposerProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center gap-3 p-4 glass border-t border-border/50">
+    <form onSubmit={handleSubmit} className="flex items-center gap-2 p-4 glass border-t border-border/50">
+      <VoiceRecorder onTranscription={onVoiceMessage} />
+      
       <input
         type="text"
         value={message}
