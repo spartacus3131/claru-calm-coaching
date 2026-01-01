@@ -1,52 +1,34 @@
-import { useState } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
-import { Check, Brain, Heart, Smile, Briefcase, Wallet, Users, PartyPopper } from 'lucide-react';
+import { Check, Brain, Heart, Smile, Briefcase, Wallet, Users, PartyPopper, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
+import { useHotSpots } from '@/hooks/useHotSpots';
 
-interface HotSpot {
-  id: string;
-  name: string;
-  icon: React.ElementType;
-  description: string;
-  rating: number;
-  color: string;
-}
-
-const DEFAULT_HOT_SPOTS: HotSpot[] = [
-  { id: 'mind', name: 'Mind', icon: Brain, description: 'Learning, growth, mental clarity', rating: 5, color: 'text-violet-500' },
-  { id: 'body', name: 'Body', icon: Heart, description: 'Physical health, energy, exercise', rating: 5, color: 'text-rose-500' },
-  { id: 'emotions', name: 'Emotions', icon: Smile, description: 'Mood, stress, emotional balance', rating: 5, color: 'text-amber-500' },
-  { id: 'career', name: 'Career', icon: Briefcase, description: 'Work, projects, professional growth', rating: 5, color: 'text-blue-500' },
-  { id: 'finances', name: 'Finances', icon: Wallet, description: 'Money, savings, financial health', rating: 5, color: 'text-emerald-500' },
-  { id: 'relationships', name: 'Relationships', icon: Users, description: 'Family, friends, connections', rating: 5, color: 'text-pink-500' },
-  { id: 'fun', name: 'Fun', icon: PartyPopper, description: 'Hobbies, leisure, enjoyment', rating: 5, color: 'text-orange-500' },
-];
+const ICONS: Record<string, React.ElementType> = {
+  mind: Brain,
+  body: Heart,
+  emotions: Smile,
+  career: Briefcase,
+  finances: Wallet,
+  relationships: Users,
+  fun: PartyPopper,
+};
 
 export function HotSpotsScreen() {
-  const [hotSpots, setHotSpots] = useState<HotSpot[]>(DEFAULT_HOT_SPOTS);
-  const [lastCheckin, setLastCheckin] = useState<Date | null>(null);
-
-  const handleRatingChange = (id: string, value: number[]) => {
-    setHotSpots(prev => 
-      prev.map(spot => 
-        spot.id === id ? { ...spot, rating: value[0] } : spot
-      )
-    );
-  };
-
-  const handleSaveCheckin = () => {
-    setLastCheckin(new Date());
-    toast.success('Hot Spots check-in saved!', {
-      description: 'Great job reflecting on your life balance.'
-    });
-  };
+  const { hotSpots, loading, lastCheckin, updateRating, saveCheckin } = useHotSpots();
 
   const averageRating = hotSpots.reduce((acc, spot) => acc + spot.rating, 0) / hotSpots.length;
   const lowestSpot = hotSpots.reduce((lowest, spot) => 
     spot.rating < lowest.rating ? spot : lowest
   , hotSpots[0]);
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 overflow-y-auto safe-bottom">
@@ -81,7 +63,7 @@ export function HotSpotsScreen() {
         {/* Hot Spots List */}
         <div className="space-y-4">
           {hotSpots.map((spot) => {
-            const Icon = spot.icon;
+            const Icon = ICONS[spot.id] || Brain;
             return (
               <div
                 key={spot.id}
@@ -106,7 +88,7 @@ export function HotSpotsScreen() {
                 
                 <Slider
                   value={[spot.rating]}
-                  onValueChange={(value) => handleRatingChange(spot.id, value)}
+                  onValueChange={(value) => updateRating(spot.id, value[0])}
                   max={10}
                   min={1}
                   step={1}
@@ -127,7 +109,7 @@ export function HotSpotsScreen() {
           <Button
             variant="calm"
             className="w-full"
-            onClick={handleSaveCheckin}
+            onClick={saveCheckin}
           >
             <Check className="w-4 h-4" />
             Save Weekly Check-in
