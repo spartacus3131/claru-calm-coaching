@@ -14,7 +14,7 @@ export function useVoiceRecording() {
   const audioChunksRef = useRef<Blob[]>([]);
   const [conversationHistory, setConversationHistory] = useState<Message[]>([]);
 
-  const startRecording = useCallback(async () => {
+  const startRecording = useCallback(async (): Promise<boolean> => {
     try {
       setError(null);
       const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -40,9 +40,11 @@ export function useVoiceRecording() {
       mediaRecorderRef.current = mediaRecorder;
       mediaRecorder.start(100); // Collect data every 100ms
       setIsRecording(true);
+      return true;
     } catch (err) {
       console.error('Error starting recording:', err);
       setError('Could not access microphone. Please allow microphone permissions.');
+      return false;
     }
   }, []);
 
