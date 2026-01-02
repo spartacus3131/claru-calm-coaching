@@ -6,31 +6,34 @@ export interface Message {
   quickReplies?: string[];
 }
 
-export type ChallengePart = 
-  | 'laying-the-groundwork'
-  | 'wasting-time'
-  | 'end-of-time-management'
-  | 'quiet-your-mind'
-  | 'attention-muscle'
-  | 'next-level';
+export type JourneyPart =
+  | 'clarity'
+  | 'systems'
+  | 'capacity';
 
-export interface ChallengeStep {
+// Legacy alias for backwards compatibility
+export type ChallengePart = JourneyPart;
+
+export interface FoundationStep {
   title?: string;
   content: string;
 }
 
-export interface Challenge {
+// Legacy alias
+export type ChallengeStep = FoundationStep;
+
+export interface Foundation {
   id: number;
   title: string;
   description: string;
   status: 'completed' | 'current';
-  part: ChallengePart;
+  part: JourneyPart;
   partTitle: string;
   time: string;
   energy: number;
   value: number;
   whatYouGet: string;
-  steps: ChallengeStep[];
+  steps: FoundationStep[];
   tips?: string[];
   worksheetPrompts?: string[];
   relevantResearch?: string[];
@@ -38,6 +41,9 @@ export interface Challenge {
   actionableTip?: string;
   citation?: string;
 }
+
+// Legacy alias
+export type Challenge = Foundation;
 
 export interface BonusTip {
   id: number;

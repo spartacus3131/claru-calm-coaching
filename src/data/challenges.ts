@@ -1,23 +1,20 @@
-import { Challenge, ChallengePart } from '@/types/claru';
+import { Foundation, JourneyPart, Challenge, ChallengePart } from '@/types/claru';
 
-export const PART_INFO: Record<ChallengePart, { title: string; order: number }> = {
-  'laying-the-groundwork': { title: 'Laying the Groundwork', order: 1 },
-  'wasting-time': { title: 'Wasting Time', order: 2 },
-  'end-of-time-management': { title: 'The End of Time Management', order: 3 },
-  'quiet-your-mind': { title: 'Quiet Your Mind', order: 4 },
-  'attention-muscle': { title: 'The Attention Muscle', order: 5 },
-  'next-level': { title: 'Taking Productivity to the Next Level', order: 6 },
+export const PART_INFO: Record<JourneyPart, { title: string; order: number; description: string }> = {
+  'clarity': { title: 'Clarity', order: 1, description: 'Know what matters' },
+  'systems': { title: 'Systems', order: 2, description: 'Build your infrastructure' },
+  'capacity': { title: 'Capacity', order: 3, description: 'Protect your energy' },
 };
 
-export const CHALLENGES: Challenge[] = [
-  // Part 1: Laying the Groundwork
+export const FOUNDATIONS: Foundation[] = [
+  // Part 1: Clarity (Foundations 1-7)
   {
     id: 1,
-    title: 'The Values Challenge',
+    title: 'The Values Foundation',
     description: 'Define what productivity means to you personally',
     status: 'current',
-    part: 'laying-the-groundwork',
-    partTitle: 'Laying the Groundwork',
+    part: 'clarity',
+    partTitle: 'Clarity',
     time: '7 minutes',
     energy: 6,
     value: 8,
@@ -39,11 +36,11 @@ export const CHALLENGES: Challenge[] = [
   },
   {
     id: 2,
-    title: 'The Impact Challenge',
+    title: 'The Impact Foundation',
     description: 'Identify your highest-impact tasks',
     status: 'current',
-    part: 'laying-the-groundwork',
-    partTitle: 'Laying the Groundwork',
+    part: 'clarity',
+    partTitle: 'Clarity',
     time: '10 minutes',
     energy: 8,
     value: 10,
@@ -65,11 +62,11 @@ export const CHALLENGES: Challenge[] = [
   },
   {
     id: 3,
-    title: 'The Rule of 3 Challenge',
+    title: 'The Rule of 3 Foundation',
     description: 'Choose only three priorities each day',
     status: 'current',
-    part: 'laying-the-groundwork',
-    partTitle: 'Laying the Groundwork',
+    part: 'clarity',
+    partTitle: 'Clarity',
     time: '5 minutes',
     energy: 6,
     value: 8,
@@ -91,14 +88,13 @@ export const CHALLENGES: Challenge[] = [
     citation: 'J.D. Meier, "Getting Results the Agile Way"',
   },
 
-  // Part 2: Wasting Time
   {
     id: 4,
-    title: 'The Prime-Time Challenge',
+    title: 'The Prime-Time Foundation',
     description: 'Discover your biological peak hours',
     status: 'current',
-    part: 'wasting-time',
-    partTitle: 'Wasting Time',
+    part: 'clarity',
+    partTitle: 'Clarity',
     time: '~1 week',
     energy: 1,
     value: 9,
@@ -121,11 +117,11 @@ export const CHALLENGES: Challenge[] = [
   },
   {
     id: 5,
-    title: 'The Flipping Challenge',
+    title: 'The Flipping Foundation',
     description: 'Overcome procrastination with small wins',
     status: 'current',
-    part: 'wasting-time',
-    partTitle: 'Wasting Time',
+    part: 'clarity',
+    partTitle: 'Clarity',
     time: '6 minutes',
     energy: 8,
     value: 8,
@@ -148,11 +144,11 @@ export const CHALLENGES: Challenge[] = [
   },
   {
     id: 6,
-    title: 'The Time-Traveling Challenge',
+    title: 'The Time-Traveling Foundation',
     description: 'Connect with your future self',
     status: 'current',
-    part: 'wasting-time',
-    partTitle: 'Wasting Time',
+    part: 'clarity',
+    partTitle: 'Clarity',
     time: '10 minutes',
     energy: 4,
     value: 7,
@@ -174,11 +170,11 @@ export const CHALLENGES: Challenge[] = [
   },
   {
     id: 7,
-    title: 'The Disconnecting Challenge',
+    title: 'The Disconnecting Foundation',
     description: 'Go offline for focused work periods',
     status: 'current',
-    part: 'wasting-time',
-    partTitle: 'Wasting Time',
+    part: 'clarity',
+    partTitle: 'Clarity',
     time: '30 minutes',
     energy: 1,
     value: 10,
@@ -199,14 +195,14 @@ export const CHALLENGES: Challenge[] = [
     citation: 'Cal Newport, "Deep Work"',
   },
 
-  // Part 3: The End of Time Management
+  // Part 2: Systems (Foundations 8-15)
   {
     id: 8,
-    title: 'The Shrink Your Work Challenge',
+    title: 'The Shrink Your Work Foundation',
     description: 'Use time constraints strategically',
     status: 'current',
-    part: 'end-of-time-management',
-    partTitle: 'The End of Time Management',
+    part: 'systems',
+    partTitle: 'Systems',
     time: '1 minute',
     energy: 4,
     value: 8,
@@ -228,11 +224,11 @@ export const CHALLENGES: Challenge[] = [
   },
   {
     id: 9,
-    title: 'The Working in Prime Time Challenge',
+    title: 'The Working in Prime Time Foundation',
     description: 'Protect your peak energy for important work',
     status: 'current',
-    part: 'end-of-time-management',
-    partTitle: 'The End of Time Management',
+    part: 'systems',
+    partTitle: 'Systems',
     time: '5 minutes',
     energy: 4,
     value: 8,
@@ -255,11 +251,11 @@ export const CHALLENGES: Challenge[] = [
   },
   {
     id: 10,
-    title: 'The Maintenance Challenge',
+    title: 'The Maintenance Foundation',
     description: 'Batch low-value tasks efficiently',
     status: 'current',
-    part: 'end-of-time-management',
-    partTitle: 'The End of Time Management',
+    part: 'systems',
+    partTitle: 'Systems',
     time: '10 minutes+',
     energy: 2,
     value: 7,
@@ -281,11 +277,11 @@ export const CHALLENGES: Challenge[] = [
   },
   {
     id: 11,
-    title: 'The Zenning Out Challenge',
+    title: 'The Zenning Out Foundation',
     description: 'Find calm in low-impact activities',
     status: 'current',
-    part: 'end-of-time-management',
-    partTitle: 'The End of Time Management',
+    part: 'systems',
+    partTitle: 'Systems',
     time: '15 minutes',
     energy: 7,
     value: 8,
@@ -307,11 +303,11 @@ export const CHALLENGES: Challenge[] = [
   },
   {
     id: 12,
-    title: 'The Delegation Challenge',
+    title: 'The Delegation Foundation',
     description: 'Free time by delegating wisely',
     status: 'current',
-    part: 'end-of-time-management',
-    partTitle: 'The End of Time Management',
+    part: 'systems',
+    partTitle: 'Systems',
     time: '10 minutes',
     energy: 8,
     value: 7,
@@ -332,14 +328,13 @@ export const CHALLENGES: Challenge[] = [
     citation: 'Tim Ferriss, "The 4-Hour Workweek"',
   },
 
-  // Part 4: Quiet Your Mind
   {
     id: 13,
-    title: 'The Capture Challenge',
+    title: 'The Capture Foundation',
     description: 'Empty your mind with a brain dump',
     status: 'current',
-    part: 'quiet-your-mind',
-    partTitle: 'Quiet Your Mind',
+    part: 'systems',
+    partTitle: 'Systems',
     time: '20-30 minutes',
     energy: 9,
     value: 9,
@@ -361,11 +356,11 @@ export const CHALLENGES: Challenge[] = [
   },
   {
     id: 14,
-    title: 'The Hot Spot Challenge',
+    title: 'The Hot Spot Foundation',
     description: 'Balance attention across life domains',
     status: 'current',
-    part: 'quiet-your-mind',
-    partTitle: 'Quiet Your Mind',
+    part: 'systems',
+    partTitle: 'Systems',
     time: '10 minutes',
     energy: 7,
     value: 3,
@@ -386,11 +381,11 @@ export const CHALLENGES: Challenge[] = [
   },
   {
     id: 15,
-    title: 'The Wandering Challenge',
+    title: 'The Wandering Foundation',
     description: 'Let your mind wander for creativity',
     status: 'current',
-    part: 'quiet-your-mind',
-    partTitle: 'Quiet Your Mind',
+    part: 'systems',
+    partTitle: 'Systems',
     time: '15 minutes',
     energy: 2,
     value: 7,
@@ -411,14 +406,14 @@ export const CHALLENGES: Challenge[] = [
     citation: 'Scott Barry Kaufman, "Wired to Create"',
   },
 
-  // Part 5: The Attention Muscle
+  // Part 3: Capacity (Foundations 16-22)
   {
     id: 16,
-    title: 'The Notification Challenge',
+    title: 'The Notification Foundation',
     description: 'Reclaim attention from interruptions',
     status: 'current',
-    part: 'attention-muscle',
-    partTitle: 'The Attention Muscle',
+    part: 'capacity',
+    partTitle: 'Capacity',
     time: '5-30 minutes',
     energy: 3,
     value: 3,
@@ -440,11 +435,11 @@ export const CHALLENGES: Challenge[] = [
   },
   {
     id: 17,
-    title: 'The Single-Tasking Challenge',
+    title: 'The Single-Tasking Foundation',
     description: 'Focus on one thing at a time',
     status: 'current',
-    part: 'attention-muscle',
-    partTitle: 'The Attention Muscle',
+    part: 'capacity',
+    partTitle: 'Capacity',
     time: '15-30 minutes',
     energy: 9,
     value: 10,
@@ -467,11 +462,11 @@ export const CHALLENGES: Challenge[] = [
   },
   {
     id: 18,
-    title: 'The Meditation Challenge',
+    title: 'The Meditation Foundation',
     description: 'Train your attention muscle',
     status: 'current',
-    part: 'attention-muscle',
-    partTitle: 'The Attention Muscle',
+    part: 'capacity',
+    partTitle: 'Capacity',
     time: '5 min/day for 7 days',
     energy: 9,
     value: 9,
@@ -493,14 +488,13 @@ export const CHALLENGES: Challenge[] = [
     citation: 'Harvard Meditation Research (Lazar et al.)',
   },
 
-  // Part 6: Taking Productivity to the Next Level
   {
     id: 19,
-    title: 'The Lamest Diet Challenge',
+    title: 'The Lamest Diet Foundation',
     description: 'Fuel your brain with better food',
     status: 'current',
-    part: 'next-level',
-    partTitle: 'Taking Productivity to the Next Level',
+    part: 'capacity',
+    partTitle: 'Capacity',
     time: '2 minutes',
     energy: 2,
     value: 8,
@@ -524,11 +518,11 @@ export const CHALLENGES: Challenge[] = [
   },
   {
     id: 20,
-    title: 'The Water Challenge',
+    title: 'The Water Foundation',
     description: 'Stay hydrated for optimal cognition',
     status: 'current',
-    part: 'next-level',
-    partTitle: 'Taking Productivity to the Next Level',
+    part: 'capacity',
+    partTitle: 'Capacity',
     time: '2 minutes',
     energy: 2,
     value: 7,
@@ -551,11 +545,11 @@ export const CHALLENGES: Challenge[] = [
   },
   {
     id: 21,
-    title: 'The Heart Rate Challenge',
+    title: 'The Heart Rate Foundation',
     description: 'Move your body to boost your mind',
     status: 'current',
-    part: 'next-level',
-    partTitle: 'Taking Productivity to the Next Level',
+    part: 'capacity',
+    partTitle: 'Capacity',
     time: '15 minutes',
     energy: 7,
     value: 7,
@@ -578,11 +572,11 @@ export const CHALLENGES: Challenge[] = [
   },
   {
     id: 22,
-    title: 'The Sleeping Challenge',
+    title: 'The Sleeping Foundation',
     description: 'Protect your sleep for peak performance',
     status: 'current',
-    part: 'next-level',
-    partTitle: 'Taking Productivity to the Next Level',
+    part: 'capacity',
+    partTitle: 'Capacity',
     time: '5 minutes',
     energy: 7,
     value: 9,
@@ -606,19 +600,22 @@ export const CHALLENGES: Challenge[] = [
   },
 ];
 
-export function getChallengesByPart(): Record<ChallengePart, Challenge[]> {
-  const grouped: Record<ChallengePart, Challenge[]> = {
-    'laying-the-groundwork': [],
-    'wasting-time': [],
-    'end-of-time-management': [],
-    'quiet-your-mind': [],
-    'attention-muscle': [],
-    'next-level': [],
+// Legacy alias for backwards compatibility
+export const CHALLENGES = FOUNDATIONS;
+
+export function getFoundationsByPart(): Record<JourneyPart, Foundation[]> {
+  const grouped: Record<JourneyPart, Foundation[]> = {
+    'clarity': [],
+    'systems': [],
+    'capacity': [],
   };
 
-  CHALLENGES.forEach((challenge) => {
-    grouped[challenge.part].push(challenge);
+  FOUNDATIONS.forEach((foundation) => {
+    grouped[foundation.part].push(foundation);
   });
 
   return grouped;
 }
+
+// Legacy alias
+export const getChallengesByPart = getFoundationsByPart;

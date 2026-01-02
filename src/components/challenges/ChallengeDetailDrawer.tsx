@@ -59,7 +59,7 @@ export function ChallengeDetailDrawer({ challenge, open, onOpenChange, onStart }
 
             {/* Steps */}
             <div>
-              <h4 className="text-sm font-medium text-foreground mb-2">The Challenge</h4>
+              <h4 className="text-sm font-medium text-foreground mb-2">The Foundation</h4>
               <ol className="space-y-2">
                 {steps.map((step, i) => (
                   <li key={i} className="flex gap-3 text-sm">
@@ -117,7 +117,7 @@ export function ChallengeDetailDrawer({ challenge, open, onOpenChange, onStart }
                 }}
               >
                 <Play className="w-4 h-4" />
-                Start Challenge
+                Start Foundation
               </Button>
             </div>
           )}
