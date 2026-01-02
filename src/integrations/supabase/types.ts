@@ -38,6 +38,45 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_notes: {
+        Row: {
+          created_at: string
+          end_of_day: Json
+          id: string
+          morning_prompts: Json
+          note_date: string
+          organized_tasks: Json
+          raw_dump: string | null
+          top3: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          end_of_day?: Json
+          id?: string
+          morning_prompts?: Json
+          note_date: string
+          organized_tasks?: Json
+          raw_dump?: string | null
+          top3?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          end_of_day?: Json
+          id?: string
+          morning_prompts?: Json
+          note_date?: string
+          organized_tasks?: Json
+          raw_dump?: string | null
+          top3?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       hotspot_areas: {
         Row: {
           area_id: string
