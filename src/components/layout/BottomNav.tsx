@@ -26,11 +26,11 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
             onClick={() => onTabChange(tab.id)}
             className={cn(
               'min-w-[56px] px-2',
-              activeTab === tab.id && 'text-primary'
+              activeTab === tab.id ? 'text-accent' : 'text-muted-foreground'
             )}
           >
-            <tab.icon className="w-5 h-5" />
-            <span className="text-[10px] font-medium">{tab.label}</span>
+            <tab.icon className={cn('w-6 h-6', activeTab === tab.id && 'stroke-[2.5]')} />
+            <span className="text-xs font-medium">{tab.label}</span>
           </Button>
         ))}
       </div>

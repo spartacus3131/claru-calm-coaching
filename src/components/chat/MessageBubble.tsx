@@ -23,7 +23,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
             : 'bubble-assistant text-foreground'
         )}
       >
-        <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{message.content}</p>
+        <p className="text-base leading-relaxed whitespace-pre-wrap">{message.content}</p>
       </div>
     </div>
   );
