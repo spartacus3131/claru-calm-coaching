@@ -5,22 +5,29 @@ import { ChatScreen } from '@/screens/ChatScreen';
 import { ImpactScreen } from '@/screens/ImpactScreen';
 import { ParkingLotScreen } from '@/screens/ParkingLotScreen';
 import { HotSpotsScreen } from '@/screens/HotSpotsScreen';
+import { Challenge } from '@/types/claru';
 
 const Try = () => {
   const [activeTab, setActiveTab] = useState('chat');
-  const [pendingHotSpotsSummary, setPendingHotSpotsSummary] = useState<string | null>(null);
+  const [pendingAutoMessage, setPendingAutoMessage] = useState<string | null>(null);
 
   const handleHotSpotsCheckin = (summary: string) => {
-    setPendingHotSpotsSummary(summary);
+    setPendingAutoMessage(summary);
+    setActiveTab('chat');
+  };
+
+  const handleStartFoundation = (foundation: Challenge) => {
+    const message = `I want to start Foundation ${foundation.id}: ${foundation.title}`;
+    setPendingAutoMessage(message);
     setActiveTab('chat');
   };
 
   const renderScreen = () => {
     switch (activeTab) {
       case 'chat':
-        return <ChatScreen autoMessage={pendingHotSpotsSummary} onAutoMessageSent={() => setPendingHotSpotsSummary(null)} />;
+        return <ChatScreen autoMessage={pendingAutoMessage} onAutoMessageSent={() => setPendingAutoMessage(null)} />;
       case 'impact':
-        return <ImpactScreen />;
+        return <ImpactScreen onStartFoundation={handleStartFoundation} />;
       case 'parking':
         return <ParkingLotScreen />;
       case 'hotspots':

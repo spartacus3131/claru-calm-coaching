@@ -9,7 +9,11 @@ import { Sparkles, Trophy, Target, ChevronRight } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 
-export function ImpactScreen() {
+interface ImpactScreenProps {
+  onStartFoundation?: (foundation: Challenge) => void;
+}
+
+export function ImpactScreen({ onStartFoundation }: ImpactScreenProps) {
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -141,6 +145,11 @@ export function ImpactScreen() {
         challenge={selectedChallenge}
         open={drawerOpen}
         onOpenChange={setDrawerOpen}
+        onStart={() => {
+          if (selectedChallenge && onStartFoundation) {
+            onStartFoundation(selectedChallenge);
+          }
+        }}
       />
     </div>
   );
