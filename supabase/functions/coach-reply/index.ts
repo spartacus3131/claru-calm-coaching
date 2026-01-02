@@ -23,6 +23,99 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Daily Note extraction schema
+interface DailyNoteExtraction {
+  rawDump?: string;
+  morningPrompts?: {
+    weighingOnMe?: string;
+    avoiding?: string;
+    meetings?: string;
+    followUps?: string;
+    win?: string;
+  };
+  top3?: Array<{ text: string; completed: boolean }>;
+  organizedTasks?: {
+    actionsToday?: string[];
+    thisWeek?: string[];
+    decisionsNeeded?: string[];
+    quickWins?: string[];
+    notes?: string;
+  };
+  endOfDay?: {
+    gotDone?: string;
+    carryingOver?: string;
+    wins?: string;
+  };
+}
+
+const DAILY_NOTE_EXTRACTION_INSTRUCTION = `
+
+---
+
+## DAILY NOTE EXTRACTION (IMPORTANT)
+
+After your conversational response, you MUST include a structured extraction of any relevant daily note data from the conversation so far. This data will be used to auto-populate the user's Daily Note.
+
+Format your response like this:
+1. First, write your normal conversational response
+2. Then, at the very end, include the extraction block:
+
+<!-- DAILY_NOTE
+{
+  "rawDump": "user's brain dump text if shared",
+  "morningPrompts": {
+    "weighingOnMe": "what they said is weighing on them",
+    "avoiding": "what they're avoiding/procrastinating",
+    "meetings": "their meetings/commitments",
+    "followUps": "who they need to follow up with",
+    "win": "what would make today a win"
+  },
+  "top3": [
+    {"text": "first priority", "completed": false},
+    {"text": "second priority", "completed": false},
+    {"text": "third priority", "completed": false}
+  ],
+  "organizedTasks": {
+    "actionsToday": ["task 1", "task 2"],
+    "thisWeek": ["task for later this week"],
+    "decisionsNeeded": ["decisions to make"],
+    "quickWins": ["quick tasks under 5 min"],
+    "notes": "any notes or thoughts"
+  },
+  "endOfDay": {
+    "gotDone": "what they accomplished",
+    "carryingOver": "what's carrying over",
+    "wins": "wins and insights"
+  }
+}
+DAILY_NOTE -->
+
+RULES:
+- Only include fields that have actual content from the conversation
+- Omit empty fields entirely (don't include empty strings or arrays)
+- Use their exact words when possible
+- The JSON must be valid
+- This block is hidden from the user—they only see your conversational response`;
+
+function parseDailyNoteExtraction(reply: string): { cleanReply: string; dailyNote: DailyNoteExtraction | null } {
+  const regex = /<!-- DAILY_NOTE\s*([\s\S]*?)\s*DAILY_NOTE -->/;
+  const match = reply.match(regex);
+
+  if (!match) {
+    return { cleanReply: reply, dailyNote: null };
+  }
+
+  const cleanReply = reply.replace(regex, '').trim();
+
+  try {
+    const dailyNote = JSON.parse(match[1]) as DailyNoteExtraction;
+    return { cleanReply, dailyNote };
+  } catch (e) {
+    console.error('Failed to parse daily note extraction:', e);
+    return { cleanReply, dailyNote: null };
+  }
+}
+
 const CORE_PERSONALITY = `You are Claru, a direct and supportive productivity coach. Think of yourself as a thoughtful friend who happens to have read 300 productivity studies—warm but direct, evidence-based but conversational, motivating through insight rather than hype.
 
 YOUR VOICE CALIBRATION:
@@ -452,7 +545,7 @@ These open new threads. The check-in is done. Send them off.
 - If they have too many "urgent" items, flag it:
   > "That's a lot of fires. What's actually most important? Urgency isn't the same as importance."
 - Remind them: every yes is a no to something else
-- Reference Chris Bailey's concepts naturally (Rule of 3, Biological Prime Time, attention management)${countGuidance}${challengeNudge}`;
+- Reference Chris Bailey's concepts naturally (Rule of 3, Biological Prime Time, attention management)${countGuidance}${challengeNudge}${DAILY_NOTE_EXTRACTION_INSTRUCTION}`;
 }
 
 function buildEveningPrompt(context: {
@@ -550,7 +643,7 @@ Or if they had a rough day:
 - Help them see patterns (what keeps getting in the way?)
 - Reframe "failures" as learning
 - Keep it brief—they're tired
-- End with closure, not more to-dos${countGuidance}${challengeNudge}`;
+- End with closure, not more to-dos${countGuidance}${challengeNudge}${DAILY_NOTE_EXTRACTION_INSTRUCTION}`;
 }
 
 serve(async (req) => {
@@ -618,9 +711,12 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const reply = data.content[0].text;
+    const rawReply = data.content[0].text;
 
-    return new Response(JSON.stringify({ reply }), {
+    // Parse out the daily note extraction
+    const { cleanReply, dailyNote } = parseDailyNoteExtraction(rawReply);
+
+    return new Response(JSON.stringify({ reply: cleanReply, dailyNote }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error: unknown) {

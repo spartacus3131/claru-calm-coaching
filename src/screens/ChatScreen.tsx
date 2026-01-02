@@ -6,6 +6,7 @@ import { ChatComposer } from '@/components/chat/ChatComposer';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { supabase } from '@/integrations/supabase/client';
 import { useChatMessages } from '@/hooks/useChatMessages';
+import { useDailyNote } from '@/hooks/useDailyNote';
 import { Loader2, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Message } from '@/types/claru';
@@ -43,6 +44,7 @@ interface ChatScreenProps {
 
 export function ChatScreen({ autoMessage, onAutoMessageSent }: ChatScreenProps) {
   const { messages, loading, addMessage, isAuthenticated } = useChatMessages();
+  const { mergeChatExtraction } = useDailyNote();
   const navigate = useNavigate();
 
   const [checkInMode, setCheckInMode] = useState<CheckInMode>(() => safeReadCheckInMode());
@@ -94,6 +96,11 @@ export function ChatScreen({ autoMessage, onAutoMessageSent }: ChatScreenProps) 
         if (error) throw error;
 
         await addMessage('assistant', data.reply);
+
+        // If the coach extracted daily note data, save it
+        if (data.dailyNote) {
+          mergeChatExtraction(data.dailyNote);
+        }
       } catch (err) {
         console.error('Error getting response:', err);
         await addMessage('assistant', "I'm having trouble responding right now. Let's try again in a moment.");
@@ -101,7 +108,7 @@ export function ChatScreen({ autoMessage, onAutoMessageSent }: ChatScreenProps) 
         setIsTyping(false);
       }
     },
-    [addMessage, messages, welcomeMessage.content, checkInMode]
+    [addMessage, messages, welcomeMessage.content, checkInMode, mergeChatExtraction]
   );
 
   useEffect(() => {

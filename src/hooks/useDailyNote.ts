@@ -273,6 +273,74 @@ export function useDailyNote(noteDate?: string) {
     });
   }, []);
 
+  // Merge partial data from chat extraction (only updates non-empty fields)
+  const mergeChatExtraction = useCallback((extraction: Partial<{
+    rawDump?: string;
+    morningPrompts?: Partial<DailyNoteDraft['morningPrompts']>;
+    top3?: Array<{ text: string; completed: boolean }>;
+    organizedTasks?: Partial<DailyNoteDraft['organizedTasks']>;
+    endOfDay?: Partial<DailyNoteDraft['endOfDay']>;
+  }>) => {
+    if (!extraction || Object.keys(extraction).length === 0) return;
+
+    markDirtyAndUpdate((prev) => {
+      const next = { ...prev };
+
+      // Merge rawDump (replace if provided)
+      if (extraction.rawDump) {
+        next.rawDump = extraction.rawDump;
+      }
+
+      // Merge morningPrompts (individual fields)
+      if (extraction.morningPrompts) {
+        next.morningPrompts = {
+          ...prev.morningPrompts,
+          ...(extraction.morningPrompts.weighingOnMe && { weighingOnMe: extraction.morningPrompts.weighingOnMe }),
+          ...(extraction.morningPrompts.avoiding && { avoiding: extraction.morningPrompts.avoiding }),
+          ...(extraction.morningPrompts.meetings && { meetings: extraction.morningPrompts.meetings }),
+          ...(extraction.morningPrompts.followUps && { followUps: extraction.morningPrompts.followUps }),
+          ...(extraction.morningPrompts.win && { win: extraction.morningPrompts.win }),
+        };
+      }
+
+      // Merge top3 (replace if provided with 3 items)
+      if (extraction.top3 && extraction.top3.length > 0) {
+        next.top3 = extraction.top3.slice(0, 3).map((item) => ({
+          text: item.text || '',
+          completed: item.completed || false,
+        }));
+        // Pad to 3 items if needed
+        while (next.top3.length < 3) {
+          next.top3.push({ text: '', completed: false });
+        }
+      }
+
+      // Merge organizedTasks (append to arrays, replace notes)
+      if (extraction.organizedTasks) {
+        const org = extraction.organizedTasks;
+        next.organizedTasks = {
+          actionsToday: org.actionsToday?.length ? org.actionsToday : prev.organizedTasks.actionsToday,
+          thisWeek: org.thisWeek?.length ? org.thisWeek : prev.organizedTasks.thisWeek,
+          decisionsNeeded: org.decisionsNeeded?.length ? org.decisionsNeeded : prev.organizedTasks.decisionsNeeded,
+          quickWins: org.quickWins?.length ? org.quickWins : prev.organizedTasks.quickWins,
+          notes: org.notes || prev.organizedTasks.notes,
+        };
+      }
+
+      // Merge endOfDay (individual fields)
+      if (extraction.endOfDay) {
+        next.endOfDay = {
+          ...prev.endOfDay,
+          ...(extraction.endOfDay.gotDone && { gotDone: extraction.endOfDay.gotDone }),
+          ...(extraction.endOfDay.carryingOver && { carryingOver: extraction.endOfDay.carryingOver }),
+          ...(extraction.endOfDay.wins && { wins: extraction.endOfDay.wins }),
+        };
+      }
+
+      return next;
+    });
+  }, [markDirtyAndUpdate]);
+
   return {
     draft,
     loading,
@@ -285,6 +353,7 @@ export function useDailyNote(noteDate?: string) {
     setListFieldFromText,
     setNotes,
     setEndOfDay,
+    mergeChatExtraction,
   };
 }
 
