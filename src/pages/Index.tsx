@@ -11,6 +11,7 @@ import { useAuth } from '@/hooks/useAuth';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('chat');
+  const [pendingHotSpotsSummary, setPendingHotSpotsSummary] = useState<string | null>(null);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -19,17 +20,22 @@ const Index = () => {
     return <HeroSection onStart={() => navigate('/try')} />;
   }
 
+  const handleHotSpotsCheckin = (summary: string) => {
+    setPendingHotSpotsSummary(summary);
+    setActiveTab('chat');
+  };
+
   // Logged in users go straight to the app
   const renderScreen = () => {
     switch (activeTab) {
       case 'chat':
-        return <ChatScreen />;
+        return <ChatScreen autoMessage={pendingHotSpotsSummary} onAutoMessageSent={() => setPendingHotSpotsSummary(null)} />;
       case 'impact':
         return <ImpactScreen />;
       case 'parking':
         return <ParkingLotScreen />;
       case 'hotspots':
-        return <HotSpotsScreen />;
+        return <HotSpotsScreen onCheckinComplete={handleHotSpotsCheckin} />;
       default:
         return <ChatScreen />;
     }

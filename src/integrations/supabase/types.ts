@@ -38,6 +38,42 @@ export type Database = {
         }
         Relationships: []
       }
+      hotspot_areas: {
+        Row: {
+          area_id: string
+          color: string
+          created_at: string
+          description: string
+          id: string
+          name: string
+          position: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          area_id: string
+          color?: string
+          created_at?: string
+          description: string
+          id?: string
+          name: string
+          position?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          area_id?: string
+          color?: string
+          created_at?: string
+          description?: string
+          id?: string
+          name?: string
+          position?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       hotspot_ratings: {
         Row: {
           area: string

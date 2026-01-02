@@ -17,12 +17,18 @@ const WELCOME_MESSAGE: Message = {
   timestamp: new Date(),
 };
 
-export function ChatScreen() {
+interface ChatScreenProps {
+  autoMessage?: string | null;
+  onAutoMessageSent?: () => void;
+}
+
+export function ChatScreen({ autoMessage, onAutoMessageSent }: ChatScreenProps) {
   const { messages, loading, addMessage, isAuthenticated } = useChatMessages();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const autoMessageSentRef = useRef(false);
 
   // Show welcome message if no messages yet
   const displayMessages = messages.length === 0 ? [WELCOME_MESSAGE] : messages;
@@ -35,6 +41,15 @@ export function ChatScreen() {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [displayMessages, isTyping]);
+
+  // Handle auto-message from Hot Spots check-in
+  useEffect(() => {
+    if (autoMessage && !autoMessageSentRef.current && !loading) {
+      autoMessageSentRef.current = true;
+      handleSend(autoMessage);
+      onAutoMessageSent?.();
+    }
+  }, [autoMessage, loading]);
 
   const handleSend = async (content: string) => {
     await addMessage('user', content);
