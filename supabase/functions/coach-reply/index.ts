@@ -55,9 +55,10 @@ function buildMorningPrompt(context: {
   weeklyTop3Projects?: string[];
   waitingOnItems?: WaitingOnItem[];
   todaysMeetings?: string[];
+  todayIso: string;
   countGuidance: string;
 }): string {
-  const { weeklyTop3Projects, waitingOnItems, todaysMeetings, countGuidance } = context;
+  const { weeklyTop3Projects, waitingOnItems, todaysMeetings, todayIso, countGuidance } = context;
 
   const weeklyProjectsContext = Array.isArray(weeklyTop3Projects) && weeklyTop3Projects.length > 0
     ? `\n\nTHEIR WEEKLY TOP 3 PROJECTS:\n${weeklyTop3Projects.map((p, i) => `${i + 1}. ${p}`).join('\n')}\nUse these to validate if their daily priorities align with their weekly focus.`
@@ -139,9 +140,9 @@ IMPORTANT FORMATTING (match the user's Obsidian daily note template):
 - When you lock the plan, output it as Markdown using EXACT section titles and checkbox formatting.
 - Use this exact skeleton (fill in items; keep the structure identical):
 
-YYYY-MM-DD
+${todayIso}
 
-# YYYY-MM-DD
+# ${todayIso}
 
 ## Morning Brain Dump
 
@@ -372,13 +373,14 @@ serve(async (req) => {
     const checkInMode = normalizeMode(mode);
     const historyCount = Array.isArray(conversationHistory) ? conversationHistory.length : 0;
     const countGuidance = getCountGuidance(historyCount);
+    const todayIso = new Date().toISOString().slice(0, 10);
 
     console.log('Received message:', message);
     console.log('Mode:', checkInMode);
 
     const system = checkInMode === 'evening'
       ? buildEveningPrompt({ weeklyTop3Projects, countGuidance })
-      : buildMorningPrompt({ weeklyTop3Projects, waitingOnItems, todaysMeetings, countGuidance });
+      : buildMorningPrompt({ weeklyTop3Projects, waitingOnItems, todaysMeetings, todayIso, countGuidance });
 
     // Build messages array for Claude
     const messages = [
