@@ -358,6 +358,7 @@ serve(async (req) => {
       weeklyTop3Projects,
       waitingOnItems,
       todaysMeetings,
+      debug,
     } = await req.json();
 
     if (!message) {
@@ -414,7 +415,8 @@ serve(async (req) => {
   } catch (error: unknown) {
     console.error('Coach reply error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    return new Response(JSON.stringify({ error: errorMessage, ...(debug ? { stack: errorStack } : {}) }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
