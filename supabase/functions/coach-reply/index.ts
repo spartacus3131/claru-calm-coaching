@@ -355,11 +355,8 @@ serve(async (req) => {
     return new Response('ok', { headers: corsHeaders });
   }
 
-  let debug = false;
-
   try {
     const body = await req.json();
-    debug = body?.debug === true;
 
     const {
       message,
@@ -425,8 +422,7 @@ serve(async (req) => {
   } catch (error: unknown) {
     console.error('Coach reply error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    const errorStack = error instanceof Error ? error.stack : undefined;
-    return new Response(JSON.stringify({ error: errorMessage, ...(debug ? { stack: errorStack } : {}) }), {
+    return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
