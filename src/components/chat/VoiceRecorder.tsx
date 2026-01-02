@@ -42,7 +42,7 @@ export function VoiceRecorder({ onTranscription }: VoiceRecorderProps) {
           variant="ghost"
           size="icon"
           onClick={handleToggleRecording}
-          className="text-muted-foreground hover:text-foreground"
+          className="h-12 w-12 rounded-full border-2 border-muted-foreground/30 text-muted-foreground hover:text-foreground hover:border-foreground/50 hover:bg-secondary/50"
           disabled={isProcessing}
         >
           {isProcessing ? <Loader2 className="w-5 h-5 animate-spin" /> : <Mic className="w-5 h-5" />}
