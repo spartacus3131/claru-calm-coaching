@@ -1,4 +1,4 @@
-import { ArrowDown, Brain, Mic } from 'lucide-react';
+import { Brain, Target, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 
@@ -10,7 +10,7 @@ export function HeroSection({ onStart }: HeroSectionProps) {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-background to-accent/5 flex flex-col">
+    <div className="min-h-[100dvh] bg-gradient-to-b from-background via-background to-accent/5">
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4">
         <div className="flex items-center gap-2">
@@ -19,8 +19,8 @@ export function HeroSection({ onStart }: HeroSectionProps) {
           </div>
           <span className="font-semibold text-foreground">Claru</span>
         </div>
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           size="sm"
           onClick={() => navigate('/auth')}
           className="text-muted-foreground"
@@ -29,57 +29,72 @@ export function HeroSection({ onStart }: HeroSectionProps) {
         </Button>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center justify-center px-6 text-center max-w-xl mx-auto">
-        {/* Greeting */}
-        <div className="mb-8 animate-fade-in">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-base font-medium mb-6">
-            <Mic className="w-4 h-4" />
-            Voice-first productivity coach
-          </div>
-          
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-6 leading-tight">
-            Hey, I'm Claru.
+      {/* Hero Section */}
+      <main className="px-6 py-12 max-w-2xl mx-auto">
+        {/* H1 - The Question */}
+        <section className="text-center mb-12 animate-fade-in">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground leading-tight">
+            In a world of constant distractions, how do you focus on what actually matters?
           </h1>
-        </div>
+        </section>
 
-        {/* The Hook */}
-        <div className="space-y-4 text-lg text-muted-foreground mb-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-          <p>
-            Do you feel <span className="text-accent font-medium">overwhelmed</span> by what you have to get done and uncertain of how to do it?
-          </p>
-          <p>
-            Do you want to feel more <span className="text-accent font-medium">fulfilled</span> in your daily life and more <span className="text-accent font-medium">productive</span>?
-          </p>
-        </div>
-
-        {/* The Promise */}
-        <p className="text-xl text-foreground font-medium mb-10 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-          I'm here to help.
-        </p>
+        {/* The Journey - Visual */}
+        <section className="mb-12 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="bg-card/50 border border-border/50 rounded-xl p-6 text-center">
+              <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
+                <Target className="w-5 h-5 text-accent" />
+              </div>
+              <h4 className="font-semibold text-foreground mb-2">Clarity</h4>
+              <p className="text-sm text-muted-foreground">Know what matters</p>
+            </div>
+            <div className="bg-card/50 border border-border/50 rounded-xl p-6 text-center">
+              <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
+                <Brain className="w-5 h-5 text-accent" />
+              </div>
+              <h4 className="font-semibold text-foreground mb-2">Systems</h4>
+              <p className="text-sm text-muted-foreground">Build your infrastructure</p>
+            </div>
+            <div className="bg-card/50 border border-border/50 rounded-xl p-6 text-center">
+              <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
+                <Zap className="w-5 h-5 text-accent" />
+              </div>
+              <h4 className="font-semibold text-foreground mb-2">Capacity</h4>
+              <p className="text-sm text-muted-foreground">Protect your energy</p>
+            </div>
+          </div>
+        </section>
 
         {/* CTA */}
-        <div className="animate-fade-in" style={{ animationDelay: '0.6s' }}>
+        <section className="text-center mb-16 animate-fade-in" style={{ animationDelay: '0.4s' }}>
           <Button
             size="lg"
             variant="calm"
             onClick={onStart}
             className="text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all"
           >
-            Let's start
+            Start your first check-in
           </Button>
-        </div>
+          <p className="mt-4 text-sm text-muted-foreground">
+            Free to try • No credit card required
+          </p>
+        </section>
 
-        {/* Scroll indicator */}
-        <div className="mt-12 animate-bounce text-muted-foreground">
-          <ArrowDown className="w-5 h-5" />
-        </div>
+        {/* Supporting Copy */}
+        <section className="text-center animate-fade-in" style={{ animationDelay: '0.6s' }}>
+          <p className="text-muted-foreground mb-8">
+            Every app and notification is competing for your attention. You don't need another task manager. You need a way to cut through the noise.
+          </p>
+          <div className="bg-card/30 border border-border/50 rounded-xl p-6 inline-block">
+            <p className="text-lg font-medium text-foreground mb-2">
+              Two check-ins a day. A three-part journey. 22 foundations.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              15 minutes a day is all it takes.
+            </p>
+          </div>
+        </section>
       </main>
-
-      {/* Footer hint */}
-      <footer className="py-6 text-center text-sm text-muted-foreground">
-        Free to try • No credit card required
-      </footer>
     </div>
   );
 }

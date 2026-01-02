@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { MessageBubble } from '@/components/chat/MessageBubble';
 import { TypingIndicator } from '@/components/chat/TypingIndicator';
 import { QuickReplies } from '@/components/chat/QuickReplies';
@@ -25,8 +25,8 @@ function safeReadCheckInMode(): CheckInMode {
 function buildWelcomeMessage(mode: CheckInMode): Message {
   const content =
     mode === 'evening'
-      ? "Evening. Let's close out the day well. What went well today—and what's still hanging over you?"
-      : "Hey, let's do your daily check-in. Tell me everything on your mind - work stuff, personal projects, random thoughts. Just dump it all out and I'll help you sort through it.\n\nAs we work together, I'll also introduce you to some challenges that'll help you get clearer on what matters most and how to actually get things done. But first - what's on your plate today?";
+      ? "Day's winding down. How'd it go?"
+      : "Let's get clear on your day.\n\nWhat's on your mind? Tasks, worries, ideas, things you're avoiding—get it all out. Don't filter.";
 
   return {
     id: 'welcome',
@@ -49,7 +49,7 @@ export function ChatScreen({ autoMessage, onAutoMessageSent }: ChatScreenProps) 
   const [isTyping, setIsTyping] = useState(false);
 
   const scrollRef = useRef<HTMLDivElement>(null);
-  const autoMessageSentRef = useRef(false);
+  const lastAutoMessageRef = useRef<string | null>(null);
 
   useEffect(() => {
     try {
@@ -62,10 +62,47 @@ export function ChatScreen({ autoMessage, onAutoMessageSent }: ChatScreenProps) 
   const welcomeMessage = useMemo(() => buildWelcomeMessage(checkInMode), [checkInMode]);
 
   // Show welcome message if no messages yet
-  const displayMessages = messages.length === 0 ? [welcomeMessage] : messages;
+  const displayMessages = useMemo(
+    () => (messages.length === 0 ? [welcomeMessage] : messages),
+    [messages, welcomeMessage]
+  );
 
   const lastMessage = displayMessages[displayMessages.length - 1];
   const showQuickReplies = lastMessage?.role === 'assistant' && lastMessage?.quickReplies;
+
+  const handleSend = useCallback(
+    async (content: string) => {
+      await addMessage('user', content);
+
+      setIsTyping(true);
+
+      try {
+        // Include welcome context if this is the first message
+        const conversationHistory =
+          messages.length === 0
+            ? [{ role: 'assistant' as const, content: welcomeMessage.content }]
+            : messages.map((m) => ({ role: m.role, content: m.content }));
+
+        const { data, error } = await supabase.functions.invoke('coach-reply', {
+          body: {
+            message: content,
+            conversationHistory,
+            mode: checkInMode,
+          },
+        });
+
+        if (error) throw error;
+
+        await addMessage('assistant', data.reply);
+      } catch (err) {
+        console.error('Error getting response:', err);
+        await addMessage('assistant', "I'm having trouble responding right now. Let's try again in a moment.");
+      } finally {
+        setIsTyping(false);
+      }
+    },
+    [addMessage, messages, welcomeMessage.content, checkInMode]
+  );
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -75,43 +112,14 @@ export function ChatScreen({ autoMessage, onAutoMessageSent }: ChatScreenProps) 
 
   // Handle auto-message from Hot Spots check-in
   useEffect(() => {
-    if (autoMessage && !autoMessageSentRef.current && !loading) {
-      autoMessageSentRef.current = true;
-      handleSend(autoMessage);
-      onAutoMessageSent?.();
-    }
-  }, [autoMessage, loading]);
+    if (!autoMessage || loading) return;
+    if (lastAutoMessageRef.current === autoMessage) return;
 
-  const handleSend = async (content: string) => {
-    await addMessage('user', content);
+    lastAutoMessageRef.current = autoMessage;
+    void handleSend(autoMessage);
+    onAutoMessageSent?.();
+  }, [autoMessage, loading, handleSend, onAutoMessageSent]);
 
-    setIsTyping(true);
-
-    try {
-      // Include welcome context if this is the first message
-      const conversationHistory =
-        messages.length === 0
-          ? [{ role: 'assistant' as const, content: welcomeMessage.content }]
-          : messages.map((m) => ({ role: m.role, content: m.content }));
-
-      const { data, error } = await supabase.functions.invoke('coach-reply', {
-        body: {
-          message: content,
-          conversationHistory,
-          mode: checkInMode,
-        },
-      });
-
-      if (error) throw error;
-
-      await addMessage('assistant', data.reply);
-    } catch (err) {
-      console.error('Error getting response:', err);
-      await addMessage('assistant', "I'm having trouble responding right now. Let's try again in a moment.");
-    } finally {
-      setIsTyping(false);
-    }
-  };
 
   const handleQuickReply = (reply: string) => {
     handleSend(reply);

@@ -42,9 +42,9 @@ const Index = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-background">
+    <div className="flex flex-col h-[100dvh] bg-background">
       <Header />
-      <main className="flex-1 flex flex-col overflow-hidden pb-20">
+      <main className="flex-1 flex flex-col overflow-hidden">
         {renderScreen()}
       </main>
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />

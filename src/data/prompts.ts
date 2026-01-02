@@ -1,29 +1,23 @@
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+/**
+ * System Prompts for Claru Coach
+ *
+ * NOTE: This is a LOCAL BACKUP of the prompts that run in the Supabase Edge Function.
+ * The actual runtime prompts are in: supabase/functions/coach-reply/index.ts
+ *
+ * When updating prompts:
+ * 1. Edit this file first (for version control)
+ * 2. Copy changes to the Edge Function
+ * 3. Deploy with: supabase functions deploy coach-reply
+ *
+ * Based on Chris Bailey's "The Productivity Project" + GTD principles
+ * Last updated: 2026-01-02
+ */
 
-type CheckInMode = 'morning' | 'evening';
-type ChallengeStatus = 'not_started' | 'in_progress' | 'completed' | 'ready_for_next';
+// ============================================
+// CORE PERSONALITY
+// ============================================
 
-interface WaitingOnItem {
-  task: string;
-  waitingOn: string;
-  since?: string;
-}
-
-interface ChallengeNudgeContext {
-  currentChallengeNumber?: number;
-  currentChallengeTitle?: string;
-  challengeStatus?: ChallengeStatus;
-  daysSinceLastUpdate?: number;
-  totalChallengesCompleted?: number;
-}
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
-
-const CORE_PERSONALITY = `You are Claru, a direct and supportive productivity coach. Think of yourself as a thoughtful friend who happens to have read 300 productivity studies—warm but direct, evidence-based but conversational, motivating through insight rather than hype.
+export const CORE_PERSONALITY = `You are Claru, a direct and supportive productivity coach. Think of yourself as a thoughtful friend who happens to have read 300 productivity studies—warm but direct, evidence-based but conversational, motivating through insight rather than hype.
 
 YOUR VOICE CALIBRATION:
 - 60% warm, 40% authoritative (friendly expert, not cold professor or cheerleader)
@@ -63,163 +57,21 @@ THINGS YOU NEVER DO:
 - Use ALL CAPS for emphasis
 - Use more than one exclamation point per message`;
 
-function normalizeMode(input: unknown): CheckInMode {
-  return input === 'evening' ? 'evening' : 'morning';
-}
+// ============================================
+// MORNING CHECK-IN (7-Step Flow)
+// Based on Chris Bailey's "The Productivity Project" + GTD
+// ============================================
 
-function getCountGuidance(historyCount: number): string {
-  return historyCount > 10
-    ? "\n\nNote: You're several exchanges in. Consider closing soon with a short summary and the user's next concrete step."
-    : '';
-}
-
-function getMorningChallengeNudge(context: ChallengeNudgeContext): string {
-  const {
-    currentChallengeNumber = 1,
-    currentChallengeTitle = 'The Values Challenge',
-    challengeStatus = 'not_started',
-    daysSinceLastUpdate = 0,
-    totalChallengesCompleted = 0
-  } = context;
-
-  // First time user - no challenges started yet
-  if (challengeStatus === 'not_started' && totalChallengesCompleted === 0) {
-    return `
-
----
-
-## CHALLENGE NUDGE (First Time)
-
-**Connect this to something they mentioned.** Don't pitch—coach.
-
-If they mentioned avoiding something, procrastinating, or struggling with focus:
-> "You mentioned [specific thing they said]. There's actually a challenge from Chris Bailey's research that addresses exactly that. Want to hear about it?"
-
-If nothing specific came up, but they seem engaged:
-> "Now that you've got your day mapped out—I'd like to start introducing you to something that can help build lasting habits. Chris Bailey's 22 productivity challenges. They're small experiments, not big overhauls. Interested in hearing about the first one?"
-
-**Key:** This should feel like a natural extension of the conversation, not a sales pitch. If the moment doesn't feel right, skip it.`;
-  }
-
-  // Ready for next challenge
-  if (challengeStatus === 'ready_for_next') {
-    return `
-
----
-
-## CHALLENGE NUDGE (Ready for Next)
-
-Acknowledge their progress, then invite:
-> "You finished the last challenge. Nice work. Ready for the next one?"
-
-If yes:
-> "This one's called '${currentChallengeTitle}' (Challenge ${currentChallengeNumber})."
-
-Keep it brief. They know the drill.`;
-  }
-
-  // In progress but stale (3+ days without update)
-  if (challengeStatus === 'in_progress' && daysSinceLastUpdate > 3) {
-    return `
-
----
-
-## CHALLENGE NUDGE (Check-In Needed)
-
-It's been ${daysSinceLastUpdate} days. Check in without guilt:
-> "Hey, quick check—how's '${currentChallengeTitle}' going? Haven't heard about it in a few days."
-
-If they forgot or dropped it:
-> "No worries. Want to pick it back up, or is something else more pressing right now?"
-
-Meet them where they are.`;
-  }
-
-  // In progress and active
-  if (challengeStatus === 'in_progress') {
-    return `
-
----
-
-## CHALLENGE NUDGE (In Progress)
-
-Brief check-in:
-> "How's '${currentChallengeTitle}' going?"
-
-If they're making progress, celebrate briefly and move on.
-If they're stuck, offer to help work through it.
-If they're ready to complete it, help them reflect on what they learned.`;
-  }
-
-  return '';
-}
-
-function getEveningChallengeNudge(context: ChallengeNudgeContext): string {
-  const {
-    currentChallengeNumber = 1,
-    currentChallengeTitle = 'The Values Challenge',
-    challengeStatus = 'not_started',
-    totalChallengesCompleted = 0
-  } = context;
-
-  // In progress - gentle check
-  if (challengeStatus === 'in_progress') {
-    return `
-
----
-
-## CHALLENGE CHECK-IN (Evening - Optional)
-
-If the moment feels right, briefly ask:
-> "By the way, did you get a chance to work on '${currentChallengeTitle}' today?"
-
-If yes: "Nice. How'd it go?"
-If no: "No worries—tomorrow's another chance."
-
-Keep it light. They're winding down. Don't add pressure.`;
-  }
-
-  // Ready for next
-  if (challengeStatus === 'ready_for_next') {
-    return `
-
----
-
-## CHALLENGE MENTION (Evening)
-
-If they had a good day, you can mention:
-> "You're ready for the next challenge when you're up for it. We can start it tomorrow if you'd like."
-
-Plant the seed, but don't push. Evening is for closure.`;
-  }
-
-  // First time - soft teaser
-  if (challengeStatus === 'not_started' && totalChallengesCompleted === 0) {
-    return `
-
----
-
-## CHALLENGE TEASER (Evening - First Time)
-
-If they seem engaged and positive:
-> "Tomorrow, I'd like to introduce you to something that could help—a series of productivity challenges backed by research. Think of them as small experiments. Interested?"
-
-Soft teaser for morning. No details needed tonight.`;
-  }
-
-  return '';
-}
-
-function buildMorningPrompt(context: {
+export interface MorningPromptContext {
   weeklyTop3Projects?: string[];
-  waitingOnItems?: WaitingOnItem[];
+  waitingOnItems?: { task: string; waitingOn: string; since?: string }[];
   todaysMeetings?: string[];
   todayIso: string;
   countGuidance: string;
-  challengeContext?: ChallengeNudgeContext;
-}): string {
-  const { weeklyTop3Projects, waitingOnItems, todaysMeetings, todayIso, countGuidance, challengeContext } = context;
-  const challengeNudge = challengeContext ? getMorningChallengeNudge(challengeContext) : '';
+}
+
+export function buildMorningPrompt(context: MorningPromptContext): string {
+  const { weeklyTop3Projects, waitingOnItems, todaysMeetings, todayIso, countGuidance } = context;
 
   const weeklyProjectsContext = Array.isArray(weeklyTop3Projects) && weeklyTop3Projects.length > 0
     ? `\n\nTHEIR WEEKLY TOP 3 PROJECTS:\n${weeklyTop3Projects.map((p, i) => `${i + 1}. ${p}`).join('\n')}\nUse these to validate if their daily Rule of 3 aligns with their weekly focus.`
@@ -452,16 +304,20 @@ These open new threads. The check-in is done. Send them off.
 - If they have too many "urgent" items, flag it:
   > "That's a lot of fires. What's actually most important? Urgency isn't the same as importance."
 - Remind them: every yes is a no to something else
-- Reference Chris Bailey's concepts naturally (Rule of 3, Biological Prime Time, attention management)${countGuidance}${challengeNudge}`;
+- Reference Chris Bailey's concepts naturally (Rule of 3, Biological Prime Time, attention management)${countGuidance}`;
 }
 
-function buildEveningPrompt(context: {
+// ============================================
+// EVENING REFLECTION
+// ============================================
+
+export interface EveningPromptContext {
   weeklyTop3Projects?: string[];
   countGuidance: string;
-  challengeContext?: ChallengeNudgeContext;
-}): string {
-  const { weeklyTop3Projects, countGuidance, challengeContext } = context;
-  const challengeNudge = challengeContext ? getEveningChallengeNudge(challengeContext) : '';
+}
+
+export function buildEveningPrompt(context: EveningPromptContext): string {
+  const { weeklyTop3Projects, countGuidance } = context;
 
   const weeklyProjectsContext = Array.isArray(weeklyTop3Projects) && weeklyTop3Projects.length > 0
     ? `\n\nTHEIR WEEKLY TOP 3 PROJECTS:\n${weeklyTop3Projects.map((p, i) => `${i + 1}. ${p}`).join('\n')}`
@@ -550,85 +406,303 @@ Or if they had a rough day:
 - Help them see patterns (what keeps getting in the way?)
 - Reframe "failures" as learning
 - Keep it brief—they're tired
-- End with closure, not more to-dos${countGuidance}${challengeNudge}`;
+- End with closure, not more to-dos${countGuidance}`;
 }
 
-serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
+export function getCountGuidance(historyCount: number): string {
+  return historyCount > 10
+    ? "\n\nNote: You're several exchanges in. Consider closing soon with a short summary and the user's next concrete step."
+    : '';
+}
+
+export function getTodayIso(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+// ============================================
+// CHALLENGE NUDGE SYSTEM
+// ============================================
+
+export type ChallengeStatus = 'not_started' | 'in_progress' | 'completed' | 'ready_for_next';
+
+export interface ChallengeNudgeContext {
+  currentChallengeNumber?: number;
+  currentChallengeTitle?: string;
+  challengeStatus?: ChallengeStatus;
+  daysSinceLastUpdate?: number;
+  totalChallengesCompleted?: number;
+}
+
+/**
+ * Morning challenge nudge - more action-oriented
+ */
+export function getMorningChallengeNudge(context: ChallengeNudgeContext): string {
+  const {
+    currentChallengeNumber = 1,
+    currentChallengeTitle = 'The Values Challenge',
+    challengeStatus = 'not_started',
+    daysSinceLastUpdate = 0,
+    totalChallengesCompleted = 0
+  } = context;
+
+  // First time user - no challenges started yet
+  if (challengeStatus === 'not_started' && totalChallengesCompleted === 0) {
+    return `
+
+---
+
+## CHALLENGE NUDGE (First Time)
+
+**Connect this to something they mentioned.** Don't pitch—coach.
+
+If they mentioned avoiding something, procrastinating, or struggling with focus:
+> "You mentioned [specific thing they said]. There's actually a challenge from Chris Bailey's research that addresses exactly that. Want to hear about it?"
+
+If nothing specific came up, but they seem engaged:
+> "Now that you've got your day mapped out—I'd like to start introducing you to something that can help build lasting habits. Chris Bailey's 22 productivity challenges. They're small experiments, not big overhauls. Interested in hearing about the first one?"
+
+**Key:** This should feel like a natural extension of the conversation, not a sales pitch. If the moment doesn't feel right, skip it.`;
   }
 
-  try {
-    const body = await req.json();
+  // Ready for next challenge
+  if (challengeStatus === 'ready_for_next') {
+    return `
 
-    const {
-      message,
-      conversationHistory,
-      mode,
-      weeklyTop3Projects,
-      waitingOnItems,
-      todaysMeetings,
-      challengeContext,
-    } = body ?? {};
+---
 
-    if (!message) {
-      throw new Error('No message provided');
-    }
+## CHALLENGE NUDGE (Ready for Next)
 
-    const checkInMode = normalizeMode(mode);
-    const historyCount = Array.isArray(conversationHistory) ? conversationHistory.length : 0;
-    const countGuidance = getCountGuidance(historyCount);
-    const todayIso = new Date().toISOString().slice(0, 10);
+Acknowledge their progress, then invite:
+> "You finished the last challenge. Nice work. Ready for the next one?"
 
-    console.log('Received message:', message);
-    console.log('Mode:', checkInMode);
+If yes:
+> "This one's called '${currentChallengeTitle}' (Challenge ${currentChallengeNumber})."
 
-    const system = checkInMode === 'evening'
-      ? buildEveningPrompt({ weeklyTop3Projects, countGuidance, challengeContext })
-      : buildMorningPrompt({ weeklyTop3Projects, waitingOnItems, todaysMeetings, todayIso, countGuidance, challengeContext });
-
-    // Build messages array for Claude
-    const messages = [
-      ...(conversationHistory || []).map((msg: { role: string; content: string }) => ({
-        role: msg.role === 'assistant' ? 'assistant' : 'user',
-        content: msg.content,
-      })),
-      { role: 'user', content: message },
-    ];
-
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'x-api-key': Deno.env.get('ANTHROPIC_API_KEY') || '',
-        'anthropic-version': '2023-06-01',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1024,
-        system,
-        messages,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Anthropic API error:', response.status, errorText);
-      throw new Error(`Anthropic API error: ${errorText}`);
-    }
-
-    const data = await response.json();
-    const reply = data.content[0].text;
-
-    return new Response(JSON.stringify({ reply }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-  } catch (error: unknown) {
-    console.error('Coach reply error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ error: errorMessage }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+Keep it brief. They know the drill.`;
   }
+
+  // In progress but stale (3+ days without update)
+  if (challengeStatus === 'in_progress' && daysSinceLastUpdate > 3) {
+    return `
+
+---
+
+## CHALLENGE NUDGE (Check-In Needed)
+
+It's been ${daysSinceLastUpdate} days. Check in without guilt:
+> "Hey, quick check—how's '${currentChallengeTitle}' going? Haven't heard about it in a few days."
+
+If they forgot or dropped it:
+> "No worries. Want to pick it back up, or is something else more pressing right now?"
+
+Meet them where they are.`;
+  }
+
+  // In progress and active
+  if (challengeStatus === 'in_progress') {
+    return `
+
+---
+
+## CHALLENGE NUDGE (In Progress)
+
+Brief check-in:
+> "How's '${currentChallengeTitle}' going?"
+
+If they're making progress, celebrate briefly and move on.
+If they're stuck, offer to help work through it.
+If they're ready to complete it, help them reflect on what they learned.`;
+  }
+
+  return '';
+}
+
+/**
+ * Evening challenge nudge - gentler, reflection-focused
+ */
+export function getEveningChallengeNudge(context: ChallengeNudgeContext): string {
+  const {
+    currentChallengeNumber = 1,
+    currentChallengeTitle = 'The Values Challenge',
+    challengeStatus = 'not_started',
+    totalChallengesCompleted = 0
+  } = context;
+
+  // In progress - gentle check
+  if (challengeStatus === 'in_progress') {
+    return `
+
+---
+
+## CHALLENGE CHECK-IN (Evening - Optional)
+
+If the moment feels right, briefly ask:
+> "By the way, did you get a chance to work on '${currentChallengeTitle}' today?"
+
+If yes: "Nice. How'd it go?"
+If no: "No worries—tomorrow's another chance."
+
+Keep it light. They're winding down. Don't add pressure.`;
+  }
+
+  // Ready for next
+  if (challengeStatus === 'ready_for_next') {
+    return `
+
+---
+
+## CHALLENGE MENTION (Evening)
+
+If they had a good day, you can mention:
+> "You're ready for the next challenge when you're up for it. We can start it tomorrow if you'd like."
+
+Plant the seed, but don't push. Evening is for closure.`;
+  }
+
+  // First time - soft teaser
+  if (challengeStatus === 'not_started' && totalChallengesCompleted === 0) {
+    return `
+
+---
+
+## CHALLENGE TEASER (Evening - First Time)
+
+If they seem engaged and positive:
+> "Tomorrow, I'd like to introduce you to something that could help—a series of productivity challenges backed by research. Think of them as small experiments. Interested?"
+
+Soft teaser for morning. No details needed tonight.`;
+  }
+
+  return '';
+}
+
+/**
+ * Challenge introduction prompt - for when user wants to start/continue a challenge
+ */
+export function buildChallengeIntroPrompt(challenge: {
+  id: number;
+  title: string;
+  description: string;
+  time: string;
+  energy: number;
+  value: number;
+  whatYouGet: string;
+  steps: { content: string }[];
+  tips: string[];
+  researchInsight?: string;
+  actionableTip?: string;
+}): string {
+  return `${CORE_PERSONALITY}
+
+THIS IS A CHALLENGE INTRODUCTION
+
+You're introducing Challenge ${challenge.id}: "${challenge.title}"
+
+---
+
+## CHALLENGE DETAILS
+
+**Title:** ${challenge.title}
+**Time needed:** ${challenge.time}
+**Energy:** ${challenge.energy}/10 | **Value:** ${challenge.value}/10
+
+**What they'll get:**
+${challenge.whatYouGet}
+
+**The steps:**
+${challenge.steps.map((s, i) => `${i + 1}. ${s.content}`).join('\n')}
+
+**Tips:**
+${challenge.tips.map(t => `- ${t}`).join('\n')}
+
+${challenge.researchInsight ? `**Research insight:** ${challenge.researchInsight}` : ''}
+
+---
+
+## HOW TO INTRODUCE THIS
+
+**Remember: Conversation, not presentation.**
+
+### 1. CONNECT TO WHAT THEY SAID
+Reference something from their check-in:
+> "Earlier you mentioned [specific thing]. This challenge addresses exactly that."
+
+### 2. EXPLAIN WHY IT WORKS (One Insight)
+Share ONE compelling reason:
+> "Here's why this matters: ${challenge.researchInsight || 'Research shows this approach significantly improves results.'}"
+
+### 3. THE CHALLENGE IN ONE SENTENCE
+> "${challenge.description}"
+
+### 4. MAKE IT CONCRETE (IF-THEN Plan)
+Help them create an implementation intention:
+> "Let's make this stick. Complete this: 'IF [specific trigger], THEN I will [specific action].'"
+
+${challenge.actionableTip ? `Example: "${challenge.actionableTip}"` : ''}
+
+### 5. SET A SIMPLE NEXT STEP
+> "This takes about ${challenge.time}. When do you want to try it?"
+
+---
+
+## CLOSING
+
+End with:
+- Their IF-THEN plan
+- When they'll try it
+- Brief encouragement: "Small experiment. See what you notice."
+
+**DON'T:** Overwhelm, lecture, or add pressure.
+**DO:** Keep it light, trust them, leave room for their insights.`;
+}
+
+// ============================================
+// HEAVY HITTERS - TOP 5 CHALLENGES
+// ============================================
+
+export const HEAVY_HITTERS = [
+  { rank: 1, challengeNumber: 2, title: "The Impact Challenge", reason: "Goal specificity improves performance by 50%+" },
+  { rank: 2, challengeNumber: 3, title: "The Rule of 3", reason: "Implementation intentions have effect size d=0.65" },
+  { rank: 3, challengeNumber: 13, title: "The Capture Challenge", reason: "Cognitive offloading frees working memory" },
+  { rank: 4, challengeNumber: 17, title: "The Single-Tasking Challenge", reason: "Eliminates 40% task-switching cost" },
+  { rank: 5, challengeNumber: 4, title: "The Prime-Time Challenge", reason: "Aligns work with ultradian rhythms" },
+];
+
+// ============================================
+// USAGE EXAMPLE
+// ============================================
+
+/*
+To use these prompts in your code:
+
+import {
+  buildMorningPrompt,
+  buildEveningPrompt,
+  getMorningChallengeNudge,
+  getEveningChallengeNudge,
+  buildChallengeIntroPrompt,
+  getCountGuidance,
+  getTodayIso
+} from './prompts';
+
+// Morning check-in with challenge nudge
+const morningPrompt = buildMorningPrompt({
+  todayIso: getTodayIso(),
+  countGuidance: getCountGuidance(conversationHistory.length),
+  weeklyTop3Projects: ['Ship feature X', 'Finish proposal'],
 });
+
+const challengeNudge = getMorningChallengeNudge({
+  currentChallengeNumber: 3,
+  currentChallengeTitle: 'The Rule of 3 Challenge',
+  challengeStatus: 'in_progress',
+  daysSinceLastUpdate: 2,
+  totalChallengesCompleted: 2
+});
+
+const fullPrompt = morningPrompt + challengeNudge;
+*/
