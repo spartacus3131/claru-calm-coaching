@@ -204,8 +204,8 @@ YYYY-MM-DD
 ...
 
 - Rules:
-  - Use checkboxes `- [ ]` for actionable lists (Actions Today, This Week) and numbered checkboxes for Top 3.
-  - If a section is unknown right now, put `-` (a single dash) as a placeholder, matching the template.
+  - Use checkboxes "- [ ]" for actionable lists (Actions Today, This Week) and numbered checkboxes for Top 3.
+  - If a section is unknown right now, put "-" (a single dash) as a placeholder, matching the template.
   - Keep the note concise: prefer 1–5 bullets per section.
   - After the template, ask exactly ONE question (on its own line), e.g. "One question: ____?"
 
