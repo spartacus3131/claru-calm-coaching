@@ -18,7 +18,7 @@ const buttonVariants = cva(
         calm: "bg-accent/20 text-accent hover:bg-accent/30 border border-accent/20",
         chip: "bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground rounded-full px-4 py-2 text-sm",
         send: "bg-primary text-primary-foreground rounded-full w-10 h-10 p-0 hover:bg-primary/90",
-        nav: "flex-col gap-1 h-auto py-2 px-4 text-muted-foreground border-2 border-transparent hover:text-foreground hover:bg-accent/10 data-[active=true]:border-accent/60 data-[active=true]:bg-accent/15 data-[active=true]:text-accent",
+        nav: "flex-col gap-1.5 h-auto min-h-[60px] py-3 px-3 text-[12px] leading-tight text-muted-foreground border-2 border-transparent hover:text-foreground hover:bg-accent/10 data-[active=true]:border-accent/60 data-[active=true]:bg-accent/15 data-[active=true]:text-accent",
       },
       size: {
         default: "h-10 px-4 py-2",

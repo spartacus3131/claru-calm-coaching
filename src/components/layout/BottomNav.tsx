@@ -17,7 +17,7 @@ const tabs = [
 export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
   return (
     <nav className="glass border-t border-border/50 pb-safe shrink-0">
-      <div className="flex items-center justify-around px-1 py-1">
+      <div className="mx-auto flex w-full max-w-2xl items-center justify-between gap-1 px-2 py-2">
         {tabs.map((tab) => (
           <Button
             key={tab.id}
@@ -25,12 +25,10 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
             data-active={activeTab === tab.id}
             aria-current={activeTab === tab.id ? 'page' : undefined}
             onClick={() => onTabChange(tab.id)}
-            className={cn(
-              'min-w-[68px] px-2'
-            )}
+            className={cn('flex-1')}
           >
-            <tab.icon className={cn('w-6 h-6', activeTab === tab.id && 'stroke-[2.5]')} />
-            <span className="text-xs font-medium">{tab.label}</span>
+            <tab.icon className={cn('w-7 h-7', activeTab === tab.id && 'stroke-[2.5]')} />
+            <span className="text-[12px] font-medium leading-none truncate">{tab.label}</span>
           </Button>
         ))}
       </div>

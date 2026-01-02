@@ -1,73 +1,89 @@
-# Welcome to your Lovable project
+# Claru Calm Coaching
 
-## Project info
+An AI-powered calm coaching app that helps users build sustainable foundations for focus, energy, and meaningful work through daily check-ins and structured conversations.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Current Status
 
-## How can I edit this code?
+**Phase**: Core Feature Development
+**Last Updated**: 2026-01-02
 
-There are several ways of editing your application.
+### What This App Does
 
-**Use Lovable**
+Claru Calm Coaching provides:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+1. **Morning & Evening Check-ins**: Mode-aware conversational coaching that adapts to the time of day
+2. **Daily Note Auto-Population**: AI extracts structured data from natural conversations (brain dump, Top 3, meetings, time blocks) and auto-populates Obsidian-style daily notes
+3. **Foundation-Based Growth**: Three-phase journey (Discover → Explore → Practice) for building sustainable habits
+4. **Seamless Trial-to-Signup**: Preserves conversation history when users convert from trial mode to full accounts
+5. **Voice Interaction**: Transcription-enabled coaching with real-time feedback
 
-Changes made via Lovable will be committed automatically to this repo.
+### Recent Session Accomplishments (2026-01-02)
 
-**Use your preferred IDE**
+**Terminology Update**: Renamed "Challenges" to "Foundations" across the entire app, establishing a more supportive, growth-oriented framework.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+**Conversation Persistence**: Verified and tested RLS policies ensuring chat messages are properly scoped by user_id, with seamless session continuity.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+**Trial Migration**: Built migration logic so trial users don't lose their conversation history when they sign up.
 
-Follow these steps:
+**Daily Note Intelligence**: Implemented AI-powered extraction of check-in data into structured daily note format, matching Obsidian template conventions.
+
+**Foundation Flow**: Wired up "Start Foundation" button to navigate directly to chat with auto-sent initialization message.
+
+### Tech Stack
+
+- **Frontend**: Vite, TypeScript, React, shadcn-ui, Tailwind CSS
+- **Backend**: Supabase (PostgreSQL, RLS, Edge Functions)
+- **AI**: Claude (Anthropic) via Edge Functions
+- **Deployment**: Lovable (with plans for Vercel/Netlify preview deployments)
+
+### Key Decisions Made
+
+1. **Database Architecture**: User-scoped chat messages via RLS (no anonymous session handling)
+2. **Migration Strategy**: Trial messages transfer on signup to preserve UX continuity
+3. **AI Extraction**: Structured prompts in `coach-reply` Edge Function parse conversations into Daily Note fields
+4. **Navigation Pattern**: Direct handoff from Impact → Chat for foundation workflows
+
+### Next Steps
+
+- Test end-to-end Foundation flow (Impact → Chat → Daily Note population)
+- Verify trial-to-signup migration in production environment
+- Set up preview deployments for PR-based testing
+- Continue UI polish and coaching prompt refinement
+
+---
+
+## Development Setup
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Clone the repository
+git clone https://github.com/spartacus3131/claru-calm-coaching.git
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Navigate to project directory
+cd claru-calm-coaching
 
-# Step 3: Install the necessary dependencies.
+# Install dependencies
 npm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Project Structure
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- `/src/components`: React components (UI, layout, coaching interface)
+- `/src/integrations/supabase`: Database client and types
+- `/supabase/functions`: Edge Functions (coach-reply, etc.)
+- `/supabase/migrations`: Database schema and RLS policies
 
-**Use GitHub Codespaces**
+## Environment Variables
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Required environment variables:
+- `VITE_SUPABASE_URL`: Supabase project URL
+- `VITE_SUPABASE_ANON_KEY`: Supabase anonymous key
+- `ANTHROPIC_API_KEY`: Claude API key (for Edge Functions)
 
-## What technologies are used for this project?
+See `.env.example` for complete list.
 
-This project is built with:
+---
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+**Questions or Issues?** Check the session summary (`claru-calm-coaching-session-summary.md`) or TODO list (`TODO.md`) for context and next steps.
