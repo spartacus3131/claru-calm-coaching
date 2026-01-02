@@ -139,6 +139,10 @@ Output a short, structured plan like:
 IMPORTANT FORMATTING (match the user's Obsidian daily note template):
 - When you lock the plan, output it as Markdown using EXACT section titles and checkbox formatting.
 - Use this exact skeleton (fill in items; keep the structure identical):
+- The first three lines MUST be exactly:
+  1) ${todayIso}
+  2) (blank line)
+  3) # ${todayIso}
 
 ${todayIso}
 
