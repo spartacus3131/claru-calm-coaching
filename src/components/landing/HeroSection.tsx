@@ -10,12 +10,12 @@ export function HeroSection({ onStart }: HeroSectionProps) {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-background via-background to-accent/5 flex flex-col">
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-            <Brain className="w-4 h-4 text-primary" />
+          <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
+            <Brain className="w-4 h-4 text-accent" />
           </div>
           <span className="font-semibold text-foreground">Claru</span>
         </div>
@@ -33,7 +33,7 @@ export function HeroSection({ onStart }: HeroSectionProps) {
       <main className="flex-1 flex flex-col items-center justify-center px-6 text-center max-w-xl mx-auto">
         {/* Greeting */}
         <div className="mb-8 animate-fade-in">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-base font-medium mb-6">
             <Mic className="w-4 h-4" />
             Voice-first productivity coach
           </div>
@@ -46,10 +46,10 @@ export function HeroSection({ onStart }: HeroSectionProps) {
         {/* The Hook */}
         <div className="space-y-4 text-lg text-muted-foreground mb-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
           <p>
-            Do you feel <span className="text-foreground font-medium">overwhelmed</span> by what you have to get done and uncertain of how to do it?
+            Do you feel <span className="text-accent font-medium">overwhelmed</span> by what you have to get done and uncertain of how to do it?
           </p>
           <p>
-            Do you want to feel more <span className="text-foreground font-medium">fulfilled</span> in your daily life and more <span className="text-foreground font-medium">productive</span>?
+            Do you want to feel more <span className="text-accent font-medium">fulfilled</span> in your daily life and more <span className="text-accent font-medium">productive</span>?
           </p>
         </div>
 

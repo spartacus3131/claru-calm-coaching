@@ -25,7 +25,7 @@ export function Header({ showBackToHome }: HeaderProps) {
             variant="ghost" 
             size="icon" 
             onClick={() => navigate('/')}
-            className="text-muted-foreground -ml-2"
+            className="text-accent hover:text-accent/80 -ml-2"
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
