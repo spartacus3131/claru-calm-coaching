@@ -1,19 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
 import { startOfWeek, format } from 'date-fns';
-import { useNavigate } from 'react-router-dom';
 
-export interface HotSpot {
+export interface HotSpotArea {
   id: string;
   name: string;
   description: string;
-  rating: number;
   color: string;
 }
 
-const HOTSPOT_AREAS = [
+export interface HotSpot extends HotSpotArea {
+  rating: number;
+}
+
+const DEFAULT_HOTSPOT_AREAS: HotSpotArea[] = [
   { id: 'mind', name: 'Mind', description: 'Learning, growth, mental clarity', color: 'text-violet-500' },
   { id: 'body', name: 'Body', description: 'Physical health, energy, exercise', color: 'text-rose-500' },
   { id: 'emotions', name: 'Emotions', description: 'Mood, stress, emotional balance', color: 'text-amber-500' },
@@ -25,41 +27,73 @@ const HOTSPOT_AREAS = [
 
 export function useHotSpots() {
   const { user } = useAuth();
+  const [areas, setAreas] = useState<HotSpotArea[]>(DEFAULT_HOTSPOT_AREAS);
   const [hotSpots, setHotSpots] = useState<HotSpot[]>(
-    HOTSPOT_AREAS.map(a => ({ ...a, rating: 5 }))
+    DEFAULT_HOTSPOT_AREAS.map(a => ({ ...a, rating: 5 }))
   );
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [lastCheckin, setLastCheckin] = useState<Date | null>(null);
 
   const currentWeekStart = format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd');
 
-  // Load ratings from database if logged in
+  // Load custom areas and ratings from database if logged in
   useEffect(() => {
     if (!user) {
       setLoading(false);
       return;
     }
 
-    const loadRatings = async () => {
-      const { data, error } = await supabase
+    const loadData = async () => {
+      // Load custom areas
+      const { data: customAreas, error: areasError } = await supabase
+        .from('hotspot_areas')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('position');
+
+      if (areasError) {
+        console.error('Error loading custom areas:', areasError);
+      }
+
+      const userAreas: HotSpotArea[] = customAreas && customAreas.length > 0
+        ? customAreas.map(a => ({
+            id: a.area_id,
+            name: a.name,
+            description: a.description,
+            color: a.color
+          }))
+        : DEFAULT_HOTSPOT_AREAS;
+
+      setAreas(userAreas);
+
+      // Load ratings
+      const { data: ratings, error: ratingsError } = await supabase
         .from('hotspot_ratings')
         .select('*')
         .eq('user_id', user.id)
         .eq('week_start', currentWeekStart);
 
-      if (error) {
-        console.error('Error loading hotspot ratings:', error);
-      } else if (data && data.length > 0) {
-        setHotSpots(prev => prev.map(spot => {
-          const dbRating = data.find(d => d.area === spot.id);
-          return dbRating ? { ...spot, rating: dbRating.rating } : spot;
-        }));
-        setLastCheckin(new Date(data[0].updated_at));
+      if (ratingsError) {
+        console.error('Error loading hotspot ratings:', ratingsError);
       }
+
+      // Merge areas with ratings
+      const mergedHotSpots = userAreas.map(area => {
+        const rating = ratings?.find(r => r.area === area.id);
+        return { ...area, rating: rating?.rating ?? 5 };
+      });
+
+      setHotSpots(mergedHotSpots);
+      
+      if (ratings && ratings.length > 0) {
+        setLastCheckin(new Date(ratings[0].updated_at));
+      }
+      
       setLoading(false);
     };
 
-    loadRatings();
+    loadData();
   }, [user, currentWeekStart]);
 
   const updateRating = (id: string, rating: number) => {
@@ -68,17 +102,58 @@ export function useHotSpots() {
     );
   };
 
-  const saveCheckin = async (): Promise<boolean> => {
+  const updateArea = (id: string, updates: Partial<HotSpotArea>) => {
+    setAreas(prev =>
+      prev.map(area => (area.id === id ? { ...area, ...updates } : area))
+    );
+    setHotSpots(prev =>
+      prev.map(spot => (spot.id === id ? { ...spot, ...updates } : spot))
+    );
+  };
+
+  const saveAreas = async (): Promise<boolean> => {
     if (!user) {
-      // Not logged in - prompt to sign up
+      toast.error('Sign in to save custom areas');
+      return false;
+    }
+
+    try {
+      const upserts = areas.map((area, index) => ({
+        user_id: user.id,
+        area_id: area.id,
+        name: area.name,
+        description: area.description,
+        color: area.color,
+        position: index
+      }));
+
+      const { error } = await supabase
+        .from('hotspot_areas')
+        .upsert(upserts, { onConflict: 'user_id,area_id' });
+
+      if (error) throw error;
+
+      toast.success('Hot Spot areas saved!');
+      return true;
+    } catch (error) {
+      console.error('Error saving areas:', error);
+      toast.error('Failed to save areas');
+      return false;
+    }
+  };
+
+  const saveCheckin = async (): Promise<{ success: boolean; summary?: string }> => {
+    if (!user) {
       toast.error('Create an account to save your check-in', {
         action: {
           label: 'Sign up',
           onClick: () => window.location.href = '/auth'
         }
       });
-      return false;
+      return { success: false };
     }
+
+    setSaving(true);
 
     try {
       const upserts = hotSpots.map(spot => ({
@@ -97,16 +172,53 @@ export function useHotSpots() {
       if (error) throw error;
 
       setLastCheckin(new Date());
+
+      // Generate a summary for the coach
+      const summary = generateHotSpotsSummary(hotSpots);
+
       toast.success('Hot Spots check-in saved!', {
-        description: 'Great job reflecting on your life balance.'
+        description: 'Generating your reflection...'
       });
-      return true;
+
+      return { success: true, summary };
     } catch (error) {
       console.error('Error saving check-in:', error);
       toast.error('Failed to save check-in');
-      return false;
+      return { success: false };
+    } finally {
+      setSaving(false);
     }
   };
 
-  return { hotSpots, loading, lastCheckin, updateRating, saveCheckin, isAuthenticated: !!user };
+  return { 
+    hotSpots, 
+    areas,
+    loading, 
+    saving,
+    lastCheckin, 
+    updateRating, 
+    updateArea,
+    saveAreas,
+    saveCheckin, 
+    isAuthenticated: !!user 
+  };
+}
+
+function generateHotSpotsSummary(hotSpots: HotSpot[]): string {
+  const average = hotSpots.reduce((acc, s) => acc + s.rating, 0) / hotSpots.length;
+  const lowest = hotSpots.reduce((min, s) => s.rating < min.rating ? s : min, hotSpots[0]);
+  const highest = hotSpots.reduce((max, s) => s.rating > max.rating ? s : max, hotSpots[0]);
+
+  const ratingsText = hotSpots
+    .map(s => `${s.name}: ${s.rating}/10`)
+    .join(', ');
+
+  return `[Hot Spots Weekly Check-in]
+My ratings this week: ${ratingsText}
+
+Overall balance: ${average.toFixed(1)}/10
+Strongest area: ${highest.name} (${highest.rating}/10)
+Area needing attention: ${lowest.name} (${lowest.rating}/10)
+
+Please give me a brief, supportive reflection on my life balance this week.`;
 }

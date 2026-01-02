@@ -8,17 +8,23 @@ import { HotSpotsScreen } from '@/screens/HotSpotsScreen';
 
 const Try = () => {
   const [activeTab, setActiveTab] = useState('chat');
+  const [pendingHotSpotsSummary, setPendingHotSpotsSummary] = useState<string | null>(null);
+
+  const handleHotSpotsCheckin = (summary: string) => {
+    setPendingHotSpotsSummary(summary);
+    setActiveTab('chat');
+  };
 
   const renderScreen = () => {
     switch (activeTab) {
       case 'chat':
-        return <ChatScreen />;
+        return <ChatScreen autoMessage={pendingHotSpotsSummary} onAutoMessageSent={() => setPendingHotSpotsSummary(null)} />;
       case 'impact':
         return <ImpactScreen />;
       case 'parking':
         return <ParkingLotScreen />;
       case 'hotspots':
-        return <HotSpotsScreen />;
+        return <HotSpotsScreen onCheckinComplete={handleHotSpotsCheckin} />;
       default:
         return <ChatScreen />;
     }
