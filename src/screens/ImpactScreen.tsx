@@ -54,10 +54,10 @@ export function ImpactScreen() {
             {/* Daily Summary Placeholder */}
             <div className="p-4 rounded-xl bg-card border border-border/50">
               <div className="flex items-center gap-2 mb-3">
-                <Calendar className="w-5 h-5 text-primary" />
-                <h3 className="font-medium text-foreground">Today's Summary</h3>
+                <Calendar className="w-5 h-5 text-accent" />
+                <h3 className="text-base font-semibold text-foreground">Today's Summary</h3>
               </div>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-base text-muted-foreground">
                 Complete your daily check-in to see your summary here.
               </p>
             </div>
@@ -65,18 +65,18 @@ export function ImpactScreen() {
             {/* Weekly Goals Placeholder */}
             <div className="p-4 rounded-xl bg-card border border-border/50">
               <div className="flex items-center gap-2 mb-3">
-                <Target className="w-5 h-5 text-primary" />
-                <h3 className="font-medium text-foreground">Weekly Goals</h3>
+                <Target className="w-5 h-5 text-accent" />
+                <h3 className="text-base font-semibold text-foreground">Weekly Goals</h3>
               </div>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-base text-muted-foreground">
                 Set goals during your check-ins to track them here.
               </p>
             </div>
 
             {/* Active Challenges Preview */}
             <div>
-              <h3 className="text-sm font-medium text-muted-foreground mb-3">Active Challenges</h3>
-              <p className="text-sm text-muted-foreground">
+              <h3 className="text-base font-semibold text-accent mb-3">Active Challenges</h3>
+              <p className="text-base text-muted-foreground">
                 Check the Challenges tab to see all {CHALLENGES.length} challenges organized by part.
               </p>
             </div>
@@ -143,11 +143,11 @@ export function ImpactScreen() {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-16 text-center">
-                <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
-                  <Sparkles className="w-7 h-7 text-muted-foreground" />
+                <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mb-4">
+                  <Sparkles className="w-7 h-7 text-accent" />
                 </div>
-                <h3 className="font-medium text-foreground mb-1">Building your insights</h3>
-                <p className="text-sm text-muted-foreground max-w-xs">
+                <h3 className="text-base font-semibold text-foreground mb-1">Building your insights</h3>
+                <p className="text-base text-muted-foreground max-w-xs">
                   Complete a few more check-ins so we can spot your patterns.
                 </p>
               </div>
