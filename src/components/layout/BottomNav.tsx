@@ -23,10 +23,10 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
             key={tab.id}
             variant="nav"
             data-active={activeTab === tab.id}
+            aria-current={activeTab === tab.id ? 'page' : undefined}
             onClick={() => onTabChange(tab.id)}
             className={cn(
-              'min-w-[56px] px-2',
-              activeTab === tab.id ? 'text-accent' : 'text-muted-foreground'
+              'min-w-[68px] px-2'
             )}
           >
             <tab.icon className={cn('w-6 h-6', activeTab === tab.id && 'stroke-[2.5]')} />

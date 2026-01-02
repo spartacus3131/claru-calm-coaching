@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { VoiceRecorder } from './VoiceRecorder';
+import { cn } from '@/lib/utils';
 
 interface ChatComposerProps {
   onSend: (message: string) => void;
@@ -11,6 +12,7 @@ interface ChatComposerProps {
 
 export function ChatComposer({ onSend, onVoiceMessage, disabled }: ChatComposerProps) {
   const [message, setMessage] = useState('');
+  const canSend = Boolean(message.trim()) && !disabled;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,7 +23,10 @@ export function ChatComposer({ onSend, onVoiceMessage, disabled }: ChatComposerP
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center gap-3 p-4 border-t border-border/30 bg-background">
+    <form
+      onSubmit={handleSubmit}
+      className="flex items-center gap-3 p-4 border-t border-border/30 bg-background"
+    >
       <VoiceRecorder onTranscription={onVoiceMessage} />
       
       <div className="flex-1 flex items-end bg-secondary/50 rounded-2xl pl-4 pr-1.5 py-1.5 min-h-[48px]">
@@ -47,7 +52,12 @@ export function ChatComposer({ onSend, onVoiceMessage, disabled }: ChatComposerP
           type="submit"
           size="icon"
           disabled={!message.trim() || disabled}
-          className="h-10 w-10 rounded-full bg-accent hover:bg-accent/90 text-accent-foreground shrink-0 mb-0.5"
+          className={cn(
+            "h-10 w-10 rounded-full shrink-0 mb-0.5 border-2 transition-colors",
+            canSend
+              ? "bg-accent text-accent-foreground border-accent/70 hover:bg-accent/90"
+              : "bg-secondary/60 text-muted-foreground border-transparent"
+          )}
         >
           <Send className="w-5 h-5" />
         </Button>
