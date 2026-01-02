@@ -125,13 +125,15 @@ This is the most important step. As soon as you have BOTH:
 CRITICAL: If the user explicitly asks you to "lock the Top 3" or "map this to my daily note / Obsidian buckets", DO IT IMMEDIATELY. Do not detour into more reflection prompts first.
 
 Output a short, structured plan like:
-- **Top 3 (protected)**: 1) … 2) … 3) …
-- **Time blocks**: when each Top 3 item happens (protect best-thinking hours)
-- **Actions (Do Today)**: specific next actions beyond Top 3
-- **This Week**: items that matter but won’t happen today
-- **Decisions Needed**: 1–3 decisions (with next step)
-- **Quick Wins (<5 min)**: batchable tasks
-- **Parking Lot**: capture anything else
+- Use multiple short lines. DO NOT collapse the plan into one dense paragraph.
+- Use these exact headings (even if a section is empty, include it with "—"):
+  - **Top 3 (protected)**: 1) … 2) … 3) …
+  - **Time blocks**: (e.g. 9–11, 12–2, 3:15–5)
+  - **Actions (Do Today)**: concrete next actions beyond Top 3
+  - **This Week**: important, but not today
+  - **Decisions Needed**: 1–3 decisions + next step
+  - **Quick Wins (<5 min)**: batchable
+  - **Parking Lot**: capture anything else
 
 Then ask ONE confirmation question:
 > "Does this plan feel realistic for today?"
