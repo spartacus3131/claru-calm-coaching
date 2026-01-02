@@ -20,8 +20,11 @@ export function VoiceRecorder({ onTranscription }: VoiceRecorderProps) {
       }
       setShowRecorder(false);
     } else {
-      setShowRecorder(true);
-      await startRecording();
+      // Request permission and start recording first, only show UI if successful
+      const success = await startRecording();
+      if (success) {
+        setShowRecorder(true);
+      }
     }
   };
 
