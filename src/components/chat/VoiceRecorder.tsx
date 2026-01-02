@@ -37,19 +37,19 @@ export function VoiceRecorder({ onTranscription }: VoiceRecorderProps) {
 
   if (!showRecorder) {
     return (
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={handleToggleRecording}
-        className="text-muted-foreground hover:text-foreground"
-        disabled={isProcessing}
-      >
-        {isProcessing ? (
-          <Loader2 className="w-5 h-5 animate-spin" />
-        ) : (
-          <Mic className="w-5 h-5" />
-        )}
-      </Button>
+      <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleToggleRecording}
+          className="text-muted-foreground hover:text-foreground"
+          disabled={isProcessing}
+        >
+          {isProcessing ? <Loader2 className="w-5 h-5 animate-spin" /> : <Mic className="w-5 h-5" />}
+        </Button>
+
+        {error && <span className="text-xs text-destructive">{error}</span>}
+      </div>
     );
   }
 
