@@ -350,7 +350,12 @@ serve(async (req) => {
     return new Response('ok', { headers: corsHeaders });
   }
 
+  let debug = false;
+
   try {
+    const body = await req.json();
+    debug = body?.debug === true;
+
     const {
       message,
       conversationHistory,
@@ -358,8 +363,7 @@ serve(async (req) => {
       weeklyTop3Projects,
       waitingOnItems,
       todaysMeetings,
-      debug,
-    } = await req.json();
+    } = body ?? {};
 
     if (!message) {
       throw new Error('No message provided');
