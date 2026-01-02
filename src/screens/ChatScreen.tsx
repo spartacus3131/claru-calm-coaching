@@ -1,21 +1,40 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { MessageBubble } from '@/components/chat/MessageBubble';
 import { TypingIndicator } from '@/components/chat/TypingIndicator';
 import { QuickReplies } from '@/components/chat/QuickReplies';
 import { ChatComposer } from '@/components/chat/ChatComposer';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { supabase } from '@/integrations/supabase/client';
 import { useChatMessages } from '@/hooks/useChatMessages';
-import { useAuth } from '@/hooks/useAuth';
 import { Loader2, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Message } from '@/types/claru';
 
-const WELCOME_MESSAGE: Message = {
-  id: 'welcome',
-  role: 'assistant',
-  content: "Hey, let's do your daily check-in. Tell me everything on your mind - work stuff, personal projects, random thoughts. Just dump it all out and I'll help you sort through it.\n\nAs we work together, I'll also introduce you to some challenges that'll help you get clearer on what matters most and how to actually get things done. But first - what's on your plate today?",
-  timestamp: new Date(),
-};
+type CheckInMode = 'morning' | 'evening';
+const CHECKIN_MODE_STORAGE_KEY = 'claru_checkin_mode';
+
+function safeReadCheckInMode(): CheckInMode {
+  try {
+    const saved = localStorage.getItem(CHECKIN_MODE_STORAGE_KEY);
+    return saved === 'evening' ? 'evening' : 'morning';
+  } catch {
+    return 'morning';
+  }
+}
+
+function buildWelcomeMessage(mode: CheckInMode): Message {
+  const content =
+    mode === 'evening'
+      ? "Evening. Let's close out the day well. What went well today—and what's still hanging over you?"
+      : "Hey, let's do your daily check-in. Tell me everything on your mind - work stuff, personal projects, random thoughts. Just dump it all out and I'll help you sort through it.\n\nAs we work together, I'll also introduce you to some challenges that'll help you get clearer on what matters most and how to actually get things done. But first - what's on your plate today?";
+
+  return {
+    id: 'welcome',
+    role: 'assistant',
+    content,
+    timestamp: new Date(),
+  };
+}
 
 interface ChatScreenProps {
   autoMessage?: string | null;
@@ -24,14 +43,26 @@ interface ChatScreenProps {
 
 export function ChatScreen({ autoMessage, onAutoMessageSent }: ChatScreenProps) {
   const { messages, loading, addMessage, isAuthenticated } = useChatMessages();
-  const { user } = useAuth();
   const navigate = useNavigate();
+
+  const [checkInMode, setCheckInMode] = useState<CheckInMode>(() => safeReadCheckInMode());
   const [isTyping, setIsTyping] = useState(false);
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const autoMessageSentRef = useRef(false);
 
+  useEffect(() => {
+    try {
+      localStorage.setItem(CHECKIN_MODE_STORAGE_KEY, checkInMode);
+    } catch {
+      // ignore
+    }
+  }, [checkInMode]);
+
+  const welcomeMessage = useMemo(() => buildWelcomeMessage(checkInMode), [checkInMode]);
+
   // Show welcome message if no messages yet
-  const displayMessages = messages.length === 0 ? [WELCOME_MESSAGE] : messages;
+  const displayMessages = messages.length === 0 ? [welcomeMessage] : messages;
 
   const lastMessage = displayMessages[displayMessages.length - 1];
   const showQuickReplies = lastMessage?.role === 'assistant' && lastMessage?.quickReplies;
@@ -55,22 +86,24 @@ export function ChatScreen({ autoMessage, onAutoMessageSent }: ChatScreenProps) 
     await addMessage('user', content);
 
     setIsTyping(true);
-    
+
     try {
       // Include welcome context if this is the first message
-      const conversationHistory = messages.length === 0 
-        ? [{ role: 'assistant' as const, content: WELCOME_MESSAGE.content }]
-        : messages.map(m => ({ role: m.role, content: m.content }));
-      
+      const conversationHistory =
+        messages.length === 0
+          ? [{ role: 'assistant' as const, content: welcomeMessage.content }]
+          : messages.map((m) => ({ role: m.role, content: m.content }));
+
       const { data, error } = await supabase.functions.invoke('coach-reply', {
-        body: { 
+        body: {
           message: content,
-          conversationHistory 
-        }
+          conversationHistory,
+          mode: checkInMode,
+        },
       });
-      
+
       if (error) throw error;
-      
+
       await addMessage('assistant', data.reply);
     } catch (err) {
       console.error('Error getting response:', err);
@@ -80,13 +113,12 @@ export function ChatScreen({ autoMessage, onAutoMessageSent }: ChatScreenProps) 
     }
   };
 
-  const handleVoiceMessage = async (transcription: string, reply: string) => {
-    await addMessage('user', transcription);
-    await addMessage('assistant', reply);
-  };
-
   const handleQuickReply = (reply: string) => {
     handleSend(reply);
+  };
+
+  const handleVoiceTranscription = (transcription: string) => {
+    handleSend(transcription);
   };
 
   if (loading) {
@@ -105,15 +137,35 @@ export function ChatScreen({ autoMessage, onAutoMessageSent }: ChatScreenProps) 
           <div className="flex items-center gap-2 text-sm text-foreground">
             <Info className="w-4 h-4 text-primary" />
             <span>Try mode – </span>
-            <button 
-              onClick={() => navigate('/auth')}
-              className="text-primary font-medium hover:underline"
-            >
+            <button onClick={() => navigate('/auth')} className="text-primary font-medium hover:underline">
               Sign up to save your progress
             </button>
           </div>
         </div>
       )}
+
+      {/* Check-in mode */}
+      <div className="border-b border-border/30 px-4 py-2 flex items-center justify-between bg-background">
+        <div className="text-sm text-muted-foreground">Check-in</div>
+        <ToggleGroup
+          type="single"
+          value={checkInMode}
+          onValueChange={(value) => {
+            if (value === 'morning' || value === 'evening') {
+              setCheckInMode(value);
+            }
+          }}
+          variant="outline"
+          size="sm"
+        >
+          <ToggleGroupItem value="morning" aria-label="Morning check-in">
+            Morning
+          </ToggleGroupItem>
+          <ToggleGroupItem value="evening" aria-label="Evening reflection">
+            Evening
+          </ToggleGroupItem>
+        </ToggleGroup>
+      </div>
 
       {/* Scrollable content */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
@@ -127,21 +179,14 @@ export function ChatScreen({ autoMessage, onAutoMessageSent }: ChatScreenProps) 
             {isTyping && <TypingIndicator />}
 
             {showQuickReplies && !isTyping && (
-              <QuickReplies
-                replies={lastMessage.quickReplies!}
-                onSelect={handleQuickReply}
-              />
+              <QuickReplies replies={lastMessage.quickReplies!} onSelect={handleQuickReply} />
             )}
           </div>
         </div>
       </div>
 
       {/* Composer */}
-      <ChatComposer 
-        onSend={handleSend} 
-        onVoiceMessage={handleVoiceMessage}
-        disabled={isTyping} 
-      />
+      <ChatComposer onSend={handleSend} onVoiceTranscription={handleVoiceTranscription} disabled={isTyping} />
     </div>
   );
 }

@@ -5,7 +5,7 @@ import { useVoiceRecording } from '@/hooks/useVoiceRecording';
 import { cn } from '@/lib/utils';
 
 interface VoiceRecorderProps {
-  onTranscription?: (text: string, reply: string) => void;
+  onTranscription?: (text: string) => void;
 }
 
 export function VoiceRecorder({ onTranscription }: VoiceRecorderProps) {
@@ -14,9 +14,9 @@ export function VoiceRecorder({ onTranscription }: VoiceRecorderProps) {
 
   const handleToggleRecording = async () => {
     if (isRecording) {
-      const result = await stopRecording();
-      if (result && onTranscription) {
-        onTranscription(result.transcription, result.reply);
+      const transcription = await stopRecording();
+      if (transcription && onTranscription) {
+        onTranscription(transcription);
       }
       setShowRecorder(false);
     } else {
@@ -55,15 +55,15 @@ export function VoiceRecorder({ onTranscription }: VoiceRecorderProps) {
 
   return (
     <div className="flex items-center gap-2 bg-destructive/10 rounded-full px-3 py-1.5">
-      <div className={cn(
-        "w-3 h-3 rounded-full",
-        isRecording && "bg-destructive animate-pulse",
-        isProcessing && "bg-primary"
-      )} />
-      
-      <span className="text-sm text-foreground">
-        {isRecording ? 'Recording...' : 'Processing...'}
-      </span>
+      <div
+        className={cn(
+          'w-3 h-3 rounded-full',
+          isRecording && 'bg-destructive animate-pulse',
+          isProcessing && 'bg-primary'
+        )}
+      />
+
+      <span className="text-sm text-foreground">{isRecording ? 'Recording...' : 'Processing...'}</span>
 
       {isRecording && (
         <>
@@ -87,10 +87,8 @@ export function VoiceRecorder({ onTranscription }: VoiceRecorderProps) {
       )}
 
       {isProcessing && <Loader2 className="w-4 h-4 animate-spin text-primary" />}
-      
-      {error && (
-        <span className="text-xs text-destructive ml-2">{error}</span>
-      )}
+
+      {error && <span className="text-xs text-destructive ml-2">{error}</span>}
     </div>
   );
 }
