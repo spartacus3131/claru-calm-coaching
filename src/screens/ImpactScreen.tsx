@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { InsightCard } from '@/components/insights/InsightCard';
 import { ChallengeDetailDrawer } from '@/components/challenges/ChallengeDetailDrawer';
+import { DailyNotePanel } from '@/components/notes/DailyNotePanel';
 import { mockInsights } from '@/data/mockData';
 import { CHALLENGES, PART_INFO, getChallengesByPart } from '@/data/challenges';
 import { Challenge, ChallengePart } from '@/types/claru';
-import { Sparkles, Trophy, Target, Calendar, ChevronRight } from 'lucide-react';
+import { Sparkles, Trophy, Target, ChevronRight } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 
@@ -51,27 +52,7 @@ export function ImpactScreen() {
           </TabsList>
 
           <TabsContent value="overview" className="space-y-4">
-            {/* Daily Summary Placeholder */}
-            <div className="p-4 rounded-xl bg-card border border-border/50">
-              <div className="flex items-center gap-2 mb-3">
-                <Calendar className="w-5 h-5 text-accent" />
-                <h3 className="text-base font-semibold text-foreground">Today's Summary</h3>
-              </div>
-              <p className="text-base text-muted-foreground">
-                Complete your daily check-in to see your summary here.
-              </p>
-            </div>
-
-            {/* Weekly Goals Placeholder */}
-            <div className="p-4 rounded-xl bg-card border border-border/50">
-              <div className="flex items-center gap-2 mb-3">
-                <Target className="w-5 h-5 text-accent" />
-                <h3 className="text-base font-semibold text-foreground">Weekly Goals</h3>
-              </div>
-              <p className="text-base text-muted-foreground">
-                Set goals during your check-ins to track them here.
-              </p>
-            </div>
+            <DailyNotePanel />
 
             {/* Active Challenges Preview */}
             <div>
