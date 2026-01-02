@@ -21,27 +21,27 @@ export function ChallengesScreen() {
   return (
     <div className="flex-1 overflow-y-auto safe-bottom">
       <div className="p-4">
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-foreground mb-1">
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-foreground mb-1">
             {CHALLENGES.length} Challenges
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-base text-muted-foreground">
             A journey of growth and self-discovery
           </p>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-8">
           {sortedParts.map(([partId, partInfo]) => {
             const challenges = challengesByPart[partId];
             if (challenges.length === 0) return null;
 
             return (
               <div key={partId}>
-                <h3 className="text-sm font-medium text-accent mb-3">
+                <h3 className="text-base font-semibold text-accent mb-4">
                   Part {partInfo.order}: {partInfo.title}
                 </h3>
                 
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {challenges.map((challenge) => {
                     const globalIndex = CHALLENGES.findIndex(c => c.id === challenge.id) + 1;
                     
@@ -49,21 +49,21 @@ export function ChallengesScreen() {
                       <button
                         key={challenge.id}
                         onClick={() => handleChallengeClick(challenge)}
-                        className="w-full flex items-center gap-4 p-4 rounded-xl bg-card border border-border/30 hover:border-border/60 transition-calm text-left group"
+                        className="w-full flex items-center gap-4 p-4 rounded-xl bg-card border border-border/30 hover:border-border/50 transition-calm text-left group"
                       >
                         {/* Numbered Circle */}
                         <div className={cn(
-                          "w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium shrink-0",
+                          "w-11 h-11 rounded-full flex items-center justify-center text-base font-semibold shrink-0 border-2",
                           challenge.status === 'completed' 
-                            ? "bg-primary/20 text-primary" 
-                            : "bg-accent/20 text-accent"
+                            ? "bg-primary/10 text-primary border-primary/30" 
+                            : "bg-accent/10 text-accent border-accent/30"
                         )}>
                           {globalIndex}
                         </div>
                         
                         {/* Content */}
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-foreground mb-0.5">
+                          <h4 className="text-base font-semibold text-foreground mb-1">
                             {challenge.title}
                           </h4>
                           <p className="text-sm text-muted-foreground line-clamp-2">
