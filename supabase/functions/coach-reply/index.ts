@@ -76,7 +76,7 @@ function getCountGuidance(historyCount: number): string {
 function getMorningChallengeNudge(context: ChallengeNudgeContext): string {
   const {
     currentChallengeNumber = 1,
-    currentChallengeTitle = 'The Values Challenge',
+    currentChallengeTitle = 'The Values Foundation',
     challengeStatus = 'not_started',
     daysSinceLastUpdate = 0,
     totalChallengesCompleted = 0
@@ -88,15 +88,15 @@ function getMorningChallengeNudge(context: ChallengeNudgeContext): string {
 
 ---
 
-## CHALLENGE NUDGE (First Time)
+## FOUNDATION NUDGE (First Time)
 
 **Connect this to something they mentioned.** Don't pitch—coach.
 
 If they mentioned avoiding something, procrastinating, or struggling with focus:
-> "You mentioned [specific thing they said]. There's actually a challenge from Chris Bailey's research that addresses exactly that. Want to hear about it?"
+> "You mentioned [specific thing they said]. There's actually a foundation from Chris Bailey's research that addresses exactly that. Want to hear about it?"
 
 If nothing specific came up, but they seem engaged:
-> "Now that you've got your day mapped out—I'd like to start introducing you to something that can help build lasting habits. Chris Bailey's 22 productivity challenges. They're small experiments, not big overhauls. Interested in hearing about the first one?"
+> "Now that you've got your day mapped out—I'd like to start introducing you to something that can help build lasting habits. Chris Bailey's 22 productivity foundations. They're small experiments, not big overhauls. Interested in hearing about the first one?"
 
 **Key:** This should feel like a natural extension of the conversation, not a sales pitch. If the moment doesn't feel right, skip it.`;
   }
@@ -107,13 +107,13 @@ If nothing specific came up, but they seem engaged:
 
 ---
 
-## CHALLENGE NUDGE (Ready for Next)
+## FOUNDATION NUDGE (Ready for Next)
 
 Acknowledge their progress, then invite:
-> "You finished the last challenge. Nice work. Ready for the next one?"
+> "You finished the last foundation. Nice work. Ready for the next one?"
 
 If yes:
-> "This one's called '${currentChallengeTitle}' (Challenge ${currentChallengeNumber})."
+> "This one's called '${currentChallengeTitle}' (Foundation ${currentChallengeNumber})."
 
 Keep it brief. They know the drill.`;
   }
@@ -124,7 +124,7 @@ Keep it brief. They know the drill.`;
 
 ---
 
-## CHALLENGE NUDGE (Check-In Needed)
+## FOUNDATION NUDGE (Check-In Needed)
 
 It's been ${daysSinceLastUpdate} days. Check in without guilt:
 > "Hey, quick check—how's '${currentChallengeTitle}' going? Haven't heard about it in a few days."
@@ -141,7 +141,7 @@ Meet them where they are.`;
 
 ---
 
-## CHALLENGE NUDGE (In Progress)
+## FOUNDATION NUDGE (In Progress)
 
 Brief check-in:
 > "How's '${currentChallengeTitle}' going?"
@@ -157,7 +157,7 @@ If they're ready to complete it, help them reflect on what they learned.`;
 function getEveningChallengeNudge(context: ChallengeNudgeContext): string {
   const {
     currentChallengeNumber = 1,
-    currentChallengeTitle = 'The Values Challenge',
+    currentChallengeTitle = 'The Values Foundation',
     challengeStatus = 'not_started',
     totalChallengesCompleted = 0
   } = context;
@@ -168,7 +168,7 @@ function getEveningChallengeNudge(context: ChallengeNudgeContext): string {
 
 ---
 
-## CHALLENGE CHECK-IN (Evening - Optional)
+## FOUNDATION CHECK-IN (Evening - Optional)
 
 If the moment feels right, briefly ask:
 > "By the way, did you get a chance to work on '${currentChallengeTitle}' today?"
@@ -185,10 +185,10 @@ Keep it light. They're winding down. Don't add pressure.`;
 
 ---
 
-## CHALLENGE MENTION (Evening)
+## FOUNDATION MENTION (Evening)
 
 If they had a good day, you can mention:
-> "You're ready for the next challenge when you're up for it. We can start it tomorrow if you'd like."
+> "You're ready for the next foundation when you're up for it. We can start it tomorrow if you'd like."
 
 Plant the seed, but don't push. Evening is for closure.`;
   }
@@ -199,10 +199,10 @@ Plant the seed, but don't push. Evening is for closure.`;
 
 ---
 
-## CHALLENGE TEASER (Evening - First Time)
+## FOUNDATION TEASER (Evening - First Time)
 
 If they seem engaged and positive:
-> "Tomorrow, I'd like to introduce you to something that could help—a series of productivity challenges backed by research. Think of them as small experiments. Interested?"
+> "Tomorrow, I'd like to introduce you to something that could help—a series of productivity foundations backed by research. Think of them as small experiments. Interested?"
 
 Soft teaser for morning. No details needed tonight.`;
   }

@@ -35,6 +35,20 @@ export function ChallengeDetailDrawer({ challenge, open, onOpenChange, onStart }
             <DrawerDescription className="text-left text-base">
               {description}
             </DrawerDescription>
+
+            {status !== 'completed' && (
+              <Button
+                variant="calm"
+                className="w-full mt-4"
+                onClick={() => {
+                  onStart?.();
+                  onOpenChange(false);
+                }}
+              >
+                <Play className="w-4 h-4" />
+                Start Foundation
+              </Button>
+            )}
           </DrawerHeader>
 
           {/* Stats */}
@@ -106,21 +120,6 @@ export function ChallengeDetailDrawer({ challenge, open, onOpenChange, onStart }
             )}
           </div>
 
-          {status !== 'completed' && (
-            <div className="mt-6">
-              <Button
-                variant="calm"
-                className="w-full"
-                onClick={() => {
-                  onStart?.();
-                  onOpenChange(false);
-                }}
-              >
-                <Play className="w-4 h-4" />
-                Start Foundation
-              </Button>
-            </div>
-          )}
         </div>
       </DrawerContent>
     </Drawer>
