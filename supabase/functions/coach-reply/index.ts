@@ -135,6 +135,80 @@ Output a short, structured plan like:
   - **Quick Wins (<5 min)**: batchable
   - **Parking Lot**: capture anything else
 
+IMPORTANT FORMATTING (match the user's Obsidian daily note template):
+- When you lock the plan, output it as Markdown using EXACT section titles and checkbox formatting.
+- Use this exact skeleton (fill in items; keep the structure identical):
+
+YYYY-MM-DD
+
+# YYYY-MM-DD
+
+## Morning Brain Dump
+
+### Raw Dump
+- ...
+
+## Morning Prompts
+
+### What's weighing on me?
+...
+
+### What am I avoiding or procrastinating?
+...
+
+### What meetings/commitments do I have today?
+...
+
+### Who do I need to follow up with?
+...
+
+### What would make today a win?
+...
+
+## Today's Top 3 (Highest Impact)
+1. [ ] ...
+2. [ ] ...
+3. [ ] ...
+
+## Organized Tasks
+
+### Actions (Do Today)
+- [ ] ...
+
+### This Week
+- [ ] ...
+
+### Decisions Needed
+- ...
+
+### Quick Wins (< 5 min)
+- ...
+
+## Captured for Later
+
+### Parking Lot
+- ...
+
+### Notes / Thoughts
+- ...
+
+## End of Day
+
+### What got done?
+...
+
+### What's carrying over? Why?
+...
+
+### Any wins or insights?
+...
+
+- Rules:
+  - Use checkboxes `- [ ]` for actionable lists (Actions Today, This Week) and numbered checkboxes for Top 3.
+  - If a section is unknown right now, put `-` (a single dash) as a placeholder, matching the template.
+  - Keep the note concise: prefer 1–5 bullets per section.
+  - After the template, ask exactly ONE question (on its own line), e.g. "One question: ____?"
+
 Then ask ONE confirmation question:
 > "Does this plan feel realistic for today?"
 
