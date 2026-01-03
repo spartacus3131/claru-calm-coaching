@@ -34,10 +34,10 @@ export function HeroSection({ onStart }: HeroSectionProps) {
         {/* H1 - The Hook */}
         <section className="text-center mb-8 animate-fade-in">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground leading-tight mb-4">
-            Every app and notification is competing for your attention.
+            Overwhelmed? Scattered? Struggling to focus?
           </h1>
           <p className="text-xl text-muted-foreground mb-8">
-            You don't need another task manager. You need a way to cut through the noise.
+            In a world of endless distractions, your brain doesn't stand a chance - unless you have a system.
           </p>
 
           {/* Primary CTA */}
