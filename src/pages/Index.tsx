@@ -44,21 +44,21 @@ const Index = () => {
   return (
     <AppFrame>
       <Header />
-      <main className="flex-1 flex flex-col overflow-hidden relative">
-        <div className={`flex-1 flex flex-col ${activeTab === 'chat' ? '' : 'hidden'}`}>
+      <main className="flex-1 min-h-0 flex flex-col overflow-hidden relative">
+        <div className={`flex-1 min-h-0 flex flex-col ${activeTab === 'chat' ? '' : 'hidden'}`}>
           <ChatScreen
             autoMessage={pendingAutoMessage}
             autoFoundation={pendingFoundation}
             onAutoMessageSent={handleAutoMessageSent}
           />
         </div>
-        <div className={`flex-1 flex flex-col overflow-hidden ${activeTab === 'impact' ? '' : 'hidden'}`}>
+        <div className={`flex-1 min-h-0 flex flex-col overflow-hidden ${activeTab === 'impact' ? '' : 'hidden'}`}>
           <ImpactScreen onStartFoundation={handleStartFoundation} />
         </div>
-        <div className={`flex-1 flex flex-col overflow-hidden ${activeTab === 'parking' ? '' : 'hidden'}`}>
+        <div className={`flex-1 min-h-0 flex flex-col overflow-hidden ${activeTab === 'parking' ? '' : 'hidden'}`}>
           <ParkingLotScreen />
         </div>
-        <div className={`flex-1 flex flex-col overflow-hidden ${activeTab === 'hotspots' ? '' : 'hidden'}`}>
+        <div className={`flex-1 min-h-0 flex flex-col overflow-hidden ${activeTab === 'hotspots' ? '' : 'hidden'}`}>
           <HotSpotsScreen onCheckinComplete={handleHotSpotsCheckin} />
         </div>
       </main>

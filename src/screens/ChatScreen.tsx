@@ -247,7 +247,7 @@ export function ChatScreen({ autoMessage, autoFoundation, onAutoMessageSent }: C
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col flex-1 min-h-0">
       {/* Trial mode banner */}
       {!isAuthenticated && (
         <div className="bg-primary/10 border-b border-primary/20 px-4 py-2 flex items-center justify-between">
@@ -285,7 +285,10 @@ export function ChatScreen({ autoMessage, autoFoundation, onAutoMessageSent }: C
       </div>
 
       {/* Scrollable content */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto">
+      <div
+        ref={scrollRef}
+        className="flex-1 min-h-0 overflow-y-auto overscroll-contain touch-pan-y [-webkit-overflow-scrolling:touch]"
+      >
         <div className="p-4 space-y-4">
           {/* Messages */}
           <div className="space-y-4">
