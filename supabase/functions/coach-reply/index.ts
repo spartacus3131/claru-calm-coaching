@@ -759,16 +759,31 @@ serve(async (req) => {
     const countGuidance = getCountGuidance(historyCount);
     const todayIso = new Date().toISOString().slice(0, 10);
 
+    console.log('=== COACH-REPLY DEBUG ===');
     console.log('Received message:', message);
     console.log('Mode:', checkInMode);
-    console.log('Foundation details:', foundationDetails ? `Foundation ${foundationDetails.id}` : 'none');
+    console.log('foundationDetails raw:', JSON.stringify(foundationDetails));
+    console.log('foundationDetails truthy:', !!foundationDetails);
 
     // Use foundation-specific prompt if starting a foundation, otherwise use regular check-in prompts
-    const system = foundationDetails
-      ? buildFoundationIntroPrompt(foundationDetails)
-      : checkInMode === 'evening'
-        ? buildEveningPrompt({ weeklyTop3Projects, countGuidance, challengeContext })
-        : buildMorningPrompt({ weeklyTop3Projects, waitingOnItems, todaysMeetings, todayIso, countGuidance, challengeContext });
+    let promptType = 'morning';
+    let system: string;
+
+    if (foundationDetails) {
+      promptType = 'foundation';
+      system = buildFoundationIntroPrompt(foundationDetails);
+      console.log('Using FOUNDATION prompt for:', foundationDetails.title);
+    } else if (checkInMode === 'evening') {
+      promptType = 'evening';
+      system = buildEveningPrompt({ weeklyTop3Projects, countGuidance, challengeContext });
+      console.log('Using EVENING prompt');
+    } else {
+      system = buildMorningPrompt({ weeklyTop3Projects, waitingOnItems, todaysMeetings, todayIso, countGuidance, challengeContext });
+      console.log('Using MORNING prompt');
+    }
+
+    console.log('Selected prompt type:', promptType);
+    console.log('=== END DEBUG ===');
 
     // Build messages array for Claude
     const messages = [
@@ -806,7 +821,11 @@ serve(async (req) => {
     // Parse out the daily note extraction
     const { cleanReply, dailyNote } = parseDailyNoteExtraction(rawReply);
 
-    return new Response(JSON.stringify({ reply: cleanReply, dailyNote }), {
+    return new Response(JSON.stringify({
+      reply: cleanReply,
+      dailyNote,
+      _debug: { promptType, foundationReceived: !!foundationDetails, version: 'v3-debug' }
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error: unknown) {

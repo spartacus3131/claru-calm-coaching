@@ -117,6 +117,8 @@ export function ChatScreen({ autoMessage, autoFoundation, onAutoMessageSent }: C
 
         if (error) throw error;
 
+        console.log('[handleSend] Edge Function response _debug:', data._debug);
+
         await addMessage('assistant', data.reply);
 
         // If the coach extracted daily note data, save it
