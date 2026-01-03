@@ -32,6 +32,7 @@ interface FoundationDetails {
   actionableTip?: string;
 }
 
+// Force redeploy v4 - 2026-01-03
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -824,7 +825,7 @@ serve(async (req) => {
     return new Response(JSON.stringify({
       reply: cleanReply,
       dailyNote,
-      _debug: { promptType, foundationReceived: !!foundationDetails, version: 'v3-debug' }
+      _debug: { promptType, foundationReceived: !!foundationDetails, version: 'v4-force-redeploy' }
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

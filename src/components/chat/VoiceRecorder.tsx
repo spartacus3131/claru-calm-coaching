@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Mic, MicOff, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useVoiceRecording } from '@/hooks/useVoiceRecording';
@@ -28,8 +28,35 @@ export function VoiceRecorder({ onTranscription, disabled }: VoiceRecorderProps)
     }
   };
 
+  // While recording, allow "Enter" to stop + send (transcribe) immediately.
+  useEffect(() => {
+    if (!isRecording || isProcessing) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Enter') return;
+      if (e.shiftKey || e.altKey || e.ctrlKey || e.metaKey) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+      void handleToggleRecording();
+    };
+
+    document.addEventListener('keydown', onKeyDown, true);
+    return () => document.removeEventListener('keydown', onKeyDown, true);
+  }, [isRecording, isProcessing]);
+
   return (
-    <div className="relative shrink-0">
+    <div className="relative shrink-0 flex items-center gap-2">
+      {isRecording && !isProcessing && (
+        <div className="audio-bars" aria-hidden="true">
+          <span className="audio-bar" />
+          <span className="audio-bar" />
+          <span className="audio-bar" />
+          <span className="audio-bar" />
+          <span className="audio-bar" />
+        </div>
+      )}
+
       <Button
         type="button"
         variant="ghost"
