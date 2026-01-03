@@ -36,16 +36,33 @@ export function HeroSection({ onStart }: HeroSectionProps) {
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground leading-tight mb-4">
             Every app and notification is competing for your attention.
           </h1>
-          <p className="text-xl text-muted-foreground mb-6">
+          <p className="text-xl text-muted-foreground mb-8">
             You don't need another task manager. You need a way to cut through the noise.
           </p>
+
+          {/* Primary CTA */}
+          <Button
+            size="lg"
+            variant="calm"
+            onClick={onStart}
+            className="text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all"
+          >
+            Start your first check-in
+          </Button>
+          <p className="mt-4 text-sm text-muted-foreground">
+            Free to try • No credit card required
+          </p>
+        </section>
+
+        {/* The Brain Truth */}
+        <section className="text-center mb-12 animate-fade-in" style={{ animationDelay: '0.2s' }}>
           <p className="text-lg text-foreground/80">
             Your brain wasn't designed to hold your to-do list. It was designed to solve problems and be creative. Let's get everything out of your head.
           </p>
         </section>
 
         {/* The Journey - Problem → Solution */}
-        <section className="mb-12 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+        <section className="mb-12 animate-fade-in" style={{ animationDelay: '0.4s' }}>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-card/50 border border-border/50 rounded-xl p-6 text-center">
               <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
@@ -75,8 +92,8 @@ export function HeroSection({ onStart }: HeroSectionProps) {
         </section>
 
         {/* The Promise */}
-        <section className="text-center mb-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-          <div className="bg-card/30 border border-border/50 rounded-xl p-6 inline-block mb-8">
+        <section className="text-center animate-fade-in" style={{ animationDelay: '0.6s' }}>
+          <div className="bg-card/30 border border-border/50 rounded-xl p-6 inline-block">
             <p className="text-lg font-medium text-foreground mb-2">
               Two check-ins a day. 15 minutes total.
             </p>
@@ -84,21 +101,6 @@ export function HeroSection({ onStart }: HeroSectionProps) {
               A three-part journey to unlock real productivity.
             </p>
           </div>
-        </section>
-
-        {/* CTA */}
-        <section className="text-center animate-fade-in" style={{ animationDelay: '0.6s' }}>
-          <Button
-            size="lg"
-            variant="calm"
-            onClick={onStart}
-            className="text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all"
-          >
-            Start your first check-in
-          </Button>
-          <p className="mt-4 text-sm text-muted-foreground">
-            Free to try • No credit card required
-          </p>
         </section>
       </main>
     </div>

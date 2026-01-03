@@ -26,3 +26,4 @@ dist-ssr
 # Supabase CLI scratch
 supabase/.temp/
 .cursorrules
+.vercel
