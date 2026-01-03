@@ -1,6 +1,6 @@
 # AI Context: Claru Calm Coaching
 
-Last updated: 2026-01-02
+Last updated: 2026-01-03
 
 ---
 
@@ -41,7 +41,7 @@ Last updated: 2026-01-02
   - [ ] Analytics integration
   - [ ] User feedback loops
 
-**Current Phase**: Testing & Polish (landing page optimized, production deployment active)
+**Current Phase**: Testing & Polish (authentication revamped to passwordless OTP flow)
 
 ---
 
@@ -186,14 +186,14 @@ Claru sounds like a thoughtful friend who happens to have read 300 productivity 
 
 ### Current Focus
 
-**Immediate Priority**: Landing page optimization & production validation
+**Immediate Priority**: Complete OTP authentication flow and validate end-to-end
 
 **Key Tasks**:
-1. Monitor landing page performance (conversion rate, time on page)
-2. End-to-end test: Impact → Start Foundation → Chat → Daily Note population
-3. Validate trial-to-signup migration in production
-4. Consider A/B testing different landing page hooks
-5. Minor UI polish (bottom nav, button styling)
+1. Fix OTP length mismatch (Supabase 8 digits vs UI 6 digits)
+2. Verify OTP code is sent in email body (not just link)
+3. Test OTP flow end-to-end in development
+4. Consider custom SMTP setup for branded emails
+5. End-to-end test: Auth → Impact → Start Foundation → Chat → Daily Note population
 
 ### Relevant Workflow Prompts
 
@@ -282,6 +282,38 @@ Key files to be aware of:
 
 ## Session History Summary
 
+### Session 4 (2026-01-03)
+**Focus**: Authentication migration from password to passwordless OTP
+
+**What Changed**:
+- Removed password-based auth (signUp, signInWithPassword)
+- Implemented magic link OTP flow (sendOtp, verifyOtp)
+- Added email verification UI with 6-digit code entry
+- User stays on page to enter code (no redirect flow)
+- Configured Supabase redirect URLs for production/localhost
+
+**Key Commits**:
+- `dff3039` auth: switch to magic link (passwordless) flow
+- `63ef446` auth: switch to OTP code entry (no redirect)
+
+**Files Modified**:
+- `src/hooks/useAuth.tsx`: Added sendOtp, verifyOtp functions
+- `src/pages/Auth.tsx`: New OTP code entry UI
+
+**What Worked**:
+- OTP flow is simpler than password management
+- Staying on page instead of redirect feels smoother
+- Email-based auth aligns with product simplicity goal
+
+**Blockers Found**:
+- OTP length mismatch: Supabase Email OTP Length set to 8, UI expects 6 digits
+- Need to verify Supabase sends code in email body (not just link)
+
+**What to Watch**:
+- Fix Supabase Email OTP Length setting (dashboard → Auth → Providers → Email OTP)
+- Confirm OTP code appears in email before next session
+- Test end-to-end flow once OTP mismatch is resolved
+
 ### Session 3 (2026-01-03)
 **Focus**: Landing page revamp, voice consistency, production deployment setup
 
@@ -359,4 +391,4 @@ When making changes:
 ---
 
 **Last Session Closed**: 2026-01-03 ("Mischief Managed")
-**Next Recommended Action**: Monitor landing page performance, then test end-to-end Foundation flow
+**Next Recommended Action**: Fix OTP length in Supabase (8 → 6), verify code in email, then test end-to-end auth flow
