@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { VoiceRecorder } from './VoiceRecorder';
+import { useVoiceRecording } from '@/hooks/useVoiceRecording';
 
 interface ChatComposerProps {
   onSend: (message: string) => void;
@@ -11,6 +12,7 @@ interface ChatComposerProps {
 
 export function ChatComposer({ onSend, onVoiceTranscription, disabled }: ChatComposerProps) {
   const [message, setMessage] = useState('');
+  const voice = useVoiceRecording();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,13 +37,22 @@ export function ChatComposer({ onSend, onVoiceTranscription, disabled }: ChatCom
               }
             }
           }}
-          placeholder="Type a message..."
+          placeholder={voice.isRecording ? '' : 'Type a message...'}
           disabled={disabled}
           rows={1}
           className="relative z-10 flex-1 bg-transparent text-foreground placeholder:text-muted-foreground text-base leading-6 focus:outline-none resize-none max-h-32 overflow-y-auto pr-2 py-3 min-h-[24px]"
         />
 
-        <VoiceRecorder onTranscription={onVoiceTranscription} disabled={disabled} />
+        <VoiceRecorder
+          onTranscription={onVoiceTranscription}
+          disabled={disabled}
+          isRecording={voice.isRecording}
+          isProcessing={voice.isProcessing}
+          audioLevel={voice.audioLevel}
+          error={voice.error}
+          startRecording={voice.startRecording}
+          stopRecording={voice.stopRecording}
+        />
 
         <Button
           type="submit"

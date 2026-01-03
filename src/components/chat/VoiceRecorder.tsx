@@ -1,17 +1,30 @@
 import { useEffect, useState } from 'react';
 import { Mic, MicOff, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useVoiceRecording } from '@/hooks/useVoiceRecording';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
 interface VoiceRecorderProps {
   onTranscription?: (text: string) => void;
   disabled?: boolean;
+  isRecording: boolean;
+  isProcessing: boolean;
+  audioLevel: number;
+  error: string | null;
+  startRecording: () => Promise<boolean>;
+  stopRecording: () => Promise<string | null>;
 }
 
-export function VoiceRecorder({ onTranscription, disabled }: VoiceRecorderProps) {
-  const { isRecording, isProcessing, audioLevel, error, startRecording, stopRecording } = useVoiceRecording();
+export function VoiceRecorder({
+  onTranscription,
+  disabled,
+  isRecording,
+  isProcessing,
+  audioLevel,
+  error,
+  startRecording,
+  stopRecording,
+}: VoiceRecorderProps) {
   const [isRequestingMic, setIsRequestingMic] = useState(false);
 
   const handleToggleRecording = async () => {
