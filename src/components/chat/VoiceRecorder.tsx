@@ -3,6 +3,7 @@ import { Mic, MicOff, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useVoiceRecording } from '@/hooks/useVoiceRecording';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface VoiceRecorderProps {
   onTranscription?: (text: string) => void;
@@ -44,6 +45,12 @@ export function VoiceRecorder({ onTranscription, disabled }: VoiceRecorderProps)
     document.addEventListener('keydown', onKeyDown, true);
     return () => document.removeEventListener('keydown', onKeyDown, true);
   }, [isRecording, isProcessing]);
+
+  // Show mic errors as a toast because the chat input container clips overflow.
+  useEffect(() => {
+    if (!error) return;
+    toast.error(error);
+  }, [error]);
 
   const scaledLevel = Math.min(1, audioLevel * 4); // boost typical speaking levels
   const isSilent = scaledLevel < 0.08;
