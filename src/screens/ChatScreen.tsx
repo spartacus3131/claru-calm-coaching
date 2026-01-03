@@ -9,7 +9,7 @@ import { useChatMessages } from '@/hooks/useChatMessages';
 import { useDailyNote } from '@/hooks/useDailyNote';
 import { Loader2, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Message } from '@/types/claru';
+import { Message, Foundation } from '@/types/claru';
 
 type CheckInMode = 'morning' | 'evening';
 const CHECKIN_MODE_STORAGE_KEY = 'claru_checkin_mode';
@@ -26,8 +26,8 @@ function safeReadCheckInMode(): CheckInMode {
 function buildWelcomeMessage(mode: CheckInMode): Message {
   const content =
     mode === 'evening'
-      ? "Day's winding down. How'd it go?"
-      : "Let's get clear on your day.\n\nWhat's on your mind? Tasks, worries, ideas, things you're avoiding—get it all out. Don't filter.";
+      ? "Time to close out the day.\n\nWhat got done? What's carrying over? Just tell me how it went.\n\n🎤 Tap the mic if talking is easier."
+      : "Your brain is meant to solve problems and be creative—not store to-do lists.\n\nThe first step to getting things done is getting everything out of your head. Just tell me what's on your mind right now—tasks, worries, things you need to do. We'll sort through it together.\n\n🎤 Tap the mic if talking is easier.";
 
   return {
     id: 'welcome',
@@ -39,16 +39,18 @@ function buildWelcomeMessage(mode: CheckInMode): Message {
 
 interface ChatScreenProps {
   autoMessage?: string | null;
+  autoFoundation?: Foundation | null;
   onAutoMessageSent?: () => void;
 }
 
-export function ChatScreen({ autoMessage, onAutoMessageSent }: ChatScreenProps) {
+export function ChatScreen({ autoMessage, autoFoundation, onAutoMessageSent }: ChatScreenProps) {
   const { messages, loading, addMessage, isAuthenticated } = useChatMessages();
   const { mergeChatExtraction } = useDailyNote();
   const navigate = useNavigate();
 
   const [checkInMode, setCheckInMode] = useState<CheckInMode>(() => safeReadCheckInMode());
   const [isTyping, setIsTyping] = useState(false);
+  const [pendingFoundationForSend, setPendingFoundationForSend] = useState<Foundation | null>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const lastAutoMessageRef = useRef<string | null>(null);
@@ -73,7 +75,7 @@ export function ChatScreen({ autoMessage, onAutoMessageSent }: ChatScreenProps) 
   const showQuickReplies = lastMessage?.role === 'assistant' && lastMessage?.quickReplies;
 
   const handleSend = useCallback(
-    async (content: string) => {
+    async (content: string, foundation?: Foundation | null) => {
       await addMessage('user', content);
 
       setIsTyping(true);
@@ -85,11 +87,27 @@ export function ChatScreen({ autoMessage, onAutoMessageSent }: ChatScreenProps) 
             ? [{ role: 'assistant' as const, content: welcomeMessage.content }]
             : messages.map((m) => ({ role: m.role, content: m.content }));
 
+        // Prepare foundation details for the Edge Function if starting a foundation
+        const foundationDetails = foundation ? {
+          id: foundation.id,
+          title: foundation.title,
+          description: foundation.description,
+          time: foundation.time,
+          energy: foundation.energy,
+          value: foundation.value,
+          whatYouGet: foundation.whatYouGet,
+          steps: foundation.steps,
+          tips: foundation.tips,
+          researchInsight: foundation.researchInsight,
+          actionableTip: foundation.actionableTip,
+        } : undefined;
+
         const { data, error } = await supabase.functions.invoke('coach-reply', {
           body: {
             message: content,
             conversationHistory,
             mode: checkInMode,
+            foundationDetails,
           },
         });
 
@@ -106,6 +124,7 @@ export function ChatScreen({ autoMessage, onAutoMessageSent }: ChatScreenProps) 
         await addMessage('assistant', "I'm having trouble responding right now. Let's try again in a moment.");
       } finally {
         setIsTyping(false);
+        setPendingFoundationForSend(null);
       }
     },
     [addMessage, messages, welcomeMessage.content, checkInMode, mergeChatExtraction]
@@ -117,15 +136,15 @@ export function ChatScreen({ autoMessage, onAutoMessageSent }: ChatScreenProps) 
     }
   }, [displayMessages, isTyping]);
 
-  // Handle auto-message from Hot Spots check-in
+  // Handle auto-message from Hot Spots check-in or Start Foundation
   useEffect(() => {
     if (!autoMessage || loading) return;
     if (lastAutoMessageRef.current === autoMessage) return;
 
     lastAutoMessageRef.current = autoMessage;
-    void handleSend(autoMessage);
+    void handleSend(autoMessage, autoFoundation);
     onAutoMessageSent?.();
-  }, [autoMessage, loading, handleSend, onAutoMessageSent]);
+  }, [autoMessage, autoFoundation, loading, handleSend, onAutoMessageSent]);
 
 
   const handleQuickReply = (reply: string) => {

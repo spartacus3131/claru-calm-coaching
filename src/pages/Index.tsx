@@ -9,11 +9,12 @@ import { ParkingLotScreen } from '@/screens/ParkingLotScreen';
 import { HotSpotsScreen } from '@/screens/HotSpotsScreen';
 import { HeroSection } from '@/components/landing/HeroSection';
 import { useAuth } from '@/hooks/useAuth';
-import { Challenge } from '@/types/claru';
+import { Challenge, Foundation } from '@/types/claru';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('chat');
   const [pendingAutoMessage, setPendingAutoMessage] = useState<string | null>(null);
+  const [pendingFoundation, setPendingFoundation] = useState<Foundation | null>(null);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -27,33 +28,39 @@ const Index = () => {
     setActiveTab('chat');
   };
 
-  const handleStartFoundation = (foundation: Challenge) => {
+  const handleStartFoundation = (foundation: Foundation) => {
     const message = `I want to start Foundation ${foundation.id}: ${foundation.title}`;
     setPendingAutoMessage(message);
+    setPendingFoundation(foundation);
     setActiveTab('chat');
   };
 
-  // Logged in users go straight to the app
-  const renderScreen = () => {
-    switch (activeTab) {
-      case 'chat':
-        return <ChatScreen autoMessage={pendingAutoMessage} onAutoMessageSent={() => setPendingAutoMessage(null)} />;
-      case 'impact':
-        return <ImpactScreen onStartFoundation={handleStartFoundation} />;
-      case 'parking':
-        return <ParkingLotScreen />;
-      case 'hotspots':
-        return <HotSpotsScreen onCheckinComplete={handleHotSpotsCheckin} />;
-      default:
-        return <ChatScreen />;
-    }
+  const handleAutoMessageSent = () => {
+    setPendingAutoMessage(null);
+    setPendingFoundation(null);
   };
 
+  // Render all screens but only show active one (preserves state across tab switches)
   return (
     <AppFrame>
       <Header />
-      <main className="flex-1 flex flex-col overflow-hidden">
-        {renderScreen()}
+      <main className="flex-1 flex flex-col overflow-hidden relative">
+        <div className={`flex-1 flex flex-col ${activeTab === 'chat' ? '' : 'hidden'}`}>
+          <ChatScreen
+            autoMessage={pendingAutoMessage}
+            autoFoundation={pendingFoundation}
+            onAutoMessageSent={handleAutoMessageSent}
+          />
+        </div>
+        <div className={`flex-1 flex flex-col overflow-hidden ${activeTab === 'impact' ? '' : 'hidden'}`}>
+          <ImpactScreen onStartFoundation={handleStartFoundation} />
+        </div>
+        <div className={`flex-1 flex flex-col overflow-hidden ${activeTab === 'parking' ? '' : 'hidden'}`}>
+          <ParkingLotScreen />
+        </div>
+        <div className={`flex-1 flex flex-col overflow-hidden ${activeTab === 'hotspots' ? '' : 'hidden'}`}>
+          <HotSpotsScreen onCheckinComplete={handleHotSpotsCheckin} />
+        </div>
       </main>
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
     </AppFrame>

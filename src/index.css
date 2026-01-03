@@ -6,8 +6,63 @@
 @tailwind utilities;
 
 @layer base {
+  /* Light mode - calm, warm, and inviting */
   :root {
-    /* Claru - Calm Productivity */
+    --background: 40 30% 97%;
+    --foreground: 30 15% 15%;
+
+    --card: 40 25% 95%;
+    --card-foreground: 30 15% 15%;
+
+    --popover: 40 25% 95%;
+    --popover-foreground: 30 15% 15%;
+
+    /* Sage green - calm and grounding */
+    --primary: 150 30% 40%;
+    --primary-foreground: 40 20% 98%;
+
+    --secondary: 40 20% 90%;
+    --secondary-foreground: 30 15% 25%;
+
+    --muted: 40 15% 92%;
+    --muted-foreground: 30 10% 45%;
+
+    --accent: 45 65% 50%;
+    --accent-foreground: 30 15% 10%;
+
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 40 20% 98%;
+
+    --border: 40 15% 85%;
+    --input: 40 15% 85%;
+    --ring: 150 30% 40%;
+
+    --radius: 1rem;
+
+    /* Custom Claru tokens */
+    --claru-glow: 150 30% 40%;
+    --claru-focus: 210 55% 45%;
+    --claru-energy: 45 75% 50%;
+    --claru-habit: 150 45% 40%;
+    --claru-productivity: 270 45% 50%;
+
+    /* Message bubbles */
+    --bubble-assistant: 40 20% 92%;
+    --bubble-user: 150 30% 38%;
+
+    /* Sidebar */
+    --sidebar-background: 40 25% 95%;
+    --sidebar-foreground: 30 15% 15%;
+    --sidebar-primary: 150 30% 40%;
+    --sidebar-primary-foreground: 40 20% 98%;
+    --sidebar-accent: 40 20% 90%;
+    --sidebar-accent-foreground: 30 15% 15%;
+    --sidebar-border: 40 15% 85%;
+    --sidebar-ring: 150 30% 40%;
+  }
+
+  /* Dark mode - calm, warm, and cozy */
+  .dark {
     --background: 30 8% 8%;
     --foreground: 40 20% 92%;
 
@@ -37,20 +92,18 @@
     --input: 30 8% 18%;
     --ring: 150 25% 45%;
 
-    --radius: 1rem;
-
     /* Custom Claru tokens */
     --claru-glow: 150 30% 40%;
     --claru-focus: 210 50% 50%;
     --claru-energy: 45 70% 55%;
     --claru-habit: 150 40% 45%;
     --claru-productivity: 270 40% 55%;
-    
+
     /* Message bubbles */
     --bubble-assistant: 30 6% 14%;
     --bubble-user: 150 25% 40%;
 
-    /* Sidebar (unused but required) */
+    /* Sidebar */
     --sidebar-background: 30 8% 8%;
     --sidebar-foreground: 40 20% 92%;
     --sidebar-primary: 150 25% 45%;

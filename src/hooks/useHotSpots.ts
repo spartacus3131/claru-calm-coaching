@@ -9,6 +9,7 @@ export interface HotSpotArea {
   name: string;
   description: string;
   color: string;
+  notes?: string; // Weekly reflection for this area
 }
 
 export interface HotSpot extends HotSpotArea {
@@ -142,7 +143,7 @@ export function useHotSpots() {
     }
   };
 
-  const saveCheckin = async (): Promise<{ success: boolean; summary?: string }> => {
+  const saveCheckin = async (weeklyReflection?: string): Promise<{ success: boolean; summary?: string }> => {
     if (!user) {
       toast.error('Create an account to save your check-in', {
         action: {
@@ -174,7 +175,7 @@ export function useHotSpots() {
       setLastCheckin(new Date());
 
       // Generate a summary for the coach
-      const summary = generateHotSpotsSummary(hotSpots);
+      const summary = generateHotSpotsSummary(hotSpots, weeklyReflection);
 
       toast.success('Hot Spots check-in saved!', {
         description: 'Generating your reflection...'
@@ -204,7 +205,7 @@ export function useHotSpots() {
   };
 }
 
-function generateHotSpotsSummary(hotSpots: HotSpot[]): string {
+function generateHotSpotsSummary(hotSpots: HotSpot[], weeklyReflection?: string): string {
   const average = hotSpots.reduce((acc, s) => acc + s.rating, 0) / hotSpots.length;
   const lowest = hotSpots.reduce((min, s) => s.rating < min.rating ? s : min, hotSpots[0]);
   const highest = hotSpots.reduce((max, s) => s.rating > max.rating ? s : max, hotSpots[0]);
@@ -213,12 +214,16 @@ function generateHotSpotsSummary(hotSpots: HotSpot[]): string {
     .map(s => `${s.name}: ${s.rating}/10`)
     .join(', ');
 
+  const reflectionSection = weeklyReflection?.trim()
+    ? `\n\nMy reflection:\n${weeklyReflection.trim()}`
+    : '';
+
   return `[Hot Spots Weekly Check-in]
 My ratings this week: ${ratingsText}
 
 Overall balance: ${average.toFixed(1)}/10
 Strongest area: ${highest.name} (${highest.rating}/10)
-Area needing attention: ${lowest.name} (${lowest.rating}/10)
+Area needing attention: ${lowest.name} (${lowest.rating}/10)${reflectionSection}
 
 Please give me a brief, supportive reflection on my life balance this week.`;
 }

@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Check, Brain, Heart, Smile, Briefcase, Wallet, Users, PartyPopper, Loader2, Settings2, X } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Check, Brain, Heart, Smile, Briefcase, Wallet, Users, PartyPopper, Loader2, Settings2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useHotSpots, HotSpotArea } from '@/hooks/useHotSpots';
 import {
@@ -46,14 +47,15 @@ export function HotSpotsScreen({ onCheckinComplete }: HotSpotsScreenProps) {
   const { hotSpots, areas, loading, saving, lastCheckin, updateRating, updateArea, saveAreas, saveCheckin, isAuthenticated } = useHotSpots();
   const [editingArea, setEditingArea] = useState<HotSpotArea | null>(null);
   const [editDrawerOpen, setEditDrawerOpen] = useState(false);
+  const [weeklyReflection, setWeeklyReflection] = useState('');
 
   const averageRating = hotSpots.reduce((acc, spot) => acc + spot.rating, 0) / hotSpots.length;
-  const lowestSpot = hotSpots.reduce((lowest, spot) => 
+  const lowestSpot = hotSpots.reduce((lowest, spot) =>
     spot.rating < lowest.rating ? spot : lowest
   , hotSpots[0]);
 
   const handleSaveCheckin = async () => {
-    const result = await saveCheckin();
+    const result = await saveCheckin(weeklyReflection);
     if (result.success && result.summary && onCheckinComplete) {
       onCheckinComplete(result.summary);
     }
@@ -161,6 +163,20 @@ export function HotSpotsScreen({ onCheckinComplete }: HotSpotsScreenProps) {
               </div>
             );
           })}
+        </div>
+
+        {/* Weekly Reflection */}
+        <div className="mt-6 rounded-xl border border-border/50 bg-card p-4">
+          <div className="text-sm font-medium text-foreground mb-2">Weekly Reflection</div>
+          <Textarea
+            value={weeklyReflection}
+            onChange={(e) => setWeeklyReflection(e.target.value)}
+            placeholder="What's going well? What needs attention? Any patterns you're noticing?"
+            className="min-h-[100px]"
+          />
+          <p className="text-xs text-muted-foreground mt-2">
+            This reflection will be shared with Claru for a more personalized response.
+          </p>
         </div>
 
         {/* Save Button */}

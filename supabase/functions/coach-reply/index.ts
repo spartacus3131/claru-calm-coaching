@@ -18,6 +18,20 @@ interface ChallengeNudgeContext {
   totalChallengesCompleted?: number;
 }
 
+interface FoundationDetails {
+  id: number;
+  title: string;
+  description: string;
+  time: string;
+  energy: number;
+  value: number;
+  whatYouGet: string;
+  steps: { content: string }[];
+  tips: string[];
+  researchInsight?: string;
+  actionableTip?: string;
+}
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -646,6 +660,77 @@ Or if they had a rough day:
 - End with closure, not more to-dos${countGuidance}${challengeNudge}${DAILY_NOTE_EXTRACTION_INSTRUCTION}`;
 }
 
+function buildFoundationIntroPrompt(foundation: FoundationDetails): string {
+  return `${CORE_PERSONALITY}
+
+THIS IS A FOUNDATION INTRODUCTION
+
+You're introducing Foundation ${foundation.id}: "${foundation.title}"
+
+---
+
+## FOUNDATION DETAILS
+
+**Title:** ${foundation.title}
+**Description:** ${foundation.description}
+**Time needed:** ${foundation.time}
+**Energy:** ${foundation.energy}/10 | **Value:** ${foundation.value}/10
+
+**What they'll get:**
+${foundation.whatYouGet}
+
+**The steps:**
+${foundation.steps.map((s, i) => `${i + 1}. ${s.content}`).join('\n')}
+
+**Tips:**
+${foundation.tips.map(t => `- ${t}`).join('\n')}
+
+${foundation.researchInsight ? `**Research insight:** ${foundation.researchInsight}` : ''}
+
+---
+
+## HOW TO INTRODUCE THIS
+
+**Remember: You're their coach, not a salesperson. Be warm, be direct, be helpful.**
+
+### 1. ACKNOWLEDGE THEIR CHOICE
+Start by acknowledging they want to work on this foundation:
+> "Great choice. The ${foundation.title} is one of the foundational pieces—let me walk you through it."
+
+### 2. EXPLAIN WHY IT MATTERS (One Insight)
+Share ONE compelling reason this foundation is valuable:
+${foundation.researchInsight ? `> "Here's why this matters: ${foundation.researchInsight}"` : '> Share a brief insight about why this foundation helps.'}
+
+### 3. WALK THROUGH THE EXERCISE
+Guide them through the steps conversationally. Don't dump all steps at once—take them through one at a time:
+- Start with the first step
+- Wait for their response
+- Then guide to the next step
+
+### 4. CREATE AN IF-THEN PLAN
+Help them create an implementation intention:
+> "Let's make this stick. Complete this: 'IF [specific trigger], THEN I will [specific action].'"
+
+${foundation.actionableTip ? `Example: "${foundation.actionableTip}"` : ''}
+
+### 5. SET A SIMPLE NEXT STEP
+> "This takes about ${foundation.time}. When do you want to try the first step?"
+
+---
+
+## GUIDELINES
+
+- ONE question at a time, then listen
+- Keep responses concise (2-4 sentences)
+- Use their words back to them
+- Don't overwhelm—this is a conversation, not a lecture
+- If they seem stuck, offer a simpler starting point
+- End with a clear, concrete next step
+
+**DON'T:** Dump all the information at once, use bullet points in your first message, or sound like you're reading from a script.
+**DO:** Be conversational, meet them where they are, make it feel like coaching.${DAILY_NOTE_EXTRACTION_INSTRUCTION}`;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -662,6 +747,7 @@ serve(async (req) => {
       waitingOnItems,
       todaysMeetings,
       challengeContext,
+      foundationDetails,
     } = body ?? {};
 
     if (!message) {
@@ -675,10 +761,14 @@ serve(async (req) => {
 
     console.log('Received message:', message);
     console.log('Mode:', checkInMode);
+    console.log('Foundation details:', foundationDetails ? `Foundation ${foundationDetails.id}` : 'none');
 
-    const system = checkInMode === 'evening'
-      ? buildEveningPrompt({ weeklyTop3Projects, countGuidance, challengeContext })
-      : buildMorningPrompt({ weeklyTop3Projects, waitingOnItems, todaysMeetings, todayIso, countGuidance, challengeContext });
+    // Use foundation-specific prompt if starting a foundation, otherwise use regular check-in prompts
+    const system = foundationDetails
+      ? buildFoundationIntroPrompt(foundationDetails)
+      : checkInMode === 'evening'
+        ? buildEveningPrompt({ weeklyTop3Projects, countGuidance, challengeContext })
+        : buildMorningPrompt({ weeklyTop3Projects, waitingOnItems, todaysMeetings, todayIso, countGuidance, challengeContext });
 
     // Build messages array for Claude
     const messages = [

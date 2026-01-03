@@ -33,9 +33,12 @@ export function HeroSection({ onStart }: HeroSectionProps) {
       <main className="px-6 py-12 max-w-2xl mx-auto">
         {/* H1 - The Question */}
         <section className="text-center mb-12 animate-fade-in">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground leading-tight mb-4">
             In a world of constant distractions, how do you focus on what actually matters?
           </h1>
+          <p className="text-lg text-muted-foreground">
+            Your AI coach for calm productivity. A few minutes each morning. Total clarity.
+          </p>
         </section>
 
         {/* The Journey - Visual */}

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { format, parseISO } from 'date-fns';
-import { Calendar, Loader2, Lock } from 'lucide-react';
+import { Calendar, Loader2, Lock, Sparkles } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -41,6 +41,15 @@ export function DailyNotePanel() {
 
   return (
     <div className="space-y-4">
+      {/* Auto-fill info banner */}
+      <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 border border-primary/20">
+        <Sparkles className="w-4 h-4 text-primary flex-shrink-0" />
+        <p className="text-xs text-foreground">
+          <span className="font-medium">Auto-fills from your check-ins.</span>{' '}
+          <span className="text-muted-foreground">Chat with Claru and these fields populate automatically. You can also edit manually.</span>
+        </p>
+      </div>
+
       <div className="p-4 rounded-xl bg-card border border-border/50">
         <div className="flex items-center justify-between gap-3 mb-3">
           <div className="flex items-center gap-2">
