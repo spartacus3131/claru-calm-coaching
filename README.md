@@ -20,13 +20,17 @@ Claru Calm Coaching provides:
 
 ### Recent Session Accomplishments (2026-01-03)
 
-**Landing Page Revamp**: Rewrote hero section with problem-first messaging ("Overwhelmed? Scattered? Struggling to focus?") and elevated CTA placement for better conversion.
+**Session 3 - Landing Page & Production Setup**:
+- Rewrote hero section with problem-first messaging ("Overwhelmed? Scattered? Struggling to focus?")
+- Removed em dashes from all AI-generated content for conversational tone
+- Connected GitHub repo to Vercel with auto-deploy on push to main branch
+- Deployed updated coach-reply Edge Function to Supabase
 
-**Voice Consistency**: Removed em dashes from all AI-generated content across the app (prompts, challenges, tips, Edge Functions) for a more conversational tone.
-
-**Production Deployment**: Connected GitHub repo to Vercel with auto-deploy on push to main branch, eliminating manual deployment steps.
-
-**Edge Function Update**: Deployed updated coach-reply function to Supabase with voice calibration improvements and verified system prompt accuracy.
+**Session 4 - Voice Guide Enhancement**:
+- Expanded CORE_PERSONALITY in coach-reply Edge Function from ~25% to 100% of original Voice Guide (577 lines)
+- Added 5 critical voice elements: common phrases library, evidence-citing patterns, story structure, exemplary quotes, Cheesy vs. Calm comparison table
+- Added 5th voice calibration ratio (75% accessible, 25% sophisticated)
+- Deployed enhanced voice system to production and synced to all AI context files (CLAUDE.md, AGENTS.md, GEMINI.md)
 
 ### Tech Stack
 

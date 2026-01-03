@@ -184,4 +184,110 @@ None blocking. All changes committed and pushed to GitHub. Vercel auto-deploying
 - [ ] Continue Foundation flow end-to-end testing
 - [ ] Consider adding social proof / testimonials to landing page
 
+---
+
+## 2026-01-03 (Session 4 - Voice Guide Enhancement & CORE_PERSONALITY Expansion)
+
+**Commits:**
+- (Pending commit with enhanced Voice Guide changes)
+
+**Key Accomplishments:**
+
+### 1. Voice Guide Audit & Gap Analysis
+- Retrieved original comprehensive Voice Guide markdown file (577 lines)
+- Compared against current CORE_PERSONALITY in coach-reply Edge Function
+- Identified that only ~25-30% of the original was captured in the deployed system prompt
+- Systematic review revealed 5 critical missing elements
+
+### 2. CORE_PERSONALITY Enhancement (coach-reply/index.ts)
+Added 5 missing voice elements from the original guide:
+
+**a) Common Phrases Library**
+- Opening phrases: "Here's the thing about...", "Consider this:", "What if the problem isn't [assumption]?"
+- Transitioning phrases: "But here's the rub:", "This points to something deeper:"
+- Acknowledging difficulty: "This is harder than it sounds.", "Most people struggle with this."
+
+**b) Evidence-Citing Patterns**
+- Conversational research references (not academic)
+- Name researchers like characters: "A Stanford psychologist named BJ Fogg discovered..."
+- Use specific numbers: "We check email 88 times per day."
+- Acknowledge limits: "Research suggests..." not "Science proves..."
+
+**c) Story Structure for Insights**
+- Three-step pattern: Story → Principle → Application
+- Open with a specific person in a specific situation
+- Extract the universal truth
+- Show how user can apply it themselves
+
+**d) 10 Exemplary Quotes**
+- "You do not rise to the level of your goals. You fall to the level of your systems."
+- "The dread of doing a task uses up more time and energy than doing the task itself."
+- "When something isn't working, it's usually a systems problem, not a willpower problem."
+- "What would this look like if it were fun?"
+- (Plus 6 more)
+
+**e) Cheesy vs. Calm Comparison Table**
+- Shows what to avoid vs. what to use instead
+- Examples:
+  - Avoid: "You've GOT this!" → Use: "This is harder than it sounds. Here's what makes the difference."
+  - Avoid: "CRUSH your goals!" → Use: "Small wins compound. The goal isn't to do a lot - it's to become the type of person who shows up."
+
+### 3. Voice Calibration Ratio Addition
+- Added missing 5th calibration: "75% accessible, 25% sophisticated (8th-grade reading level with occasional depth)"
+- Now all 5 ratios complete:
+  1. 60% warm, 40% authoritative
+  2. 70% casual, 30% formal
+  3. 65% empathetic, 35% direct
+  4. 75% accessible, 25% sophisticated
+  5. 70% supportive, 30% challenging
+
+### 4. Explicit Em-Dash Rule
+- Added "Use em-dashes (use commas or periods instead)" to THINGS YOU NEVER DO list
+- Resolves conflict with original guide which liked em-dashes
+- Maintains consistency with Session 3 decision to remove em-dashes
+
+### 5. Edge Function Deployment
+- Deployed updated coach-reply function to Supabase (project: pmsbuvzlaoweimkogdaf)
+- Verified deployment succeeded
+- Production system now has full Voice Guide integrated
+
+### 6. AI Context File Updates
+- Updated CLAUDE.md with expanded Voice Guide section
+- Synced identical updates to AGENTS.md and GEMINI.md
+- All AI assistants now have consistent, comprehensive voice guidelines
+
+**Technical Decisions:**
+
+1. **Voice Guide Integration**: Integrated the comprehensive 577-line Voice Guide into the Edge Function's CORE_PERSONALITY section, ensuring the AI coaching tone remains consistent with the original vision
+
+2. **Em-Dash Rule**: Explicitly added "no em-dashes" rule to resolve ambiguity between original guide (liked em-dashes) and Session 3 decision (removed em-dashes)
+
+3. **Exemplary Quotes**: Added 10 specific quotes to give Claude concrete examples of the desired voice (beyond abstract guidelines)
+
+4. **Cheesy vs. Calm Table**: Included comparison table to show concrete contrasts between avoided and preferred language
+
+**Problems Solved:**
+
+1. How to ensure the deployed AI coaching voice matches the original comprehensive Voice Guide
+2. How to provide Claude with concrete examples (not just abstract guidelines)
+3. How to resolve the em-dash ambiguity between original guide and recent decisions
+4. How to make the voice calibration more actionable (phrases, quotes, comparisons vs. just ratios)
+
+**Ideas Explored but Rejected:**
+
+1. Keeping the original guide's em-dash preference (decided to maintain Session 3 consistency)
+2. Summarizing the Voice Guide further (chose to include full detail for better AI fidelity)
+3. Creating a separate voice prompt file (integrated directly into CORE_PERSONALITY for deployment simplicity)
+
+**Outstanding Issues:**
+
+None blocking. All changes staged and ready to commit.
+
+**Next Session:**
+- [ ] Test the enhanced Voice Guide in production (run actual coaching conversations)
+- [ ] Compare AI responses before/after to validate improvement
+- [ ] Monitor for any unintended voice changes (too formal, too casual, etc.)
+- [ ] Continue landing page performance monitoring
+- [ ] Continue Foundation flow end-to-end testing
+
 
