@@ -54,6 +54,9 @@ export function ChatScreen({ autoMessage, autoFoundation, onAutoMessageSent }: C
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const shouldAutoScrollRef = useRef(true);
+  const isUserScrollingRef = useRef(false);
+  const scrollStopTimeoutRef = useRef<number | null>(null);
+  const lastScrollTopRef = useRef(0);
   const lastAutoMessageRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -142,26 +145,59 @@ export function ChatScreen({ autoMessage, autoFoundation, onAutoMessageSent }: C
     const el = scrollRef.current;
     if (!el) return;
 
-    const THRESHOLD_PX = 120;
+    const THRESHOLD_PX = 40;
+
+    const markUserInteracting = () => {
+      isUserScrollingRef.current = true;
+      if (scrollStopTimeoutRef.current != null) {
+        window.clearTimeout(scrollStopTimeoutRef.current);
+      }
+      scrollStopTimeoutRef.current = window.setTimeout(() => {
+        isUserScrollingRef.current = false;
+      }, 180);
+    };
+
     const onScroll = () => {
+      markUserInteracting();
+
+      // If the user scrolls upward at all, immediately disable auto-scroll.
+      const currentTop = el.scrollTop;
+      if (currentTop < lastScrollTopRef.current - 2) {
+        shouldAutoScrollRef.current = false;
+      }
+      lastScrollTopRef.current = currentTop;
+
       const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
       shouldAutoScrollRef.current = distanceFromBottom < THRESHOLD_PX;
     };
 
     el.addEventListener('scroll', onScroll, { passive: true });
+    el.addEventListener('touchstart', markUserInteracting, { passive: true });
+    el.addEventListener('mousedown', markUserInteracting, { passive: true } as AddEventListenerOptions);
     onScroll();
-    return () => el.removeEventListener('scroll', onScroll);
+    return () => {
+      el.removeEventListener('scroll', onScroll);
+      el.removeEventListener('touchstart', markUserInteracting);
+      el.removeEventListener('mousedown', markUserInteracting as EventListener);
+      if (scrollStopTimeoutRef.current != null) {
+        window.clearTimeout(scrollStopTimeoutRef.current);
+        scrollStopTimeoutRef.current = null;
+      }
+    };
   }, []);
 
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
     if (!shouldAutoScrollRef.current) return;
+    if (isUserScrollingRef.current) return;
 
     // Wait a tick for layout so scrollHeight is accurate.
     requestAnimationFrame(() => {
       const el2 = scrollRef.current;
       if (!el2) return;
+      if (!shouldAutoScrollRef.current) return;
+      if (isUserScrollingRef.current) return;
       el2.scrollTop = el2.scrollHeight;
     });
   }, [displayMessages, isTyping]);
