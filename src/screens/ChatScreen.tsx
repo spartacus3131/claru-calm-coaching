@@ -53,6 +53,7 @@ export function ChatScreen({ autoMessage, autoFoundation, onAutoMessageSent }: C
   const [pendingFoundationForSend, setPendingFoundationForSend] = useState<Foundation | null>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
+  const shouldAutoScrollRef = useRef(true);
   const lastAutoMessageRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -136,10 +137,33 @@ export function ChatScreen({ autoMessage, autoFoundation, onAutoMessageSent }: C
     [addMessage, messages, welcomeMessage.content, checkInMode, mergeChatExtraction]
   );
 
+  // Only auto-scroll if the user is already near the bottom (don't fight manual scrolling).
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const THRESHOLD_PX = 120;
+    const onScroll = () => {
+      const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+      shouldAutoScrollRef.current = distanceFromBottom < THRESHOLD_PX;
+    };
+
+    el.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => el.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    if (!shouldAutoScrollRef.current) return;
+
+    // Wait a tick for layout so scrollHeight is accurate.
+    requestAnimationFrame(() => {
+      const el2 = scrollRef.current;
+      if (!el2) return;
+      el2.scrollTop = el2.scrollHeight;
+    });
   }, [displayMessages, isTyping]);
 
   // Handle auto-message from Hot Spots check-in or Start Foundation
