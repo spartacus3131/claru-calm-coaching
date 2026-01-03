@@ -52,7 +52,8 @@ export function VoiceRecorder({ onTranscription, disabled }: VoiceRecorderProps)
     toast.error(error);
   }, [error]);
 
-  const scaledLevel = Math.min(1, audioLevel * 4); // boost typical speaking levels
+  // Boost typical speaking levels so the waveform feels lively like modern voice UIs.
+  const scaledLevel = Math.min(1, audioLevel * 7);
   const isSilent = scaledLevel < 0.08;
 
   return (
@@ -60,12 +61,12 @@ export function VoiceRecorder({ onTranscription, disabled }: VoiceRecorderProps)
       {/* Full-width waveform overlay (positioned relative to the chat input container) */}
       {isRecording && !isProcessing && (
         <div
-          // Constrain the waveform to the text area + mic button, excluding the send button.
+          // Constrain the waveform to the text area ONLY (stop before the mic button).
           // Layout math (from ChatComposer):
           // - container left padding: 16px  => left-4
-          // - right offset to end at mic *right edge*:
-          //   pr-1.5 (6px) + send button (40px) + gap-1 (4px) = 50px
-          className="pointer-events-none absolute left-4 right-[50px] top-1/2 -translate-y-1/2 z-0"
+          // - right offset to end at mic *left edge*:
+          //   pr-1.5 (6px) + send (40px) + gap (4px) + mic (40px) + gap (4px) = 94px
+          className="pointer-events-none absolute left-4 right-[94px] top-1/2 -translate-y-1/2 z-0"
           aria-hidden="true"
         >
           {/* Baseline */}
@@ -73,9 +74,11 @@ export function VoiceRecorder({ onTranscription, disabled }: VoiceRecorderProps)
 
           {/* Bars */}
           <div className="relative h-4 flex items-center justify-between gap-1">
-            {Array.from({ length: 40 }).map((_, i) => {
-              const shape = 0.3 + 0.7 * Math.abs(Math.sin(i * 1.7));
-              const h = 2 + Math.min(14, scaledLevel * 14 * shape);
+            {Array.from({ length: 28 }).map((_, i) => {
+              // Add a subtle traveling-wave feel (updates as meter updates while speaking)
+              const t = typeof performance !== 'undefined' ? performance.now() / 180 : Date.now() / 180;
+              const shape = 0.25 + 0.75 * Math.abs(Math.sin(i * 0.9 + t));
+              const h = 2 + Math.min(18, scaledLevel * 18 * shape);
               return (
                 <span
                   key={i}

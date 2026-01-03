@@ -213,66 +213,6 @@
   animation-delay: 0.4s;
 }
 
-/* Voice recording "audio signal" bars */
-@keyframes audio-bar {
-  0% {
-    transform: scaleY(0.25);
-    opacity: 0.55;
-  }
-  35% {
-    transform: scaleY(1);
-    opacity: 1;
-  }
-  70% {
-    transform: scaleY(0.4);
-    opacity: 0.75;
-  }
-  100% {
-    transform: scaleY(0.25);
-    opacity: 0.55;
-  }
-}
-
-.audio-bars {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  height: 16px;
-}
-
-.audio-bar {
-  width: 3px;
-  height: 100%;
-  border-radius: 9999px;
-  background: hsl(var(--destructive));
-  transform-origin: center bottom;
-  animation: audio-bar 900ms ease-in-out infinite;
-}
-
-.audio-bar:nth-child(1) {
-  animation-delay: 0ms;
-}
-.audio-bar:nth-child(2) {
-  animation-delay: 120ms;
-}
-.audio-bar:nth-child(3) {
-  animation-delay: 240ms;
-}
-.audio-bar:nth-child(4) {
-  animation-delay: 360ms;
-}
-.audio-bar:nth-child(5) {
-  animation-delay: 480ms;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .audio-bar {
-    animation: none;
-    transform: scaleY(0.5);
-    opacity: 0.8;
-  }
-}
-
 /* Smooth transitions */
 .transition-calm {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
