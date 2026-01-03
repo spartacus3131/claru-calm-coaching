@@ -19,6 +19,8 @@ const Try = () => {
   };
 
   const handleStartFoundation = (foundation: Foundation) => {
+    console.log('[Try] handleStartFoundation called with:', foundation.id, foundation.title);
+    console.log('[Try] Foundation has steps:', foundation.steps?.length || 0);
     const message = `I want to start Foundation ${foundation.id}: ${foundation.title}`;
     setPendingAutoMessage(message);
     setPendingFoundation(foundation);

@@ -1,16 +1,17 @@
 import { useState } from 'react';
-import { Mic, MicOff, Loader2, X } from 'lucide-react';
+import { Mic, MicOff, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useVoiceRecording } from '@/hooks/useVoiceRecording';
 import { cn } from '@/lib/utils';
 
 interface VoiceRecorderProps {
   onTranscription?: (text: string) => void;
+  disabled?: boolean;
 }
 
-export function VoiceRecorder({ onTranscription }: VoiceRecorderProps) {
+export function VoiceRecorder({ onTranscription, disabled }: VoiceRecorderProps) {
   const { isRecording, isProcessing, error, startRecording, stopRecording } = useVoiceRecording();
-  const [showRecorder, setShowRecorder] = useState(false);
+  const [isRequestingMic, setIsRequestingMic] = useState(false);
 
   const handleToggleRecording = async () => {
     if (isRecording) {
@@ -18,77 +19,45 @@ export function VoiceRecorder({ onTranscription }: VoiceRecorderProps) {
       if (transcription && onTranscription) {
         onTranscription(transcription);
       }
-      setShowRecorder(false);
     } else {
       // Request permission and start recording first, only show UI if successful
+      setIsRequestingMic(true);
       const success = await startRecording();
-      if (success) {
-        setShowRecorder(true);
-      }
+      setIsRequestingMic(false);
+      void success;
     }
   };
-
-  const handleCancel = () => {
-    if (isRecording) {
-      stopRecording();
-    }
-    setShowRecorder(false);
-  };
-
-  if (!showRecorder) {
-    return (
-      <div className="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleToggleRecording}
-          className="h-12 w-12 rounded-full border-2 border-muted-foreground/30 text-muted-foreground hover:text-foreground hover:border-foreground/50 hover:bg-secondary/50"
-          disabled={isProcessing}
-        >
-          {isProcessing ? <Loader2 className="w-5 h-5 animate-spin" /> : <Mic className="w-5 h-5" />}
-        </Button>
-
-        {error && <span className="text-xs text-destructive">{error}</span>}
-      </div>
-    );
-  }
 
   return (
-    <div className="flex items-center gap-2 bg-destructive/10 rounded-full px-3 py-1.5">
-      <div
+    <div className="relative shrink-0">
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        onClick={handleToggleRecording}
+        disabled={disabled || isProcessing || isRequestingMic}
+        aria-label={
+          isRecording ? 'Stop recording' : isProcessing ? 'Transcribing voice' : 'Start voice recording'
+        }
         className={cn(
-          'w-3 h-3 rounded-full',
-          isRecording && 'bg-destructive animate-pulse',
-          isProcessing && 'bg-primary'
+          'h-10 w-10 rounded-full text-muted-foreground hover:text-foreground hover:bg-background/60',
+          isRecording && 'text-destructive bg-destructive/10 hover:bg-destructive/15 hover:text-destructive'
         )}
-      />
+      >
+        {isProcessing || isRequestingMic ? (
+          <Loader2 className="w-5 h-5 animate-spin" />
+        ) : isRecording ? (
+          <MicOff className="w-5 h-5" />
+        ) : (
+          <Mic className="w-5 h-5" />
+        )}
+      </Button>
 
-      <span className="text-sm text-foreground">{isRecording ? 'Recording...' : 'Processing...'}</span>
-
-      {isRecording && (
-        <>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleToggleRecording}
-            className="h-8 w-8 rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
-          >
-            <MicOff className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleCancel}
-            className="h-8 w-8 text-muted-foreground hover:text-foreground"
-          >
-            <X className="w-4 h-4" />
-          </Button>
-        </>
+      {error && (
+        <div className="absolute top-full right-0 mt-1 text-xs text-destructive whitespace-nowrap max-w-[260px] truncate">
+          {error}
+        </div>
       )}
-
-      {isProcessing && <Loader2 className="w-4 h-4 animate-spin text-primary" />}
-
-      {error && <span className="text-xs text-destructive ml-2">{error}</span>}
     </div>
   );
 }

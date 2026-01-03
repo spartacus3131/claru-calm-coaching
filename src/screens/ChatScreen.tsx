@@ -76,6 +76,8 @@ export function ChatScreen({ autoMessage, autoFoundation, onAutoMessageSent }: C
 
   const handleSend = useCallback(
     async (content: string, foundation?: Foundation | null) => {
+      console.log('[handleSend] Called with foundation:', foundation ? `Foundation ${foundation.id}` : 'undefined');
+
       await addMessage('user', content);
 
       setIsTyping(true);
@@ -101,6 +103,8 @@ export function ChatScreen({ autoMessage, autoFoundation, onAutoMessageSent }: C
           researchInsight: foundation.researchInsight,
           actionableTip: foundation.actionableTip,
         } : undefined;
+
+        console.log('[handleSend] Sending to Edge Function with foundationDetails:', foundationDetails ? 'yes' : 'no');
 
         const { data, error } = await supabase.functions.invoke('coach-reply', {
           body: {
@@ -140,6 +144,9 @@ export function ChatScreen({ autoMessage, autoFoundation, onAutoMessageSent }: C
   useEffect(() => {
     if (!autoMessage || loading) return;
     if (lastAutoMessageRef.current === autoMessage) return;
+
+    console.log('[ChatScreen] Auto-message triggered:', autoMessage);
+    console.log('[ChatScreen] autoFoundation:', autoFoundation ? `Foundation ${autoFoundation.id}: ${autoFoundation.title}` : 'null');
 
     lastAutoMessageRef.current = autoMessage;
     void handleSend(autoMessage, autoFoundation);

@@ -21,10 +21,8 @@ export function ChatComposer({ onSend, onVoiceTranscription, disabled }: ChatCom
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center justify-center gap-3 p-4 border-t border-border/30 bg-background">
-      <VoiceRecorder onTranscription={onVoiceTranscription} />
-
-      <div className="flex-1 max-w-2xl flex items-center bg-secondary/50 rounded-2xl pl-4 pr-1.5 min-h-[48px]">
+    <form onSubmit={handleSubmit} className="flex items-center justify-center p-4 border-t border-border/30 bg-background">
+      <div className="flex-1 max-w-2xl flex items-center gap-1 bg-secondary/50 rounded-2xl pl-4 pr-1.5 min-h-[48px]">
         <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
@@ -42,6 +40,9 @@ export function ChatComposer({ onSend, onVoiceTranscription, disabled }: ChatCom
           rows={1}
           className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground text-base leading-6 focus:outline-none resize-none max-h-32 overflow-y-auto pr-2 py-3 min-h-[24px]"
         />
+
+        <VoiceRecorder onTranscription={onVoiceTranscription} disabled={disabled} />
+
         <Button
           type="submit"
           size="icon"
