@@ -29,17 +29,19 @@ Last updated: 2026-01-02
   - [x] Start Foundation button navigation flow
 
 - [ ] **Phase 4: Testing & Polish**
+  - [x] Landing page messaging optimization
+  - [x] Voice consistency (em dash removal)
+  - [x] Production deployment setup (Vercel)
   - [ ] End-to-end Foundation flow testing
   - [ ] Trial migration production validation
   - [ ] UI refinement (bottom nav spacing, button styling)
-  - [ ] Set up preview deployments
 
 - [ ] **Phase 5: Launch Preparation**
   - [ ] Production deployment strategy
   - [ ] Analytics integration
   - [ ] User feedback loops
 
-**Current Phase**: Core Feature Development (transitioning to Testing & Polish)
+**Current Phase**: Testing & Polish (landing page optimized, production deployment active)
 
 ---
 
@@ -101,6 +103,24 @@ Last updated: 2026-01-02
 
 ### Production Decisions
 
+**Deployment Platform**:
+- Vercel for production hosting (auto-deploy from GitHub main branch)
+- Connected repo: https://github.com/spartacus3131/claru-calm-coaching.git
+- Deployment triggers: Every push to main
+- Previous platform: Lovable (now deprecated for this project)
+
+**Voice & Tone Calibration**:
+- Removed em dashes (—) universally across AI-generated content
+- Reasoning: More conversational, less literary/formal
+- Applied to: prompts, challenges, bonus tips, mock data, Edge Functions
+
+**Landing Page Messaging** (2026-01-03):
+- Problem-first approach: "Overwhelmed? Scattered? Struggling to focus?"
+- Solution framing: "Unless you have a system."
+- Three pillars lead with questions (emotional validation before feature explanation)
+- CTA placement: High (right after hook and promise)
+- Promise: "Two check-ins a day. 15 minutes total."
+
 **Database Schema**:
 - `chat_messages`: user_id, role, content, metadata, timestamp
 - `daily_notes`: user_id, date, brain_dump, top_3, meetings, time_blocks, etc.
@@ -135,13 +155,14 @@ Last updated: 2026-01-02
 
 ### Current Focus
 
-**Immediate Priority**: Testing & validation of recent features
+**Immediate Priority**: Landing page optimization & production validation
 
 **Key Tasks**:
-1. End-to-end test: Impact → Start Foundation → Chat → Daily Note population
-2. Validate trial-to-signup migration in production
-3. Set up preview deployments for safer iteration
-4. Minor UI polish (bottom nav, button styling)
+1. Monitor landing page performance (conversion rate, time on page)
+2. End-to-end test: Impact → Start Foundation → Chat → Daily Note population
+3. Validate trial-to-signup migration in production
+4. Consider A/B testing different landing page hooks
+5. Minor UI polish (bottom nav, button styling)
 
 ### Relevant Workflow Prompts
 
@@ -230,6 +251,31 @@ Key files to be aware of:
 
 ## Session History Summary
 
+### Session 3 (2026-01-03)
+**Focus**: Landing page revamp, voice consistency, production deployment setup
+
+**What Changed**:
+- Removed em dashes from all AI-generated content
+- Deployed coach-reply Edge Function to production
+- Connected GitHub repo to Vercel for auto-deployments
+- Rewrote landing page hero section with problem-first messaging
+
+**Key Commits**:
+- Landing page revamp (HeroSection.tsx)
+- Em dash removal across 7+ files
+- Edge Function deployment
+- Vercel configuration
+
+**What Worked**:
+- Problem-first landing page approach feels more empathetic
+- Em dash removal makes voice more conversational
+- Vercel auto-deploy simplifies workflow
+
+**What to Watch**:
+- Landing page conversion rate (A/B test hooks if needed)
+- Production deployment stability
+- User feedback on messaging clarity
+
 ### Session 2 (2026-01-02)
 **Focus**: Terminology update, conversation persistence, trial migration, Daily Note auto-population, Foundation flow integration
 
@@ -281,5 +327,5 @@ When making changes:
 
 ---
 
-**Last Session Closed**: 2026-01-02 ("Mischief Managed")
-**Next Recommended Action**: Test end-to-end Foundation flow (Impact → Chat → Daily Note)
+**Last Session Closed**: 2026-01-03 ("Mischief Managed")
+**Next Recommended Action**: Monitor landing page performance, then test end-to-end Foundation flow

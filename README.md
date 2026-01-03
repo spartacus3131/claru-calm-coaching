@@ -4,8 +4,9 @@ An AI-powered calm coaching app that helps users build sustainable foundations f
 
 ## Current Status
 
-**Phase**: Core Feature Development
-**Last Updated**: 2026-01-02
+**Phase**: Testing & Polish
+**Last Updated**: 2026-01-03
+**Deployment**: Auto-deploying to Vercel from main branch
 
 ### What This App Does
 
@@ -17,38 +18,39 @@ Claru Calm Coaching provides:
 4. **Seamless Trial-to-Signup**: Preserves conversation history when users convert from trial mode to full accounts
 5. **Voice Interaction**: Transcription-enabled coaching with real-time feedback
 
-### Recent Session Accomplishments (2026-01-02)
+### Recent Session Accomplishments (2026-01-03)
 
-**Terminology Update**: Renamed "Challenges" to "Foundations" across the entire app, establishing a more supportive, growth-oriented framework.
+**Landing Page Revamp**: Rewrote hero section with problem-first messaging ("Overwhelmed? Scattered? Struggling to focus?") and elevated CTA placement for better conversion.
 
-**Conversation Persistence**: Verified and tested RLS policies ensuring chat messages are properly scoped by user_id, with seamless session continuity.
+**Voice Consistency**: Removed em dashes from all AI-generated content across the app (prompts, challenges, tips, Edge Functions) for a more conversational tone.
 
-**Trial Migration**: Built migration logic so trial users don't lose their conversation history when they sign up.
+**Production Deployment**: Connected GitHub repo to Vercel with auto-deploy on push to main branch, eliminating manual deployment steps.
 
-**Daily Note Intelligence**: Implemented AI-powered extraction of check-in data into structured daily note format, matching Obsidian template conventions.
-
-**Foundation Flow**: Wired up "Start Foundation" button to navigate directly to chat with auto-sent initialization message.
+**Edge Function Update**: Deployed updated coach-reply function to Supabase with voice calibration improvements and verified system prompt accuracy.
 
 ### Tech Stack
 
 - **Frontend**: Vite, TypeScript, React, shadcn-ui, Tailwind CSS
 - **Backend**: Supabase (PostgreSQL, RLS, Edge Functions)
 - **AI**: Claude (Anthropic) via Edge Functions
-- **Deployment**: Lovable (with plans for Vercel/Netlify preview deployments)
+- **Deployment**: Vercel (auto-deploy from GitHub main branch)
 
 ### Key Decisions Made
 
-1. **Database Architecture**: User-scoped chat messages via RLS (no anonymous session handling)
-2. **Migration Strategy**: Trial messages transfer on signup to preserve UX continuity
-3. **AI Extraction**: Structured prompts in `coach-reply` Edge Function parse conversations into Daily Note fields
-4. **Navigation Pattern**: Direct handoff from Impact → Chat for foundation workflows
+1. **Landing Page Messaging**: Problem-first approach with emotional validation before solution framing
+2. **Voice Calibration**: Em dash removal for more conversational AI tone
+3. **Deployment Workflow**: Vercel auto-deploy on push to main (replaced Lovable)
+4. **Database Architecture**: User-scoped chat messages via RLS (no anonymous session handling)
+5. **Migration Strategy**: Trial messages transfer on signup to preserve UX continuity
+6. **AI Extraction**: Structured prompts in `coach-reply` Edge Function parse conversations into Daily Note fields
 
 ### Next Steps
 
+- Monitor landing page performance (conversion rate, time on page)
+- A/B test different hook variations if needed
 - Test end-to-end Foundation flow (Impact → Chat → Daily Note population)
 - Verify trial-to-signup migration in production environment
-- Set up preview deployments for PR-based testing
-- Continue UI polish and coaching prompt refinement
+- Consider adding social proof / testimonials to landing page
 
 ---
 

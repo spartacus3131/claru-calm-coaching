@@ -104,4 +104,84 @@
 - [ ] Verify trial-to-signup migration works in production
 - [ ] Consider setting up preview deployments (see TODO.md)
 
+---
+
+## 2026-01-03 (Session 3 - Landing Page Revamp & Production Setup)
+
+**Key Accomplishments:**
+
+### 1. Em Dash Removal - Voice Consistency
+- Removed all em dashes (—) from AI-generated language across the app
+- Files updated:
+  - `src/data/prompts.ts`
+  - `src/data/challenges.ts`
+  - `src/data/bonus-tips.ts`
+  - `src/data/mockData.ts`
+  - `src/components/challenges/ChallengeDetailDrawer.tsx`
+  - `src/screens/ChatScreen.tsx`
+  - `supabase/functions/coach-reply/index.ts`
+- Rationale: Streamline the conversational tone, make AI-generated text feel more natural and less literary
+
+### 2. Edge Function Deployment
+- Successfully deployed `coach-reply` function to Supabase project (pmsbuvzlaoweimkogdaf)
+- Verified system prompts include updated voice calibration
+- Confirmed CORE_PERSONALITY section contains detailed tone-of-voice guidelines
+
+### 3. Vercel Production Setup
+- Connected claru-calm-coaching GitHub repo to Vercel
+- Configured auto-deployments on push to main branch
+- Production URL now auto-deploys on every commit
+- Eliminated need for manual Lovable deployments
+
+### 4. Landing Page Revamp (HeroSection.tsx)
+- Explored multiple problem statement angles
+- Final H1: **"Overwhelmed? Scattered? Struggling to focus?"**
+- Subhead: **"In a world of endless distractions, your brain doesn't stand a chance. Unless you have a system."**
+- Moved CTA button placement higher (right after the hook)
+- Updated three pillars to lead with problem questions:
+  - "Too much in your head?" (Mind Clarity)
+  - "Can't follow through?" (Intentional Action)
+  - "Low energy?" (Sustainable Energy)
+- Promise statement: **"Two check-ins a day. 15 minutes total."**
+
+**Creative Strategy Evolution:**
+
+Iterated through several positioning angles:
+1. "Your brain is overstimulated" (too clinical)
+2. "Distractions everywhere" (problem-focused, lacks agency)
+3. **Final: "Overwhelmed? Scattered? Struggling to focus?"** (validates user's feeling, then offers solution)
+
+Key insight: The landing page now leads with emotional validation (overwhelm) before introducing the system-based solution. This creates a "problem-agitate-solve" structure that feels more empathetic than prescriptive.
+
+**Technical Decisions:**
+
+1. **Deployment Platform**: Vercel over Lovable for production
+   - Rationale: Auto-deploys, better preview environments, standard workflow
+2. **Voice Calibration**: Removed em dashes universally
+   - Rationale: Consistency across all AI-generated content (prompts, tips, chat)
+3. **Landing Page Structure**: Hook → Promise → CTA → Pillars
+   - Rationale: Get users to the action (signup) faster, reduce cognitive load
+
+**Problems Solved:**
+
+1. How to position the app on the landing page (emotional validation first, system second)
+2. How to streamline deployment workflow (Vercel auto-deploy)
+3. How to ensure consistent voice across all AI touchpoints (em dash removal)
+
+**Ideas Explored but Rejected:**
+
+1. "Your brain is overstimulated" as H1 (too clinical/neuroscience-y)
+2. Leading with "Distractions everywhere" (felt victim-y, lacked agency)
+3. Putting CTA at the bottom of the hero section (too far down)
+
+**Outstanding Issues:**
+
+None blocking. All changes committed and pushed to GitHub. Vercel auto-deploying.
+
+**Next Session:**
+- [ ] Review landing page performance (conversion rate, time on page)
+- [ ] A/B test different hook variations if needed
+- [ ] Continue Foundation flow end-to-end testing
+- [ ] Consider adding social proof / testimonials to landing page
+
 
