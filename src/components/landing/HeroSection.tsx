@@ -37,7 +37,7 @@ export function HeroSection({ onStart }: HeroSectionProps) {
             Overwhelmed? Scattered? Struggling to focus?
           </h1>
           <p className="text-xl text-muted-foreground mb-8">
-            In a world of endless distractions, your brain doesn't stand a chance - unless you have a system.
+            In a world of endless distractions, your brain doesn't stand a chance. Unless you have a system.
           </p>
 
           {/* Primary CTA */}
