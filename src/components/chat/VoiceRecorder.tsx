@@ -53,7 +53,12 @@ export function VoiceRecorder({ onTranscription, disabled }: VoiceRecorderProps)
       {/* Full-width waveform overlay (positioned relative to the chat input container) */}
       {isRecording && !isProcessing && (
         <div
-          className="pointer-events-none absolute inset-x-4 top-1/2 -translate-y-1/2 z-0"
+          // Constrain the waveform to the text area + mic button, excluding the send button.
+          // Layout math (from ChatComposer):
+          // - container left padding: 16px  => left-4
+          // - right offset to end at mic *right edge*:
+          //   pr-1.5 (6px) + send button (40px) + gap-1 (4px) = 50px
+          className="pointer-events-none absolute left-4 right-[50px] top-1/2 -translate-y-1/2 z-0"
           aria-hidden="true"
         >
           {/* Baseline */}
