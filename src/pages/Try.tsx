@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Header } from '@/components/layout/Header';
+import { AppFrame } from '@/components/layout/AppFrame';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { ChatScreen } from '@/screens/ChatScreen';
 import { ImpactScreen } from '@/screens/ImpactScreen';
@@ -38,13 +39,13 @@ const Try = () => {
   };
 
   return (
-    <div className="flex flex-col h-[100dvh] bg-background">
+    <AppFrame>
       <Header showBackToHome />
       <main className="flex-1 flex flex-col overflow-hidden">
         {renderScreen()}
       </main>
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
-    </div>
+    </AppFrame>
   );
 };
 
