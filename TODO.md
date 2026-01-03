@@ -2,15 +2,24 @@
 
 Last updated: 2026-01-03
 
-## Immediate Next Steps (Session 3 Handoff)
+## Immediate Next Steps (Session 4 Handoff)
 
-**Context**: Just completed session 3 ("Mischief Managed") where we:
-- Revamped landing page with problem-first messaging
-- Removed em dashes for voice consistency
-- Connected Vercel for auto-deployments
-- Deployed updated Edge Functions
+**Context**: Just completed session 4 ("Mischief Managed") where we:
+- Expanded CORE_PERSONALITY from ~25% to 100% of original Voice Guide (577 lines)
+- Added 5 critical voice elements (phrases library, evidence-citing, story structure, quotes, Cheesy vs. Calm table)
+- Added 5th voice calibration ratio (75% accessible, 25% sophisticated)
+- Deployed enhanced Edge Function to Supabase production
+- Synced comprehensive Voice Guide to CLAUDE.md, AGENTS.md, GEMINI.md
 
 **Priority Tasks**:
+
+- [ ] **Test Enhanced Voice Guide in Production**
+  - [ ] Run actual coaching conversations with the updated system
+  - [ ] Compare AI responses before/after to validate improvement
+  - [ ] Check if Claude uses the new phrases ("Here's the thing about...", "But here's the rub:")
+  - [ ] Verify exemplary quotes appear naturally in conversations
+  - [ ] Monitor for unintended voice changes (too formal? too casual? too robotic?)
+  - [ ] Validate Cheesy vs. Calm table is preventing hustle culture language
 
 - [ ] **Monitor Landing Page Performance**
   - [ ] Track conversion rate (visitors → signups)
@@ -123,21 +132,24 @@ Last updated: 2026-01-03
 ## Context for Next Session
 
 **Where We Left Off**:
-- Landing page revamped with problem-first messaging
-- Em dashes removed from all AI-generated content
-- Vercel auto-deploy configured and working
-- Production deployment live and stable
+- Voice Guide expanded from ~25% to 100% in CORE_PERSONALITY (coach-reply Edge Function)
+- Added 5 critical voice elements: phrases library, evidence-citing patterns, story structure, exemplary quotes, Cheesy vs. Calm table
+- Added 5th voice calibration ratio (75% accessible, 25% sophisticated)
+- Deployed enhanced Edge Function to Supabase production
+- Synced comprehensive Voice Guide to all AI context files (CLAUDE.md, AGENTS.md, GEMINI.md)
 
 **Why We Made Key Decisions**:
-1. **Problem-first landing page**: Emotional validation creates connection before offering solution
-2. **Em dash removal**: Conversational tone beats literary formality for AI coaching
-3. **Vercel for deployment**: Auto-deploy reduces friction, standard workflow
-4. **CTA placement high**: Get users to signup faster, reduce drop-off
+1. **Full Voice Guide Integration**: Original guide (577 lines) was only ~25-30% captured in deployed system - needed comprehensive integration for AI coaching fidelity
+2. **Concrete Examples Over Abstract Guidelines**: Added exemplary quotes and Cheesy vs. Calm table to give Claude specific voice targets (not just ratios)
+3. **Phrases Library**: Claude responds better to concrete phrase examples than abstract tone guidelines
+4. **Evidence-Citing Patterns**: Needed to specify conversational (not academic) research references
+5. **Em-Dash Consistency**: Maintained Session 3 decision despite original guide preference (conversational beats literary)
 
 **What to Tackle First**:
-1. Monitor landing page performance (conversion rate, engagement metrics)
-2. Test the full Foundation flow end-to-end (most critical user path)
-3. Validate trial migration in production (core conversion feature)
-4. Consider A/B testing landing page variations if conversion is low
+1. Test the enhanced Voice Guide in production (run actual coaching conversations, compare before/after)
+2. Monitor for unintended voice changes (too formal, too casual, too robotic, etc.)
+3. Continue landing page performance monitoring (conversion rate, engagement metrics)
+4. Test the full Foundation flow end-to-end (most critical user path)
+5. Validate trial migration in production (core conversion feature)
 
 
