@@ -22,7 +22,7 @@ export function ChatComposer({ onSend, onVoiceTranscription, disabled }: ChatCom
 
   return (
     <form onSubmit={handleSubmit} className="flex items-center justify-center p-4 border-t border-border/30 bg-background">
-      <div className="flex-1 max-w-2xl flex items-center gap-1 bg-secondary/50 rounded-2xl pl-4 pr-1.5 min-h-[48px]">
+      <div className="relative overflow-hidden flex-1 max-w-2xl flex items-center gap-1 bg-secondary/50 rounded-2xl pl-4 pr-1.5 min-h-[48px]">
         <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
@@ -38,7 +38,7 @@ export function ChatComposer({ onSend, onVoiceTranscription, disabled }: ChatCom
           placeholder="Type a message..."
           disabled={disabled}
           rows={1}
-          className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground text-base leading-6 focus:outline-none resize-none max-h-32 overflow-y-auto pr-2 py-3 min-h-[24px]"
+          className="relative z-10 flex-1 bg-transparent text-foreground placeholder:text-muted-foreground text-base leading-6 focus:outline-none resize-none max-h-32 overflow-y-auto pr-2 py-3 min-h-[24px]"
         />
 
         <VoiceRecorder onTranscription={onVoiceTranscription} disabled={disabled} />
@@ -47,7 +47,7 @@ export function ChatComposer({ onSend, onVoiceTranscription, disabled }: ChatCom
           type="submit"
           size="icon"
           disabled={!message.trim() || disabled}
-          className="h-10 w-10 rounded-full bg-accent hover:bg-accent/90 text-accent-foreground shrink-0"
+          className="relative z-10 h-10 w-10 rounded-full bg-accent hover:bg-accent/90 text-accent-foreground shrink-0"
         >
           <Send className="w-5 h-5" />
         </Button>
