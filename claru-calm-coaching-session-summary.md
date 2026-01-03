@@ -1,5 +1,25 @@
 ---
 
+## 2026-01-03 (Session 5)
+
+**Commits:**
+- `754fde2` ux: fix chat scrolling with min-h-0 + iOS overflow
+- `abd449f` ux: lock chat auto-scroll off until true bottom
+- `25181b9` ux: stop auto-scroll while user is scrolling
+- `2ab470c` ux: don't fight user scroll in chat
+- `68018dd` ui: hide chat placeholder during voice waveform
+- `8f761e9` ui: tune voice waveform (taller, tighter)
+- `0443625` ui: toast mic errors (local debugging)
+
+**Uncommitted:** `.env`
+
+**Accomplished:**
+- Rebuilt the mic UI to feel like modern LLM voice input: inline mic, live waveform, Enter-to-stop-and-send, clearer error handling.
+- Fixed chat scrolling getting “stuck” with a combination of auto-scroll behavior changes and the core flex/overflow (`min-h-0`) layout fix.
+
+**Next session:**
+- [ ] Improve the UI polish for the voice note (waveform and mic controls still feel a bit janky)
+
 ## 2026-01-02 (Session 1)
 
 **Commits:**
