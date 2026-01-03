@@ -17,7 +17,7 @@ export const mockMessages: Message[] = [
   {
     id: '3',
     role: 'assistant',
-    content: "That's okay. Overwhelm often comes from trying to hold everything at once. Let's empty your mind first — write down everything that's floating around up there. No order, no judgment.",
+    content: "That's okay. Overwhelm often comes from trying to hold everything at once. Let's empty your mind first - write down everything that's floating around up there. No order, no judgment.",
     timestamp: new Date(Date.now() - 1000 * 60 * 3),
     quickReplies: ['Start brain dump', 'Show me an example'],
   },

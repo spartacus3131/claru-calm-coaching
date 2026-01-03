@@ -107,7 +107,7 @@ export function ChallengeDetailDrawer({ challenge, open, onOpenChange, onStart }
                   <BookOpen className="w-3.5 h-3.5" /> Research Insight
                 </h4>
                 <p className="text-sm text-foreground/90">{researchInsight}</p>
-                {citation && <p className="text-xs text-muted-foreground mt-2 italic">— {citation}</p>}
+                {citation && <p className="text-xs text-muted-foreground mt-2 italic">- {citation}</p>}
               </div>
             )}
 

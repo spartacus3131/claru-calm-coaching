@@ -12,7 +12,7 @@ export const BONUS_TIPS: BonusTip[] = [
     id: 2,
     title: 'Recall Three Things You\'re Grateful For',
     description: 'Train your brain to scan for positives',
-    content: 'Every night, even after the toughest days, write down the three biggest things you\'re grateful for from that day—or if that\'s too hard, three things you\'re grateful for in general. According to researcher Shawn Achor, "as you consciously practice scanning for positives, your brain gets better at it and retains the new pattern of unconsciously constantly scanning the world for the good."',
+    content: 'Every night, even after the toughest days, write down the three biggest things you\'re grateful for from that day - or if that\'s too hard, three things you\'re grateful for in general. According to researcher Shawn Achor, "as you consciously practice scanning for positives, your brain gets better at it and retains the new pattern of unconsciously constantly scanning the world for the good."',
     tip: 'It\'s not the gratitude itself as much as the ability to scan for positives that makes this habit so effective.',
   },
   {
@@ -39,20 +39,20 @@ export const BONUS_TIPS: BonusTip[] = [
     id: 6,
     title: 'Reward Yourself',
     description: 'Solidify habits and have fun',
-    content: 'Whether that means spending fifteen minutes on social media after a long work session, transferring a dollar into a "fun money" account for every day you stick to a habit, or treating yourself to a nice dinner when you finish a big project—rewarding yourself works wonders for solidifying habits AND for having fun while investing in your productivity.',
+    content: 'Whether that means spending fifteen minutes on social media after a long work session, transferring a dollar into a "fun money" account for every day you stick to a habit, or treating yourself to a nice dinner when you finish a big project - rewarding yourself works wonders for solidifying habits AND for having fun while investing in your productivity.',
   },
   {
     id: 7,
     title: 'Know You Can Grow',
     description: 'Embrace the growth mindset',
     content: 'According to Stanford psychologist Carol Dweck, the main thing separating successful people from unsuccessful people is whether they feel their intelligence and abilities are fixed. People with a growth mindset believe that through hard work and persistence, they can accomplish more. They embrace obstacles as challenges to be overcome, see working hard as the only way to master a skill, and don\'t view setbacks as proof of limitation.',
-    tip: 'Remind yourself that you can always grow—it\'s a great way to challenge yourself to become more productive.',
+    tip: 'Remind yourself that you can always grow - it\'s a great way to challenge yourself to become more productive.',
   },
   {
     id: 8,
     title: 'Create an Accomplishments List',
     description: 'Celebrate your wins and stay motivated',
-    content: 'Maintain an Accomplishments List that you review and add to regularly (like on Maintenance Day). Before keeping this list, I invested in productivity without actually taking time to reflect on what I accomplished. Reviewing the list each week lets me pat myself on the back, propels me into the week ahead, and motivates me to accomplish more—especially on long-term projects where results aren\'t immediately apparent.',
+    content: 'Maintain an Accomplishments List that you review and add to regularly (like on Maintenance Day). Before keeping this list, I invested in productivity without actually taking time to reflect on what I accomplished. Reviewing the list each week lets me pat myself on the back, propels me into the week ahead, and motivates me to accomplish more - especially on long-term projects where results aren\'t immediately apparent.',
   },
   {
     id: 9,

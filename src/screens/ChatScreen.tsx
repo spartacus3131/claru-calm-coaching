@@ -27,7 +27,7 @@ function buildWelcomeMessage(mode: CheckInMode): Message {
   const content =
     mode === 'evening'
       ? "Time to close out the day.\n\nWhat got done? What's carrying over? Just tell me how it went.\n\n🎤 Tap the mic if talking is easier."
-      : "Your brain is meant to solve problems and be creative—not store to-do lists.\n\nThe first step to getting things done is getting everything out of your head. Just tell me what's on your mind right now—tasks, worries, things you need to do. We'll sort through it together.\n\n🎤 Tap the mic if talking is easier.";
+      : "Your brain is meant to solve problems and be creative - not store to-do lists.\n\nThe first step to getting things done is getting everything out of your head. Just tell me what's on your mind right now - tasks, worries, things you need to do. We'll sort through it together.\n\n🎤 Tap the mic if talking is easier.";
 
   return {
     id: 'welcome',

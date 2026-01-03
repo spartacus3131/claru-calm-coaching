@@ -30,7 +30,7 @@ export const FOUNDATIONS: Foundation[] = [
     ],
     worksheetPrompts: ['List the values you deeply care about (meaning, community, relationships, freedom, learning, etc.)'],
     relevantResearch: ['Intrinsic Motivation', 'Self-Determination'],
-    researchInsight: 'Research shows that intrinsic motivation—pursuing goals aligned with personal values—leads to greater persistence and satisfaction than external rewards alone.',
+    researchInsight: 'Research shows that intrinsic motivation -pursuing goals aligned with personal values -leads to greater persistence and satisfaction than external rewards alone.',
     actionableTip: 'Use the Values → Goals → Intention → Action framework to connect daily tasks to deeper meaning.',
     citation: 'Self-Determination Theory (Deci & Ryan)',
   },
@@ -70,14 +70,14 @@ export const FOUNDATIONS: Foundation[] = [
     time: '5 minutes',
     energy: 6,
     value: 8,
-    whatYouGet: 'You\'ll step back to determine your most important tasks at the beginning of each day—the tasks where you should invest the majority of your time, attention, and energy.',
+    whatYouGet: 'You\'ll step back to determine your most important tasks at the beginning of each day -the tasks where you should invest the majority of your time, attention, and energy.',
     steps: [
       { content: 'Before you open your inbox or start your day, sit down with pen and paper.' },
       { content: 'Mentally fast-forward to the end of the day and write down the three main things you want to have accomplished when the day is done.' },
       { content: 'Think about when, where, and how you\'ll accomplish each item.' },
     ],
     tips: [
-      'Fight the urge to check email first—you need a clear mind to think about what\'s important.',
+      'Fight the urge to check email first -you need a clear mind to think about what\'s important.',
       'Think in terms of "wins, achievements, or highlights."',
       'Set two alarms during your workday to check: Are you on track?',
     ],
@@ -98,16 +98,16 @@ export const FOUNDATIONS: Foundation[] = [
     time: '~1 week',
     energy: 1,
     value: 9,
-    whatYouGet: 'An understanding of how well you manage the three ingredients of productivity—time, energy, and attention—so you know your starting point and can make adjustments.',
+    whatYouGet: 'An understanding of how well you manage the three ingredients of productivity -time, energy, and attention -so you know your starting point and can make adjustments.',
     steps: [
       { content: 'Cut out caffeine, alcohol, sugar, and other stimulants if possible for accurate tracking.' },
       { content: 'Every hour, note: what time it is, your energy level (1-10), what you\'re doing, and how many minutes you procrastinated.' },
-      { content: 'After a week, identify your Biological Prime Time—when your energy is naturally highest.' },
+      { content: 'After a week, identify your Biological Prime Time -when your energy is naturally highest.' },
     ],
     tips: [
       'Use RescueTime for automatic tracking or Toggl for manual tracking.',
       'If tracking for a full week feels overwhelming, try just a few days.',
-      'Don\'t be too hard on yourself about procrastination—be honest.',
+      'Don\'t be too hard on yourself about procrastination -be honest.',
     ],
     worksheetPrompts: ['My Biological Prime Time: Morning peak: ___ Afternoon peak: ___ Evening peak: ___'],
     relevantResearch: ['Circadian Rhythms', 'Chronobiology'],
@@ -129,11 +129,11 @@ export const FOUNDATIONS: Foundation[] = [
     steps: [
       { content: 'When you notice yourself putting off a task, use that as a trigger to think about what\'s making it aversive.' },
       { content: 'Identify the procrastination triggers: Is it boring? Frustrating? Difficult? Ambiguous? Unstructured? Lacking meaning or rewards?' },
-      { content: 'Write those triggers down and make a plan to flip them—add meaning, break it down, add rewards, etc.' },
+      { content: 'Write those triggers down and make a plan to flip them -add meaning, break it down, add rewards, etc.' },
     ],
     tips: [
       'Create a "procrastination list" of the costs of putting off the task.',
-      'Just get started—action creates momentum.',
+      'Just get started -action creates momentum.',
       'The tasks that make you most productive are often the most aversive.',
     ],
     worksheetPrompts: ['Tasks I tend to procrastinate on: 1. ___ 2. ___ 3. ___', 'What makes these aversive?'],
@@ -180,7 +180,7 @@ export const FOUNDATIONS: Foundation[] = [
     value: 10,
     whatYouGet: 'You\'ll waste much less time and find yourself working on higher-impact and meaningful tasks more often.',
     steps: [
-      { content: 'Disconnect from the internet for thirty minutes tomorrow—put your phone on airplane mode, disconnect Wi-Fi, or go offline during low-energy times.' },
+      { content: 'Disconnect from the internet for thirty minutes tomorrow -put your phone on airplane mode, disconnect Wi-Fi, or go offline during low-energy times.' },
       { content: 'When you notice yourself surfing the internet on autopilot, use that as a trigger to disconnect.' },
       { content: 'Observe how much you get done and how your attention feels.' },
     ],
@@ -208,7 +208,7 @@ export const FOUNDATIONS: Foundation[] = [
     value: 8,
     whatYouGet: 'You\'ll learn to expend more energy and attention on your work to get things done in a fraction of the time.',
     steps: [
-      { content: 'Tomorrow, limit how much time you\'ll spend on an important task—and stick to that limit.' },
+      { content: 'Tomorrow, limit how much time you\'ll spend on an important task -and stick to that limit.' },
       { content: 'Set a countdown timer for about half the time you think a task will take.' },
       { content: 'Schedule this during your Biological Prime Time if possible.' },
     ],
@@ -232,14 +232,14 @@ export const FOUNDATIONS: Foundation[] = [
     time: '5 minutes',
     energy: 4,
     value: 8,
-    whatYouGet: 'You\'ll get your highest-impact tasks done more efficiently because you\'ll work on them when you actually have the most energy—instead of when they feel urgent.',
+    whatYouGet: 'You\'ll get your highest-impact tasks done more efficiently because you\'ll work on them when you actually have the most energy -instead of when they feel urgent.',
     steps: [
       { content: 'Tomorrow, let your Biological Prime Time and energy levels dictate what you work on.' },
       { content: 'During your BPT, schedule time to work on your three most important tasks.' },
       { content: 'Block off your BPT in your calendar so no one books you during that time.' },
     ],
     tips: [
-      'Be defensive of your BPT—that time is yours to be productive.',
+      'Be defensive of your BPT -that time is yours to be productive.',
       'Adapt on the fly if your energy is higher or lower than usual.',
       'Not all hours of the day are created equal.',
     ],
@@ -266,7 +266,7 @@ export const FOUNDATIONS: Foundation[] = [
       { content: 'During that time, use spare mental energy for something meaningful like listening to a podcast.' },
     ],
     tips: [
-      'Don\'t tackle maintenance tasks during your BPT—that time is sacred!',
+      'Don\'t tackle maintenance tasks during your BPT -that time is sacred!',
       'Some things like watering plants may not wait, but most maintenance can be batched.',
     ],
     worksheetPrompts: ['My maintenance tasks: 1. ___ 2. ___ 3. ___ 4. ___ 5. ___', 'When will I schedule my Maintenance Day?'],
@@ -313,13 +313,13 @@ export const FOUNDATIONS: Foundation[] = [
     value: 7,
     whatYouGet: 'A deeper understanding of exactly how much your time is worth, which tells you your tolerance for delegating and outsourcing.',
     steps: [
-      { content: 'Calculate the value of your time—considering your income, how busy you are, and how valuable you find money vs. time.' },
+      { content: 'Calculate the value of your time -considering your income, how busy you are, and how valuable you find money vs. time.' },
       { content: 'Look at the cost of hiring help (assistant, virtual assistant, intern, professional services).' },
       { content: 'Consciously say no to five things tomorrow, regardless of size.' },
     ],
     tips: [
       'Your time is the most limited of the three ingredients of productivity.',
-      'Think about commitments involving your lowest-return tasks—should you eliminate some?',
+      'Think about commitments involving your lowest-return tasks -should you eliminate some?',
     ],
     worksheetPrompts: ['Hourly value estimate: $___', 'Tasks I could delegate: 1. ___ 2. ___ 3. ___', 'Five things to say no to: 1. ___ 2. ___ 3. ___ 4. ___ 5. ___'],
     relevantResearch: ['Time Value', 'Opportunity Cost'],
@@ -341,7 +341,7 @@ export const FOUNDATIONS: Foundation[] = [
     whatYouGet: 'This is perhaps the most fun and freeing challenge. You\'ll clear up incredible attentional space, become able to fully invest in your work, and feel calmer knowing nothing will slip through the cracks.',
     steps: [
       { content: 'Shut off all your devices and sit down with only a notepad and pen.' },
-      { content: 'Capture everything in your mind that bubbles up—tasks, projects, worries, things that slipped through the cracks, things you\'re waiting for.' },
+      { content: 'Capture everything in your mind that bubbles up -tasks, projects, worries, things that slipped through the cracks, things you\'re waiting for.' },
       { content: 'Once you\'ve captured everything, start managing it in an external system.' },
     ],
     tips: [
@@ -367,11 +367,11 @@ export const FOUNDATIONS: Foundation[] = [
     whatYouGet: 'You\'ll see your life from a perspective you\'ve never had before and reflect on the importance of all your tasks, projects, and commitments.',
     steps: [
       { content: 'Take ten minutes and think about the elements in seven areas of your life: Mind, Body, Emotions, Career, Finances, Relationships, Fun.' },
-      { content: 'Create a scannable list of hot spots—the key areas of your life.' },
+      { content: 'Create a scannable list of hot spots -the key areas of your life.' },
       { content: 'Review your list on Maintenance Day, thinking about where you want to improve.' },
     ],
     tips: [
-      'When you don\'t act in accordance with what\'s important, don\'t be too hard on yourself—just adjust course.',
+      'When you don\'t act in accordance with what\'s important, don\'t be too hard on yourself -just adjust course.',
     ],
     worksheetPrompts: ['My Seven Hot Spots: 1. Mind: ___ 2. Body: ___ 3. Emotions: ___ 4. Career: ___ 5. Finances: ___ 6. Relationships: ___ 7. Fun: ___'],
     relevantResearch: ['Life Balance', 'Wheel of Life'],
@@ -402,7 +402,7 @@ export const FOUNDATIONS: Foundation[] = [
     worksheetPrompts: ['Ideas that emerged: 1. ___ 2. ___ 3. ___'],
     relevantResearch: ['Default Mode Network', 'Incubation Effect'],
     researchInsight: 'The brain\'s default mode network, active during mind-wandering, is crucial for creativity, problem-solving, and connecting disparate ideas.',
-    actionableTip: 'Schedule "thinking time" with no agenda. Walk, sit, or shower—just let your mind wander.',
+    actionableTip: 'Schedule "thinking time" with no agenda. Walk, sit, or shower -just let your mind wander.',
     citation: 'Scott Barry Kaufman, "Wired to Create"',
   },
 
@@ -420,7 +420,7 @@ export const FOUNDATIONS: Foundation[] = [
     whatYouGet: 'You\'ll potentially reclaim hours of lost productivity every day because you\'ll no longer be interrupted by alerts. You\'ll also remember more and focus more deeply.',
     steps: [
       { content: 'Dive into the settings on your phone, computer, tablet, smartwatch, and every other device.' },
-      { content: 'Disable notification alerts on them all—shut off buzzes, beeps, alert boxes, and anything that hijacks your attention.' },
+      { content: 'Disable notification alerts on them all -shut off buzzes, beeps, alert boxes, and anything that hijacks your attention.' },
       { content: 'Be especially defensive during your Biological Prime Time.' },
     ],
     tips: [
@@ -446,8 +446,8 @@ export const FOUNDATIONS: Foundation[] = [
     whatYouGet: 'You\'ll build up your attention muscle so you can devote more focus to the task at hand and get more done in the same amount of time.',
     steps: [
       { content: 'Spend between fifteen and thirty minutes tomorrow focusing on just one thing.' },
-      { content: 'Whether you dedicate all your attention to work, a phone call, a conversation, a book, or a meal—focus on just that one thing.' },
-      { content: 'Whenever your mind wanders—and it will—gently bring it back.' },
+      { content: 'Whether you dedicate all your attention to work, a phone call, a conversation, a book, or a meal -focus on just that one thing.' },
+      { content: 'Whenever your mind wanders -and it will -gently bring it back.' },
     ],
     tips: [
       'Don\'t be too hard on yourself when your mind wanders; simply redirect your focus.',
@@ -456,7 +456,7 @@ export const FOUNDATIONS: Foundation[] = [
     ],
     worksheetPrompts: ['What I\'ll focus on: Task: ___ Duration: ___', 'What I noticed: How many times did my mind wander? ___'],
     relevantResearch: ['Single-Tasking', 'Multitasking Costs'],
-    researchInsight: 'Multitasking reduces productivity by up to 40% and increases errors. The brain cannot truly multitask on cognitive work—it rapidly switches, losing efficiency each time.',
+    researchInsight: 'Multitasking reduces productivity by up to 40% and increases errors. The brain cannot truly multitask on cognitive work -it rapidly switches, losing efficiency each time.',
     actionableTip: 'Practice single-tasking for 25 minutes at a time. Notice when your mind wanders and gently return focus.',
     citation: 'Stanford Multitasking Research (Ophir et al.)',
   },
@@ -534,7 +534,7 @@ export const FOUNDATIONS: Foundation[] = [
     ],
     tips: [
       'Sugary drinks spike glucose and cause energy crashes.',
-      'Drink caffeine strategically—before hunkering down on a pressing task, or between 9:30-11:30am when most people need it most.',
+      'Drink caffeine strategically -before hunkering down on a pressing task, or between 9:30-11:30am when most people need it most.',
       'You\'ll be surprised how much more energy you have when you drink less alcohol.',
     ],
     worksheetPrompts: ['My one small improvement: ___'],
@@ -555,7 +555,7 @@ export const FOUNDATIONS: Foundation[] = [
     value: 7,
     whatYouGet: 'The incredible neurological benefits of exercise: more energy, focus, stamina, resilience, and memory, plus less stress and fatigue.',
     steps: [
-      { content: 'Elevate your heart rate for fifteen minutes tomorrow—walking, jogging, elliptical, or any aerobic exercise that gets your blood pumping.' },
+      { content: 'Elevate your heart rate for fifteen minutes tomorrow -walking, jogging, elliptical, or any aerobic exercise that gets your blood pumping.' },
       { content: 'If you feel resistance to 15 minutes, shrink the time until you don\'t.' },
       { content: 'After the challenge, ask yourself: Is my head clearer? Do I have more energy? Do I feel less stressed?' },
     ],
