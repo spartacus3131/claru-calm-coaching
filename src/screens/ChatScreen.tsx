@@ -57,6 +57,7 @@ export function ChatScreen({ autoMessage, autoFoundation, onAutoMessageSent }: C
   const isUserScrollingRef = useRef(false);
   const scrollStopTimeoutRef = useRef<number | null>(null);
   const lastScrollTopRef = useRef(0);
+  const autoScrollLockedOffRef = useRef(false);
   const lastAutoMessageRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -145,7 +146,9 @@ export function ChatScreen({ autoMessage, autoFoundation, onAutoMessageSent }: C
     const el = scrollRef.current;
     if (!el) return;
 
-    const THRESHOLD_PX = 40;
+    // We only consider "at bottom" when very close to the true bottom.
+    // This prevents the UI from "snapping back" while the user tries to scroll up.
+    const AT_BOTTOM_PX = 2;
 
     const markUserInteracting = () => {
       isUserScrollingRef.current = true;
@@ -163,12 +166,23 @@ export function ChatScreen({ autoMessage, autoFoundation, onAutoMessageSent }: C
       // If the user scrolls upward at all, immediately disable auto-scroll.
       const currentTop = el.scrollTop;
       if (currentTop < lastScrollTopRef.current - 2) {
+        autoScrollLockedOffRef.current = true;
         shouldAutoScrollRef.current = false;
       }
       lastScrollTopRef.current = currentTop;
 
       const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
-      shouldAutoScrollRef.current = distanceFromBottom < THRESHOLD_PX;
+      if (distanceFromBottom <= AT_BOTTOM_PX) {
+        // User is back at the bottom: re-enable auto-scroll.
+        autoScrollLockedOffRef.current = false;
+        shouldAutoScrollRef.current = true;
+      } else if (autoScrollLockedOffRef.current) {
+        // User scrolled up earlier: don't re-enable until they're truly at bottom.
+        shouldAutoScrollRef.current = false;
+      } else {
+        // Default: follow when near-bottom, otherwise don't.
+        shouldAutoScrollRef.current = false;
+      }
     };
 
     el.addEventListener('scroll', onScroll, { passive: true });
