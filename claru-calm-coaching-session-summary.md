@@ -1,5 +1,74 @@
 ---
 
+## 2026-01-11 (Session 6 - Scope Refinement & Coach-Reply Flow Optimization)
+
+**Commits:**
+- `d62ae8e` Add projects feature + refined workflow documentation
+- `e2de79b` Simplify morning check-in: less interrogation, more action
+- `e78a84c` Improve morning check-in flow: add day planning step
+
+**Key Accomplishments:**
+
+### 1. Extracted Conversation Patterns from Claude Code Sessions
+- Analyzed daily check-in transcripts to understand the workflow Claru needs to replicate
+- Created `reference/claude-code-workflow-patterns.md` documenting:
+  - The 5-step conversation pattern (capture → structure → confirm → plan → commit)
+  - Actual examples from user's Claude Code sessions
+  - Key insight: Conversational back-and-forth is the magic (not just transcription)
+
+### 2. Refined Project Scope
+- Killed: Meal tracking, nutrition science
+- Kept: Projects (user-created), Daily Notes (full markdown), Morning/Evening check-ins
+- Updated CLAUDE.md Session 6 TODOs with new priorities
+
+### 3. Projects Feature
+- Shipped complete projects CRUD with database migration
+- Added RLS policy for user_id scoping
+- Integrated into navigation as new section
+
+### 4. Coach-Reply Edge Function Rewrite (2x)
+- **First iteration**: Simplified from 7-step interrogation to 5-step action pattern
+  - Problem: Too terse, didn't actually guide the user
+- **Second iteration**: Full conversational flow restored
+  - Pattern: Capture → Top 3 → ask about day → time estimates → slot tasks
+  - Proper flow that mirrors Claude Code workflow
+
+### 5. Daily Morning Check-in Flow Enhancement
+- Added day planning step to ensure tasks are time-blocked
+- Fixed markdown formatting issue (removed bold syntax that wasn't rendering)
+- Deployed to Supabase
+
+### 6. Pushed All Changes to GitHub/Vercel
+- All commits pushed
+- Production now reflects improvements
+
+**Technical Decisions:**
+
+1. **Scope Reduction**: Removed meal tracking to focus on core workflow
+2. **Projects Table**: Created `projects` table with full CRUD for user-created items
+3. **Coach Flow Pattern**: Adopted 5-step conversation pattern from Claude Code analysis
+4. **Markdown in Daily Notes**: Ensure full markdown support, not just structured fields
+
+**Problems Solved:**
+
+1. How to understand what makes Claru magical (analyzed actual user workflows)
+2. How to implement a conversational flow that guides without being prescriptive
+3. How to format markdown output properly in Edge Function responses
+4. How to integrate projects into the daily check-in context
+
+**What to Watch:**
+
+User is testing Claru tomorrow and will provide their Claude Code transcript for comparison. Next session will validate whether the flow truly mirrors their actual workflow.
+
+**Next Session:**
+- [ ] Review user's actual Claude Code conversation transcript
+- [ ] Compare against Claru flow and identify gaps
+- [ ] Adjust coach-reply prompts based on real workflow differences
+- [ ] Ship evening check-in flow
+- [ ] Test carryover functionality (yesterday's incomplete items)
+
+---
+
 ## 2026-01-03 (Session 5)
 
 **Commits:**
