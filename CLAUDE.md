@@ -1,6 +1,6 @@
 # AI Context: Claru Calm Coaching
 
-Last updated: 2026-01-03
+Last updated: 2026-01-04
 
 ---
 
@@ -390,5 +390,149 @@ When making changes:
 
 ---
 
-**Last Session Closed**: 2026-01-03 ("Mischief Managed")
-**Next Recommended Action**: Fix OTP length in Supabase (8 → 6), verify code in email, then test end-to-end auth flow
+**Last Session Closed**: 2026-01-04 ("Mischief Managed")
+**Next Recommended Action**: See Session 5 TODOs below - Obsidian workflow integration
+
+---
+
+## Session 6 TODOs (2026-01-11) - Refined Scope
+
+### Goal: Use Claru for daily check-ins next week (replacing Obsidian + Claude Code workflow)
+
+**Ship Criteria**: Use it yourself for 1 week before shipping publicly
+
+**Scope Simplified**: No meal tracking, no nutrition science. Focus on core workflow.
+
+---
+
+### The Core Value (What Makes It Work)
+
+The conversational back-and-forth is the magic:
+1. User shares messy thoughts (voice/text brain dump)
+2. AI structures and summarizes
+3. AI asks ONE clarifying question or suggests prioritization
+4. User confirms/adjusts
+5. AI commits to daily note and confirms what was captured
+6. Repeat until aligned
+
+This iterative dialogue makes it a thinking partner, not just a transcription tool.
+
+---
+
+### P0 - Must Work to Be Usable
+
+#### 1. Daily Notes (Full Markdown, Editable)
+**Problem**: Current daily notes are extracted fields only, not full stored documents.
+
+**TODOs**:
+- [ ] Add `raw_markdown` column to daily_notes table (or restructure)
+- [ ] Daily Note view shows full markdown with editor
+- [ ] One note per day per user, auto-created
+- [ ] User can edit directly at any time
+- [ ] Updated in real-time during conversation
+
+#### 2. Brain Dump → Structured Parsing → Top 3
+**Problem**: Need to take messy input and suggest priorities.
+
+**TODOs**:
+- [ ] Update coach-reply system prompt for brain dump parsing
+- [ ] AI should summarize what it understood
+- [ ] AI suggests Top 3 priorities
+- [ ] AI asks "Does this priority order feel right?"
+
+#### 3. Conversational Pattern (The Dialogue)
+**Problem**: Current AI might just respond without confirming/clarifying.
+
+**TODOs**:
+- [ ] Update system prompt: "Ask ONE clarifying question at a time"
+- [ ] Update system prompt: "Always confirm what you're writing to the daily note"
+- [ ] Update system prompt: "Keep responses to 2-4 sentences"
+- [ ] Response pattern: summarize → suggest → confirm
+
+#### 4. Morning Check-in Flow
+**Problem**: Need status overview at session start.
+
+**TODOs**:
+- [ ] Detect morning check-in (button or phrase like "fire up the pod")
+- [ ] Show: today's note status, active projects, carryover from yesterday
+- [ ] Prompt for brain dump
+- [ ] Flow: dump → structure → clarify → commit
+
+---
+
+### P1 - Add During the Week
+
+#### 5. Projects (User-Created)
+**Problem**: No way to track ongoing projects that integrate into check-ins.
+
+**TODOs**:
+- [ ] Create `projects` table: id, user_id, title, description, type (active/recurring), status, blockers, next_actions, notes
+- [ ] Add RLS policy for user_id scoping
+- [ ] `/projects` page with CRUD
+- [ ] Integrate active projects into morning check-in prompt
+- [ ] Users can create any project type they want (workout, diet, shipping X, etc.)
+
+#### 6. Evening Check-in
+**Problem**: No end-of-day reflection flow.
+
+**TODOs**:
+- [ ] Detect evening check-in
+- [ ] Show Top 3 status (done/not done)
+- [ ] Prompt: "What got done? What's carrying over?"
+- [ ] Capture wins, carryover items, insights
+- [ ] Update daily note with EOD section
+
+#### 7. Carryover from Yesterday
+**Problem**: Need continuity between days.
+
+**TODOs**:
+- [ ] On morning check-in, load yesterday's incomplete items
+- [ ] Show in status overview: "Carrying over: [items]"
+- [ ] Suggest as priorities for today
+
+---
+
+### P2 - Later (After Week 1)
+
+- [ ] Historical notes browser (view past days)
+- [ ] Weekly review automation
+- [ ] Task Dashboard view
+- [ ] Historical data import from Obsidian vault
+
+---
+
+### Reference Files
+
+- `reference/claude-code-workflow-patterns.md` - **Main reference** (conversation patterns, examples)
+- `reference/Claro-Daily-Checkin-Workflow.md` - Original workflow spec
+- `reference/daily-checkin-session-example.jsonl` - Raw session transcript
+- `reference/daily-checkin-session-jan5.jsonl` - Second session transcript
+
+---
+
+### Session 5 Summary (2026-01-04)
+
+**Focus**: Bug fix + initial roadmap
+
+**What Changed**:
+- Fixed Vercel deployment bug (env vars needed redeploy)
+- Created initial TODO list for Obsidian workflow integration
+- Added reference session transcripts
+
+---
+
+### Session 6 Notes (2026-01-11)
+
+**Focus**: Scope refinement
+
+**What Changed**:
+- Killed meal tracking and nutrition science from scope
+- Refined priorities to three core features:
+  1. Projects (user-created, any type they want)
+  2. Daily notes (full markdown, editable, one per day)
+  3. Morning/evening check-ins (the conversational flow)
+- Created `claude-code-workflow-patterns.md` with extracted conversation patterns
+- Extracted and analyzed actual session transcripts for reference
+
+**Key Insight**:
+The conversational back-and-forth is the core value. Summarize → suggest → clarify → confirm. This makes it a thinking partner, not just a note-taker.

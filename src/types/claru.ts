@@ -75,3 +75,22 @@ export interface TodayPriority {
   text: string;
   completed: boolean;
 }
+
+export type ProjectType = 'active' | 'recurring';
+export type ProjectStatus = 'active' | 'blocked' | 'in-progress' | 'completed' | 'paused';
+
+export interface Project {
+  id: string;
+  user_id: string;
+  title: string;
+  type: ProjectType;
+  status: ProjectStatus;
+  goals: string[];
+  blockers: string[];
+  next_actions: string[];
+  recent_progress: string | null;
+  notes: string | null;
+  position: number;
+  created_at: string;
+  updated_at: string;
+}

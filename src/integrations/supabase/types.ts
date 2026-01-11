@@ -131,6 +131,54 @@ export type Database = {
         }
         Relationships: []
       }
+      projects: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          type: 'active' | 'recurring'
+          status: 'active' | 'blocked' | 'in-progress' | 'completed' | 'paused'
+          goals: Json
+          blockers: Json
+          next_actions: Json
+          recent_progress: string | null
+          notes: string | null
+          position: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title: string
+          type: 'active' | 'recurring'
+          status?: 'active' | 'blocked' | 'in-progress' | 'completed' | 'paused'
+          goals?: Json
+          blockers?: Json
+          next_actions?: Json
+          recent_progress?: string | null
+          notes?: string | null
+          position?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          type?: 'active' | 'recurring'
+          status?: 'active' | 'blocked' | 'in-progress' | 'completed' | 'paused'
+          goals?: Json
+          blockers?: Json
+          next_actions?: Json
+          recent_progress?: string | null
+          notes?: string | null
+          position?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

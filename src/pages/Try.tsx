@@ -4,6 +4,7 @@ import { AppFrame } from '@/components/layout/AppFrame';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { ChatScreen } from '@/screens/ChatScreen';
 import { ImpactScreen } from '@/screens/ImpactScreen';
+import { ProjectsScreen } from '@/screens/ProjectsScreen';
 import { ParkingLotScreen } from '@/screens/ParkingLotScreen';
 import { HotSpotsScreen } from '@/screens/HotSpotsScreen';
 import { Challenge, Foundation } from '@/types/claru';
@@ -46,6 +47,9 @@ const Try = () => {
         </div>
         <div className={`flex-1 min-h-0 flex flex-col overflow-hidden ${activeTab === 'impact' ? '' : 'hidden'}`}>
           <ImpactScreen onStartFoundation={handleStartFoundation} />
+        </div>
+        <div className={`flex-1 min-h-0 flex flex-col overflow-hidden ${activeTab === 'projects' ? '' : 'hidden'}`}>
+          <ProjectsScreen />
         </div>
         <div className={`flex-1 min-h-0 flex flex-col overflow-hidden ${activeTab === 'parking' ? '' : 'hidden'}`}>
           <ParkingLotScreen />
