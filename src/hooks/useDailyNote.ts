@@ -1,35 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { format } from 'date-fns';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
-
-export type DailyNoteTop3Item = { text: string; completed: boolean };
-
-export type DailyNoteDraft = {
-  noteDate: string; // yyyy-MM-dd
-  rawDump: string;
-  morningPrompts: {
-    weighingOnMe: string;
-    avoiding: string;
-    meetings: string;
-    followUps: string;
-    win: string;
-  };
-  top3: DailyNoteTop3Item[];
-  organizedTasks: {
-    actionsToday: string[];
-    thisWeek: string[];
-    decisionsNeeded: string[];
-    quickWins: string[];
-    notes: string;
-  };
-  endOfDay: {
-    gotDone: string;
-    carryingOver: string;
-    wins: string;
-  };
-};
+import { backend } from '@/backend';
+import type { DailyNoteDraft, DailyNoteTop3Item } from '@/types/dailyNote';
 
 function defaultDraft(noteDate: string): DailyNoteDraft {
   return {
@@ -102,61 +76,23 @@ export function useDailyNote(noteDate?: string) {
     lastLoadedDateRef.current = effectiveDate;
 
     const load = async () => {
-      const { data, error } = await supabase
-        .from('daily_notes')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('note_date', effectiveDate)
-        .maybeSingle();
+      try {
+        const loaded = await backend.dailyNotes.getByDate(user.id, effectiveDate);
+        if (!loaded) {
+          setDraft(defaultDraft(effectiveDate));
+          setLoading(false);
+          return;
+        }
 
-      if (error) {
-        console.error('Error loading daily note:', error);
+        setDraft(loaded);
+        dirtyRef.current = false;
         setLoading(false);
-        return;
-      }
-
-      if (!data) {
+      } catch (e) {
+        console.error('Error loading daily note:', e);
         setDraft(defaultDraft(effectiveDate));
         setLoading(false);
         return;
       }
-
-      // Defensive parsing (these are Json columns)
-      const morning = (data.morning_prompts ?? {}) as Partial<DailyNoteDraft['morningPrompts']>;
-      const top3 = (data.top3 ?? []) as unknown as DailyNoteTop3Item[];
-      const organized = (data.organized_tasks ?? {}) as Partial<DailyNoteDraft['organizedTasks']>;
-      const eod = (data.end_of_day ?? {}) as Partial<DailyNoteDraft['endOfDay']>;
-
-      setDraft({
-        noteDate: effectiveDate,
-        rawDump: data.raw_dump ?? '',
-        morningPrompts: {
-          weighingOnMe: morning.weighingOnMe ?? '',
-          avoiding: morning.avoiding ?? '',
-          meetings: morning.meetings ?? '',
-          followUps: morning.followUps ?? '',
-          win: morning.win ?? '',
-        },
-        top3:
-          Array.isArray(top3) && top3.length > 0
-            ? top3.map((i) => ({ text: i?.text ?? '', completed: !!i?.completed })).slice(0, 10)
-            : defaultDraft(effectiveDate).top3,
-        organizedTasks: {
-          actionsToday: Array.isArray(organized.actionsToday) ? (organized.actionsToday as string[]) : [],
-          thisWeek: Array.isArray(organized.thisWeek) ? (organized.thisWeek as string[]) : [],
-          decisionsNeeded: Array.isArray(organized.decisionsNeeded) ? (organized.decisionsNeeded as string[]) : [],
-          quickWins: Array.isArray(organized.quickWins) ? (organized.quickWins as string[]) : [],
-          notes: organized.notes ?? '',
-        },
-        endOfDay: {
-          gotDone: eod.gotDone ?? '',
-          carryingOver: eod.carryingOver ?? '',
-          wins: eod.wins ?? '',
-        },
-      });
-
-      dirtyRef.current = false;
-      setLoading(false);
     };
 
     load();
@@ -173,20 +109,7 @@ export function useDailyNote(noteDate?: string) {
     saveTimerRef.current = window.setTimeout(async () => {
       setSaving(true);
       try {
-        const { error } = await supabase.from('daily_notes').upsert(
-          {
-            user_id: user.id,
-            note_date: draft.noteDate,
-            raw_dump: draft.rawDump,
-            morning_prompts: draft.morningPrompts,
-            top3: draft.top3,
-            organized_tasks: draft.organizedTasks,
-            end_of_day: draft.endOfDay,
-          },
-          { onConflict: 'user_id,note_date' }
-        );
-
-        if (error) throw error;
+        await backend.dailyNotes.upsert(user.id, draft);
 
         dirtyRef.current = false;
       } catch (e) {

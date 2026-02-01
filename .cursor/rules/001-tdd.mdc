@@ -1,0 +1,64 @@
+---
+description: Enforce Test-Driven Development for all code changes
+alwaysApply: true
+---
+
+# Test-Driven Development
+
+This rule is NON-NEGOTIABLE. Every feature is built test-first.
+
+## The Red-Green-Refactor Cycle
+
+1. **RED:** Write a test that defines expected behavior. Run it. It MUST fail.
+2. **GREEN:** Write MINIMUM code to make the test pass. Nothing more.
+3. **REFACTOR:** Clean up while keeping tests green.
+4. **REPEAT:** For the next piece of functionality.
+
+## Requirements
+
+### Before Writing Implementation Code
+
+- NEVER write implementation without a failing test first
+- Tests define WHAT should happen, not HOW
+- Test names describe behavior: `should_return_error_when_user_not_found`
+
+### Test Structure (AAA Pattern)
+
+```typescript
+// Arrange - Set up test data and conditions
+const user = createTestUser({ email: 'test@example.com' });
+
+// Act - Execute the function being tested
+const result = await loginUser(user.email, 'wrong-password');
+
+// Assert - Verify the outcome
+expect(result.success).toBe(false);
+expect(result.error).toBe('Invalid credentials');
+```
+
+### Coverage Requirements
+
+- Every public function MUST have at least one test
+- Every business rule MUST have a test
+- Every state transition MUST have a test
+- Edge cases and error conditions MUST be tested
+
+## FORBIDDEN
+
+- Writing tests AFTER implementation
+- Tautological tests (tests that cannot fail)
+- Skipping tests "to save time"
+- Commenting out failing tests
+- Tests without assertions
+- Tests that depend on implementation details
+
+## Why This Matters
+
+TDD is like going up a ramp—slower throughout, but you never fall back down. Without TDD, you climb stairs and occasionally fall all the way to the bottom.
+
+**Specific benefits:**
+- Tests document expected behavior (living documentation)
+- Catching bugs during development costs minutes; catching them in production costs hours
+- Refactoring becomes safe—tests prove nothing broke
+- Forces you to think about API design before implementation
+- Prevents "works on my machine" problems

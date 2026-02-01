@@ -1,0 +1,249 @@
+---
+description: Deepgram Nova-3 voice transcription patterns for Claru
+globs: ["**/*.ts", "**/*.tsx"]
+alwaysApply: true
+---
+
+# Deepgram Voice Rules
+
+## CRITICAL: Client-Side Only
+
+⚠️ **Vercel serverless functions CANNOT maintain WebSocket connections.**
+
+Voice transcription MUST happen in the browser, connecting directly to Deepgram.
+
+```
+CORRECT:
+Browser ──WebSocket──► Deepgram (real-time transcription)
+Browser ──POST──► Vercel API (send completed transcript)
+
+WRONG (will timeout/fail):
+Browser ──► Vercel API ──► Deepgram WebSocket
+```
+
+## Implementation Pattern
+
+ALWAYS implement voice capture as a client component:
+
+```typescript
+"use client";
+
+import { useCallback, useRef, useState, useEffect } from 'react';
+
+export function useVoiceCapture() {
+  const [transcript, setTranscript] = useState('');
+  const [isListening, setIsListening] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  const socketRef = useRef<WebSocket | null>(null);
+  const recorderRef = useRef<MediaRecorder | null>(null);
+
+  const start = useCallback(async () => {
+    try {
+      setError(null);
+      setTranscript('');
+
+      // Connect directly to Deepgram from browser
+      const socket = new WebSocket(
+        'wss://api.deepgram.com/v1/listen?model=nova-3&punctuate=true',
+        ['token', process.env.NEXT_PUBLIC_DEEPGRAM_KEY!]
+      );
+
+      socket.onopen = async () => {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+          },
+        });
+
+        const recorder = new MediaRecorder(stream, {
+          mimeType: 'audio/webm;codecs=opus',
+        });
+
+        recorder.ondataavailable = (e) => {
+          if (e.data.size > 0 && socket.readyState === WebSocket.OPEN) {
+            socket.send(e.data);
+          }
+        };
+
+        recorder.start(250); // Send chunks every 250ms
+        recorderRef.current = recorder;
+        setIsListening(true);
+      };
+
+      socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        const text = data.channel?.alternatives?.[0]?.transcript;
+        if (text && data.is_final) {
+          setTranscript((prev) => prev + ' ' + text);
+        }
+      };
+
+      socket.onerror = () => setError('Voice connection failed');
+      socket.onclose = () => setIsListening(false);
+
+      socketRef.current = socket;
+    } catch (err) {
+      setError('Microphone access denied');
+    }
+  }, []);
+
+  const stop = useCallback(() => {
+    recorderRef.current?.stop();
+    recorderRef.current?.stream.getTracks().forEach((t) => t.stop());
+    socketRef.current?.close(1000);
+    setIsListening(false);
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      recorderRef.current?.stop();
+      socketRef.current?.close(1000);
+    };
+  }, []);
+
+  return { transcript, isListening, error, start, stop };
+}
+```
+
+## Fallback to Text
+
+ALWAYS provide text input fallback when voice fails:
+
+```typescript
+"use client";
+
+export function BrainDumpInput({ onSubmit }: { onSubmit: (text: string) => void }) {
+  const [useVoice, setUseVoice] = useState(true);
+  const [textInput, setTextInput] = useState('');
+  const { transcript, isListening, error, start, stop } = useVoiceCapture();
+
+  // Auto-fallback after errors
+  useEffect(() => {
+    if (error) {
+      setUseVoice(false);
+    }
+  }, [error]);
+
+  // Check feature flag
+  const voiceEnabled = process.env.NEXT_PUBLIC_VOICE_ENABLED === 'true';
+
+  if (!voiceEnabled || !useVoice) {
+    return (
+      <textarea
+        value={textInput}
+        onChange={(e) => setTextInput(e.target.value)}
+        placeholder="Type everything on your mind..."
+      />
+    );
+  }
+
+  return (
+    <div>
+      <button onClick={isListening ? stop : start}>
+        {isListening ? 'Stop' : 'Start Voice'}
+      </button>
+      {transcript && <p>{transcript}</p>}
+      {error && (
+        <button onClick={() => setUseVoice(false)}>
+          Switch to text
+        </button>
+      )}
+    </div>
+  );
+}
+```
+
+## User Consent
+
+ALWAYS get consent before first voice recording:
+
+```typescript
+async function checkVoiceConsent(): Promise<boolean> {
+  const consent = localStorage.getItem('voice_consent');
+  if (consent === 'true') return true;
+
+  const agreed = await showConsentModal({
+    title: 'Enable Voice',
+    body: 'Audio is sent to Deepgram for transcription. It is not stored after processing.',
+  });
+
+  if (agreed) {
+    localStorage.setItem('voice_consent', 'true');
+    return true;
+  }
+  return false;
+}
+```
+
+## Feature Flag
+
+ALWAYS check the feature flag before showing voice UI:
+
+```typescript
+// Can disable voice globally if Deepgram has an outage
+const VOICE_ENABLED = process.env.NEXT_PUBLIC_VOICE_ENABLED === 'true';
+
+if (!VOICE_ENABLED) {
+  return <TextOnlyInput />;
+}
+```
+
+## Audio Settings
+
+ALWAYS configure for speech quality:
+
+```typescript
+const stream = await navigator.mediaDevices.getUserMedia({
+  audio: {
+    echoCancellation: true,
+    noiseSuppression: true,
+    autoGainControl: true,
+    sampleRate: 16000,
+  },
+});
+```
+
+## Cleanup
+
+ALWAYS clean up resources on unmount:
+
+```typescript
+useEffect(() => {
+  return () => {
+    if (recorderRef.current) {
+      recorderRef.current.stop();
+      recorderRef.current.stream.getTracks().forEach(track => track.stop());
+    }
+    if (socketRef.current) {
+      socketRef.current.close(1000);
+    }
+  };
+}, []);
+```
+
+## FORBIDDEN Patterns
+
+NEVER do these:
+
+```typescript
+// FORBIDDEN: Routing voice through Vercel
+// app/api/transcribe/route.ts
+export async function POST(request: Request) {
+  // WebSocket to Deepgram ← This will NOT work from serverless
+}
+
+// FORBIDDEN: Recording without consent
+start(); // Where's the consent check?
+
+// FORBIDDEN: No cleanup
+// Component unmounts with active WebSocket/recorder
+
+// FORBIDDEN: No text fallback
+// Voice-only UI with no alternative
+
+// FORBIDDEN: Storing raw audio
+await supabase.storage.upload('audio.webm', blob); // Privacy concern
+```

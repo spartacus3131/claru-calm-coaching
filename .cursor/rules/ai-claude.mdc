@@ -1,0 +1,236 @@
+---
+description: Claude 4.5 Sonnet + Vercel AI SDK patterns for Claru
+globs: ["**/*.ts", "**/*.tsx"]
+alwaysApply: true
+---
+
+# Claude AI Rules
+
+## Model Selection
+
+ALWAYS use Claude 4.5 Sonnet for coaching conversations:
+
+```typescript
+import { anthropic } from '@ai-sdk/anthropic';
+
+// CORRECT: Sonnet for all coaching
+const model = anthropic('claude-sonnet-4-5-20250514');
+
+// WRONG: Haiku for coaching (higher hallucination rate)
+const model = anthropic('claude-haiku-4-5-20251001');
+```
+
+## Streaming Pattern
+
+ALWAYS use Vercel AI SDK for streaming responses:
+
+```typescript
+import { streamText } from 'ai';
+import { anthropic } from '@ai-sdk/anthropic';
+
+export async function POST(request: Request) {
+  const { messages, systemPrompt } = await request.json();
+  
+  const result = await streamText({
+    model: anthropic('claude-sonnet-4-5-20250514'),
+    system: systemPrompt,
+    messages,
+    maxTokens: 1024,
+  });
+  
+  return result.toDataStreamResponse();
+}
+```
+
+NEVER build streaming manually. The SDK handles all the complexity.
+
+## Token Budget
+
+Claru's token budget per session:
+
+| Component | Tokens |
+|-----------|--------|
+| System prompt | ~1,500 |
+| User context | ~500 |
+| Conversation history | ~800 |
+| User input | ~300 |
+| **Total Input** | **~3,100** |
+| Response | ~700 |
+
+ALWAYS truncate conversation history to stay within budget:
+
+```typescript
+function truncateHistory(messages: Message[], maxMessages: number = 6): Message[] {
+  // Keep most recent messages
+  if (messages.length <= maxMessages) return messages;
+  return messages.slice(-maxMessages);
+}
+```
+
+## System Prompt Structure
+
+ALWAYS structure system prompts with clear sections:
+
+```typescript
+function buildSystemPrompt(context: CoachingContext): string {
+  return `
+## Role
+You are Claru, an AI productivity coach.
+
+## Persona
+${COACHING_PERSONA}
+
+## Current Context
+- User: ${context.userName}
+- Date: ${context.today}
+- Flow: ${context.flow}
+- Phase: ${context.phase}
+
+## Yesterday's Plan
+${context.yesterdayPlan || 'None'}
+
+## Carryover Items
+${context.carryover?.join('\\n') || 'None'}
+
+## Guardrails
+${GUARDRAILS}
+
+## Response Format
+${RESPONSE_FORMAT_RULES}
+`.trim();
+}
+```
+
+## Usage Tracking
+
+ALWAYS log AI usage for cost monitoring:
+
+```typescript
+async function logAIUsage(params: {
+  userId: string;
+  sessionId: string;
+  tokensIn: number;
+  tokensOut: number;
+  latencyMs: number;
+}) {
+  const costUsd = calculateCost(params.tokensIn, params.tokensOut);
+  
+  await supabase.from('ai_usage_logs').insert({
+    user_id: params.userId,
+    session_id: params.sessionId,
+    model: 'claude-sonnet-4-5-20250514',
+    tokens_in: params.tokensIn,
+    tokens_out: params.tokensOut,
+    cost_usd: costUsd,
+    latency_ms: params.latencyMs,
+  });
+}
+
+function calculateCost(tokensIn: number, tokensOut: number): number {
+  // Claude 4.5 Sonnet pricing (January 2026)
+  const INPUT_COST_PER_MILLION = 3.00;
+  const OUTPUT_COST_PER_MILLION = 15.00;
+  
+  return (tokensIn / 1_000_000) * INPUT_COST_PER_MILLION +
+         (tokensOut / 1_000_000) * OUTPUT_COST_PER_MILLION;
+}
+```
+
+## Rate Limiting
+
+ALWAYS check user cost limits before AI calls:
+
+```typescript
+const MAX_DAILY_COST_USD = 5.00;
+
+async function checkCostLimit(userId: string): Promise<boolean> {
+  const today = new Date().toISOString().split('T')[0];
+  
+  const { data } = await supabase
+    .from('ai_usage_logs')
+    .select('cost_usd')
+    .eq('user_id', userId)
+    .gte('created_at', `${today}T00:00:00Z`);
+  
+  const totalCost = data?.reduce((sum, r) => sum + (r.cost_usd || 0), 0) ?? 0;
+  return totalCost < MAX_DAILY_COST_USD;
+}
+```
+
+## Fallback Responses
+
+ALWAYS have static fallbacks for API failures:
+
+```typescript
+const FALLBACK_RESPONSES: Record<string, string> = {
+  greeting: "Good morning! I'm having a brief connection issue. What's on your mind today?",
+  dump: "I'm having trouble connecting. Go ahead and type everything on your mind — I'll help organize when I'm back.",
+  priority: "Connection issue on my end. What are your top 3 priorities for today?",
+  reflect: "Having trouble connecting. What were your wins today?",
+};
+
+async function generateWithFallback(input: CoachingInput) {
+  try {
+    return await streamText({ ... });
+  } catch (error) {
+    console.error('AI generation failed:', error);
+    return { text: FALLBACK_RESPONSES[input.phase], fallback: true };
+  }
+}
+```
+
+## Retry Logic
+
+ALWAYS retry transient failures:
+
+```typescript
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 3
+): Promise<T> {
+  let lastError: Error;
+  
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error as Error;
+      
+      // Don't retry auth errors
+      if (error.message?.includes('401')) throw error;
+      
+      // Exponential backoff
+      const delay = Math.min(1000 * Math.pow(2, attempt), 5000);
+      await new Promise(r => setTimeout(r, delay));
+    }
+  }
+  
+  throw lastError!;
+}
+```
+
+## FORBIDDEN Patterns
+
+NEVER do these:
+
+```typescript
+// FORBIDDEN: Haiku for multi-turn coaching
+const model = anthropic('claude-haiku-4-5-20251001');
+
+// FORBIDDEN: Skipping usage logging
+await streamText({ ... }); // Where's the cost tracking?
+
+// FORBIDDEN: No fallback handling
+const result = await streamText({ ... }); // What if this fails?
+
+// FORBIDDEN: Hardcoded API keys
+const client = new Anthropic({ apiKey: 'sk-ant-...' });
+
+// FORBIDDEN: Manual streaming implementation
+// Just use the SDK
+
+// FORBIDDEN: Unlimited token usage
+await streamText({
+  maxTokens: 100000, // WAY too high
+});
+```

@@ -1,20 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
 import { startOfWeek, format } from 'date-fns';
-
-export interface HotSpotArea {
-  id: string;
-  name: string;
-  description: string;
-  color: string;
-  notes?: string; // Weekly reflection for this area
-}
-
-export interface HotSpot extends HotSpotArea {
-  rating: number;
-}
+import { backend } from '@/backend';
+import type { HotSpot, HotSpotArea } from '@/types/hotSpots';
 
 const DEFAULT_HOTSPOT_AREAS: HotSpotArea[] = [
   { id: 'mind', name: 'Mind', description: 'Learning, growth, mental clarity', color: 'text-violet-500' },
@@ -46,52 +35,30 @@ export function useHotSpots() {
     }
 
     const loadData = async () => {
-      // Load custom areas
-      const { data: customAreas, error: areasError } = await supabase
-        .from('hotspot_areas')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('position');
+      try {
+        const userAreas = await backend.hotSpots.listAreas(user.id);
+        const areasToUse = userAreas.length > 0 ? userAreas : DEFAULT_HOTSPOT_AREAS;
+        setAreas(areasToUse);
 
-      if (areasError) {
-        console.error('Error loading custom areas:', areasError);
-      }
+        const ratings = await backend.hotSpots.listRatings(user.id, currentWeekStart);
 
-      const userAreas: HotSpotArea[] = customAreas && customAreas.length > 0
-        ? customAreas.map(a => ({
-            id: a.area_id,
-            name: a.name,
-            description: a.description,
-            color: a.color
-          }))
-        : DEFAULT_HOTSPOT_AREAS;
+        // Merge areas with ratings
+        const mergedHotSpots = areasToUse.map((area) => {
+          const rating = ratings.find((r) => r.area === area.id);
+          return { ...area, rating: rating?.rating ?? 5 };
+        });
 
-      setAreas(userAreas);
-
-      // Load ratings
-      const { data: ratings, error: ratingsError } = await supabase
-        .from('hotspot_ratings')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('week_start', currentWeekStart);
-
-      if (ratingsError) {
-        console.error('Error loading hotspot ratings:', ratingsError);
-      }
-
-      // Merge areas with ratings
-      const mergedHotSpots = userAreas.map(area => {
-        const rating = ratings?.find(r => r.area === area.id);
-        return { ...area, rating: rating?.rating ?? 5 };
-      });
-
-      setHotSpots(mergedHotSpots);
+        setHotSpots(mergedHotSpots);
       
-      if (ratings && ratings.length > 0) {
-        setLastCheckin(new Date(ratings[0].updated_at));
-      }
+        if (ratings.length > 0) {
+          setLastCheckin(new Date(ratings[0].updated_at));
+        }
       
-      setLoading(false);
+        setLoading(false);
+      } catch (e) {
+        console.error('Error loading hotspot data:', e);
+        setLoading(false);
+      }
     };
 
     loadData();
@@ -119,20 +86,7 @@ export function useHotSpots() {
     }
 
     try {
-      const upserts = areas.map((area, index) => ({
-        user_id: user.id,
-        area_id: area.id,
-        name: area.name,
-        description: area.description,
-        color: area.color,
-        position: index
-      }));
-
-      const { error } = await supabase
-        .from('hotspot_areas')
-        .upsert(upserts, { onConflict: 'user_id,area_id' });
-
-      if (error) throw error;
+      await backend.hotSpots.upsertAreas(user.id, areas);
 
       toast.success('Hot Spot areas saved!');
       return true;
@@ -157,20 +111,7 @@ export function useHotSpots() {
     setSaving(true);
 
     try {
-      const upserts = hotSpots.map(spot => ({
-        user_id: user.id,
-        week_start: currentWeekStart,
-        area: spot.id,
-        rating: spot.rating
-      }));
-
-      const { error } = await supabase
-        .from('hotspot_ratings')
-        .upsert(upserts, { 
-          onConflict: 'user_id,week_start,area'
-        });
-
-      if (error) throw error;
+      await backend.hotSpots.upsertRatings(user.id, currentWeekStart, hotSpots);
 
       setLastCheckin(new Date());
 

@@ -1,0 +1,242 @@
+---
+description: TypeScript patterns and validation for Claru
+globs: ["**/*.ts", "**/*.tsx"]
+alwaysApply: true
+---
+
+# TypeScript Rules
+
+## Strict Mode
+
+ALWAYS use strict TypeScript configuration:
+
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true
+  }
+}
+```
+
+## Type Definitions
+
+ALWAYS define explicit types for domain entities:
+
+```typescript
+// CORRECT: Explicit types
+interface DailyNote {
+  id: string;
+  userId: string;
+  date: string;
+  rawDump: string | null;
+  plan: Plan | null;
+  reflection: Reflection | null;
+  state: DailyNoteState;
+}
+
+type DailyNoteState = 'created' | 'plan_set' | 'reflection_added' | 'completed';
+
+// WRONG: Using 'any'
+interface DailyNote {
+  id: any;
+  data: any;
+}
+```
+
+## Zod Validation
+
+ALWAYS validate external input with Zod:
+
+```typescript
+import { z } from 'zod';
+
+// Define schema
+const CreateSessionSchema = z.object({
+  flow: z.enum(['morning_checkin', 'evening_checkin', 'adhoc']),
+  userId: z.string().uuid(),
+});
+
+// Use in API route
+export async function POST(request: Request) {
+  const body = await request.json();
+  
+  const result = CreateSessionSchema.safeParse(body);
+  if (!result.success) {
+    return Response.json(
+      { error: 'Invalid request', details: result.error.flatten() },
+      { status: 400 }
+    );
+  }
+  
+  const { flow, userId } = result.data;
+  // Now safely typed
+}
+```
+
+## API Response Types
+
+ALWAYS type API responses:
+
+```typescript
+// types/api.ts
+interface ApiResponse<T> {
+  data?: T;
+  error?: string;
+}
+
+interface CoachingTurnResponse {
+  sessionId: string;
+  turnNumber: number;
+  aiResponse: string;
+  extractedData?: ExtractedData;
+}
+
+// Usage
+export async function POST(request: Request): Promise<Response> {
+  const response: ApiResponse<CoachingTurnResponse> = {
+    data: {
+      sessionId: session.id,
+      turnNumber: turn.number,
+      aiResponse: result.text,
+    },
+  };
+  
+  return Response.json(response);
+}
+```
+
+## Discriminated Unions for State
+
+ALWAYS use discriminated unions for state machines:
+
+```typescript
+// CORRECT: Discriminated union
+type SessionState =
+  | { status: 'created'; startedAt: Date }
+  | { status: 'in_progress'; turnCount: number }
+  | { status: 'plan_confirmed'; plan: Plan }
+  | { status: 'completed'; completedAt: Date }
+  | { status: 'abandoned'; reason: string };
+
+function handleSession(state: SessionState) {
+  switch (state.status) {
+    case 'created':
+      // TypeScript knows startedAt exists
+      return state.startedAt;
+    case 'completed':
+      // TypeScript knows completedAt exists
+      return state.completedAt;
+  }
+}
+
+// WRONG: Single type with optional fields
+interface Session {
+  status: string;
+  startedAt?: Date;
+  completedAt?: Date;
+  turnCount?: number;
+}
+```
+
+## Null Handling
+
+ALWAYS handle null/undefined explicitly:
+
+```typescript
+// CORRECT: Explicit null handling
+async function getNote(userId: string, date: string): Promise<DailyNote | null> {
+  const { data, error } = await supabase
+    .from('daily_notes')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('date', date)
+    .single();
+
+  if (error || !data) return null;
+  return data;
+}
+
+// Usage
+const note = await getNote(userId, today);
+if (!note) {
+  // Handle missing note case
+}
+
+// WRONG: Ignoring possible null
+const note = await getNote(userId, today);
+console.log(note.rawDump); // TypeScript error: note might be null
+```
+
+## Enums vs Union Types
+
+PREFER union types over enums:
+
+```typescript
+// CORRECT: Union type
+type CoachingFlow = 'morning_checkin' | 'evening_checkin' | 'adhoc';
+
+// AVOID: Enums (can cause bundle size issues)
+enum CoachingFlow {
+  MorningCheckin = 'morning_checkin',
+  EveningCheckin = 'evening_checkin',
+  Adhoc = 'adhoc',
+}
+```
+
+## Function Return Types
+
+ALWAYS explicitly type function returns:
+
+```typescript
+// CORRECT: Explicit return type
+async function createSession(
+  userId: string,
+  flow: CoachingFlow
+): Promise<CoachingSession> {
+  // ...
+}
+
+// WRONG: Inferred return type
+async function createSession(userId: string, flow: string) {
+  // Return type is inferred, may be incorrect
+}
+```
+
+## Import Types
+
+USE `import type` for type-only imports:
+
+```typescript
+// CORRECT: Type-only import
+import type { DailyNote, CoachingSession } from '@/types';
+import { createSession } from '@/lib/coaching';
+
+// WRONG: All imports mixed
+import { DailyNote, CoachingSession, createSession } from '@/lib';
+```
+
+## FORBIDDEN Patterns
+
+NEVER do these:
+
+```typescript
+// FORBIDDEN: Using 'any'
+function process(data: any) {}
+
+// FORBIDDEN: Type assertions without validation
+const user = data as User; // What if data is wrong?
+
+// FORBIDDEN: Non-null assertion on external data
+const name = user!.name; // What if user is null?
+
+// FORBIDDEN: Ignoring TypeScript errors
+// @ts-ignore
+doSomethingWrong();
+
+// FORBIDDEN: Implicit any in function parameters
+function process(data) {} // 'data' implicitly has 'any' type
+```

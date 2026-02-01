@@ -1,0 +1,70 @@
+---
+description: Port existing UI components instead of building from scratch
+globs: **/*.{tsx,jsx}
+alwaysApply: true
+---
+
+# Port Existing UI
+
+## Critical Rule
+
+There is an existing codebase with working UI components. DO NOT rebuild UI from scratch.
+
+## Old Repo Location
+
+GitHub: https://github.com/spartacus3131/claru-calm-coaching
+
+Or local: Check for `claru-calm-coaching` or `claru-calm-coaching-main` folder
+
+## Before Building Any UI
+
+1. **Check if it exists in old repo**
+2. **If yes → Port and adapt for Next.js App Router**
+3. **If no → Build fresh**
+
+## Component Mapping
+
+| Feature | Old Repo File | Port To |
+|---------|---------------|---------|
+| Auth | `src/pages/Auth.tsx` | `app/auth/page.tsx` |
+| App Shell | `src/components/layout/AppFrame.tsx` | `app/(app)/layout.tsx` |
+| Header | `src/components/layout/Header.tsx` | `components/layout/Header.tsx` |
+| Bottom Nav | `src/components/layout/BottomNav.tsx` | `components/layout/BottomNav.tsx` |
+| Chat Screen | `src/screens/ChatScreen.tsx` | `app/(app)/chat/page.tsx` |
+| Message Bubble | `src/components/chat/MessageBubble.tsx` | `components/chat/MessageBubble.tsx` |
+| Chat Composer | `src/components/chat/ChatComposer.tsx` | `components/chat/ChatComposer.tsx` |
+| Voice Recorder | `src/components/chat/VoiceRecorder.tsx` | `components/chat/VoiceRecorder.tsx` |
+| Typing Indicator | `src/components/chat/TypingIndicator.tsx` | `components/chat/TypingIndicator.tsx` |
+| Daily Note Panel | `src/components/notes/DailyNotePanel.tsx` | `components/notes/DailyNotePanel.tsx` |
+| Projects Screen | `src/screens/ProjectsScreen.tsx` | `app/(app)/projects/page.tsx` |
+| Challenges Screen | `src/screens/ChallengesScreen.tsx` | `app/(app)/challenges/page.tsx` |
+| Challenge Card | `src/components/challenges/ChallengeCard.tsx` | `components/challenges/ChallengeCard.tsx` |
+| Challenge Drawer | `src/components/challenges/ChallengeDetailDrawer.tsx` | `components/challenges/ChallengeDetailDrawer.tsx` |
+| Parking Lot | `src/components/ParkingLot.tsx` | `components/ParkingLot.tsx` |
+| Hot Spots | `src/screens/HotSpotsScreen.tsx` | `app/(app)/hotspots/page.tsx` |
+
+## Adaptation Required
+
+When porting, adapt for Next.js patterns:
+
+- `useNavigate()` → `useRouter()` from `next/navigation`
+- `<Link to="">` → `<Link href="">`
+- Client hooks need `'use client'` directive
+- Supabase client calls may need server/client separation
+
+## New UI (Build Fresh)
+
+Only these need new UI:
+
+- Rate limit warning banner
+- BPT visualization chart
+- Session state indicator (optional)
+- Energy logging modal
+
+## Data Files to Port
+
+Also port these directly:
+
+- `src/data/challenges.ts` → `data/challenges.ts`
+- `src/types/claru.ts` → `types/claru.ts`
+- `tailwind.config.ts` → `tailwind.config.ts`

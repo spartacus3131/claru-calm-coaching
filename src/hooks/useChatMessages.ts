@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { backend } from '@/backend';
 import { useAuth } from './useAuth';
 import { Message } from '@/types/claru';
 
@@ -39,41 +39,27 @@ export function useChatMessages() {
       // If we have trial messages to migrate, save them first
       if (trialMessages.length > 0) {
         console.log('Migrating trial messages:', trialMessages.length);
-
-        const messagesToInsert = trialMessages.map(m => ({
-          user_id: user.id,
-          role: m.role,
-          content: m.content,
-          created_at: m.timestamp.toISOString()
-        }));
-
-        const { error: insertError } = await supabase
-          .from('chat_messages')
-          .insert(messagesToInsert);
-
-        if (insertError) {
-          console.error('Error migrating trial messages:', insertError);
-        } else {
+        try {
+          await backend.chatMessages.insertMany(
+            trialMessages.map((m) => ({
+              userId: user.id,
+              role: m.role,
+              content: m.content,
+              createdAt: m.timestamp.toISOString(),
+            }))
+          );
           console.log('Trial messages migrated successfully');
+        } catch (e) {
+          console.error('Error migrating trial messages:', e);
         }
       }
 
       // Now load all messages (including freshly migrated ones)
-      const { data, error } = await supabase
-        .from('chat_messages')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: true });
-
-      if (error) {
-        console.error('Error loading messages:', error);
-      } else if (data) {
-        setMessages(data.map(m => ({
-          id: m.id,
-          role: m.role as 'user' | 'assistant',
-          content: m.content,
-          timestamp: new Date(m.created_at)
-        })));
+      try {
+        const msgs = await backend.chatMessages.list(user.id);
+        setMessages(msgs);
+      } catch (e) {
+        console.error('Error loading messages:', e);
       }
 
       // Clear the local messages ref after successful migration
@@ -97,27 +83,19 @@ export function useChatMessages() {
 
     // Only persist to database if logged in
     if (user) {
-      const { data, error } = await supabase
-        .from('chat_messages')
-        .insert({
-          user_id: user.id,
+      try {
+        const inserted = await backend.chatMessages.insert({
+          userId: user.id,
           role,
-          content
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error saving message:', error);
-      } else if (data) {
+          content,
+        });
         // Update with real ID
-        setMessages(prev => 
-          prev.map(m => m.id === newMessage.id 
-            ? { ...m, id: data.id } 
-            : m
-          )
+        setMessages((prev) =>
+          prev.map((m) => (m.id === newMessage.id ? { ...m, id: inserted.id } : m))
         );
-        return { ...newMessage, id: data.id };
+        return { ...newMessage, id: inserted.id };
+      } catch (e) {
+        console.error('Error saving message:', e);
       }
     }
 

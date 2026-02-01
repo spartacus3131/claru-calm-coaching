@@ -1,0 +1,81 @@
+---
+description: Code documentation standards
+alwaysApply: true
+---
+
+# Documentation Standards
+
+Code without documentation is a liability. Future you (and AI tools) need context.
+
+## Requirements
+
+### File Headers
+
+Every file MUST have a header comment:
+
+```typescript
+/**
+ * @file UserAuthService.ts
+ * @description Handles user authentication, session management, and token refresh.
+ * @module auth
+ */
+```
+
+### Function Documentation
+
+Every public function MUST have a docstring:
+
+```typescript
+/**
+ * Authenticates a user with email and password.
+ * 
+ * @param email - User's email address
+ * @param password - User's password (will be hashed)
+ * @returns User object with session token, or null if invalid
+ * @throws AuthError if account is locked or requires verification
+ * 
+ * @example
+ * const user = await authenticateUser('user@example.com', 'password123');
+ * if (user) {
+ *   console.log('Logged in:', user.id);
+ * }
+ */
+export async function authenticateUser(email: string, password: string): Promise<User | null>
+```
+
+### Complex Logic
+
+Any non-obvious logic MUST have inline comments explaining WHY:
+
+```typescript
+// We check the token expiry 5 minutes early to prevent edge cases
+// where a valid-looking token expires during the request
+const bufferMinutes = 5;
+const isExpiringSoon = tokenExpiry < Date.now() + (bufferMinutes * 60 * 1000);
+```
+
+### README Updates
+
+When adding new features:
+- Update README.md with feature description
+- Add any new environment variables to .env.example
+- Document any new API endpoints
+
+## FORBIDDEN
+
+- Code without any comments in files over 50 lines
+- Comments that just repeat the code: `// increment i by 1`
+- Outdated comments that don't match the code
+- TODO comments without a ticket/issue reference
+- Magic numbers without explanation
+
+## Why This Matters
+
+Documentation is not extra work—it's how you communicate intent.
+
+**Specific benefits:**
+- AI coding tools use docstrings to understand what functions should do
+- File headers help navigate large codebases quickly
+- "Why" comments prevent future developers from "fixing" intentional behavior
+- Good docs reduce onboarding time from days to hours
+- Self-documenting code is a myth—intent is never obvious from implementation alone

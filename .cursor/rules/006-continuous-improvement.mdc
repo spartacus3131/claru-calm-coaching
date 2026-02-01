@@ -1,0 +1,130 @@
+---
+description: Evolve rules based on mistakes and learnings
+alwaysApply: true
+---
+
+# Continuous Rule Improvement
+
+Your rules are never complete on day one. This rule ensures they evolve.
+
+## When a Mistake Happens
+
+Whenever a significant or preventable error is made, and analysis shows it could have been avoided by introducing, revising, or clarifying a cursor rule:
+
+1. **STOP** current work
+2. **INFORM** the user: "This error suggests we need a new/revised rule"
+3. **PROPOSE** the rule addition or change
+4. **WAIT** for user approval before continuing
+5. **IF APPROVED** add/update the rule immediately
+
+## Triggers for New Rules
+
+Consider a new rule when:
+
+- The same correction is given twice
+- An error pattern emerges across multiple features
+- An edge case reveals a gap in existing rules
+- A security or quality issue slips through
+- Code review consistently catches the same issue
+
+## Rule Proposal Format
+
+When proposing a new rule:
+
+```markdown
+## Proposed Rule: [Name]
+
+**Triggered by:** [What mistake happened]
+
+**The Pattern:** [What keeps going wrong]
+
+**Proposed Rule:**
+[The actual rule text]
+
+**Prevents:** [What this rule would catch]
+
+**Approve this rule? [Yes/No]**
+```
+
+## Example Scenario
+
+```
+User: "The API is returning 500 errors in production"
+
+AI Analysis: "I see the issue - we're not validating user input before 
+database queries. This caused a SQL error that leaked to the user."
+
+AI Proposal: "This error suggests we need a new rule:
+
+## Proposed Rule: Input Validation Before Database
+
+**Triggered by:** Unvalidated user input caused SQL error in production
+
+**The Pattern:** User input going directly to database without validation
+
+**Proposed Rule:**
+All user input MUST be validated with Zod schemas before 
+reaching any database operation. No exceptions.
+
+**Prevents:** SQL errors, injection attacks, malformed data
+
+**Approve this rule? [Yes/No]**"
+```
+
+## Documentation
+
+After fixing preventable errors, update `lessons-learned.md`:
+
+```markdown
+## 2024-01-15: SQL Error from Unvalidated Input
+
+**What happened:** User submitted malformed email, caused SQL error
+
+**Root cause:** No input validation on signup endpoint
+
+**Solution:** Added Zod schema validation
+
+**New rule added:** Input Validation Before Database (005-validation.mdc)
+
+**Time lost:** ~2 hours debugging
+```
+
+## Rule Quality Checklist
+
+When adding or revising rules, ensure:
+
+- [ ] Uses strong language (MUST, NEVER, FORBIDDEN)
+- [ ] Includes specific examples
+- [ ] Explains WHY (not just what)
+- [ ] Is actionable (clear what to do)
+- [ ] Doesn't conflict with existing rules
+- [ ] Has been tested with a real scenario
+
+## Anti-Patterns
+
+Don't add rules that are:
+
+- Too vague: "Write good code"
+- Too specific: "Line 47 of file X should..."
+- Conflicting with existing rules
+- Unenforceable by observation
+- Based on one-time edge cases unlikely to recur
+
+## Quarterly Review
+
+Every 3 months, review all rules:
+
+1. Are any rules being consistently ignored? (Rule is bad or needs strengthening)
+2. Are any rules no longer relevant? (Remove them)
+3. Are there patterns in recent bugs? (Add rules)
+4. Do examples need updating? (Technology moved on)
+
+## Why This Matters
+
+Rules are only as good as their evolution.
+
+**Specific benefits:**
+- Mistakes become systemic improvements instead of repeated failures
+- The ruleset adapts to your actual codebase, not generic best practices
+- New team members (and AI) benefit from hard-won lessons
+- Quarterly reviews prevent rule rot and context decay

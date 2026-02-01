@@ -1,14 +1,8 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
-
-export interface ParkingItem {
-  id: string;
-  content: string;
-  isCompleted: boolean;
-  createdAt: Date;
-}
+import { backend } from '@/backend';
+import type { ParkingItem } from '@/types/parkingLot';
 
 export function useParkingLot() {
   const { user } = useAuth();
@@ -24,21 +18,18 @@ export function useParkingLot() {
     }
 
     const loadItems = async () => {
-      const { data, error } = await supabase
-        .from('parking_lot_items')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error loading parking lot items:', error);
-      } else if (data) {
-        setItems(data.map(item => ({
-          id: item.id,
-          content: item.content,
-          isCompleted: item.is_completed,
-          createdAt: new Date(item.created_at)
-        })));
+      try {
+        const data = await backend.parkingLot.list(user.id);
+        setItems(
+          data.map((item) => ({
+            id: item.id,
+            content: item.content,
+            isCompleted: item.is_completed,
+            createdAt: new Date(item.created_at),
+          }))
+        );
+      } catch (e) {
+        console.error('Error loading parking lot items:', e);
       }
       setLoading(false);
     };
@@ -67,27 +58,16 @@ export function useParkingLot() {
 
     setItems(prev => [newItem, ...prev]);
 
-    const { data, error } = await supabase
-      .from('parking_lot_items')
-      .insert({
-        user_id: user.id,
-        content,
-        is_completed: false
-      })
-      .select()
-      .single();
-
-    if (error) {
+    try {
+      const created = await backend.parkingLot.create(user.id, content);
+      setItems((prev) => prev.map((i) => (i.id === tempId ? { ...i, id: created.id } : i)));
+      return true;
+    } catch (error) {
       console.error('Error adding item:', error);
       setItems(prev => prev.filter(i => i.id !== tempId));
       toast.error('Failed to add item');
       return false;
-    } else if (data) {
-      setItems(prev =>
-        prev.map(i => i.id === tempId ? { ...i, id: data.id } : i)
-      );
     }
-    return true;
   };
 
   const toggleItem = async (id: string) => {
@@ -100,12 +80,9 @@ export function useParkingLot() {
       prev.map(i => i.id === id ? { ...i, isCompleted: !i.isCompleted } : i)
     );
 
-    const { error } = await supabase
-      .from('parking_lot_items')
-      .update({ is_completed: !item.isCompleted })
-      .eq('id', id);
-
-    if (error) {
+    try {
+      await backend.parkingLot.setCompleted(user.id, id, !item.isCompleted);
+    } catch (error) {
       console.error('Error toggling item:', error);
       setItems(prev =>
         prev.map(i => i.id === id ? { ...i, isCompleted: item.isCompleted } : i)
@@ -120,12 +97,9 @@ export function useParkingLot() {
     
     setItems(prev => prev.filter(i => i.id !== id));
 
-    const { error } = await supabase
-      .from('parking_lot_items')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
+    try {
+      await backend.parkingLot.remove(user.id, id);
+    } catch (error) {
       console.error('Error deleting item:', error);
       if (item) {
         setItems(prev => [...prev, item]);

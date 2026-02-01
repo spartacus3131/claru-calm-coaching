@@ -1,0 +1,293 @@
+{
+  "project": "Claru",
+  "version": "2.0",
+  "created": "2026-01-31",
+  "features": [
+    {
+      "id": "F001",
+      "name": "User Authentication",
+      "description": "Sign up, sign in, sign out with Supabase Auth",
+      "context": "User Identity",
+      "priority": 1,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F002",
+      "name": "App Shell",
+      "description": "Layout with header, bottom nav, routing between main screens",
+      "context": "User Identity",
+      "priority": 1,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F003",
+      "name": "Morning Check-In Chat",
+      "description": "Conversational AI check-in with brain dump capture",
+      "context": "Coaching Engine",
+      "priority": 1,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F004",
+      "name": "AI Response Streaming",
+      "description": "Stream AI responses in real-time using Vercel AI SDK",
+      "context": "Coaching Engine",
+      "priority": 1,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F005",
+      "name": "Daily Note Extraction",
+      "description": "Extract Top 3, tasks, and structured data from AI conversation",
+      "context": "Coaching Engine",
+      "priority": 1,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F006",
+      "name": "Daily Note Panel",
+      "description": "View and edit daily note with Top 3, tasks, reflections",
+      "context": "User Context Store",
+      "priority": 1,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F007",
+      "name": "Coaching Session State Machine",
+      "description": "Track session lifecycle: created → in_progress → completed",
+      "context": "Coaching Engine",
+      "priority": 1,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F008",
+      "name": "Evening Reflection",
+      "description": "Evening mode with reflection prompts and day closure",
+      "context": "Coaching Engine",
+      "priority": 2,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F009",
+      "name": "Carryover Detection",
+      "description": "Surface incomplete Top 3 from yesterday in morning check-in",
+      "context": "User Context Store",
+      "priority": 2,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F010",
+      "name": "Token Usage Tracking",
+      "description": "Log AI token usage and costs per user",
+      "context": "Coaching Engine",
+      "priority": 2,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F011",
+      "name": "Rate Limiting",
+      "description": "Enforce $5/day token budget per user",
+      "context": "Coaching Engine",
+      "priority": 2,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F012",
+      "name": "Voice Recording",
+      "description": "Record audio in browser for voice brain dumps",
+      "context": "Capture Service",
+      "priority": 2,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F013",
+      "name": "Voice Transcription",
+      "description": "Transcribe voice to text via Deepgram Nova-2 WebSocket",
+      "context": "Capture Service",
+      "priority": 2,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F014",
+      "name": "Projects CRUD",
+      "description": "Create, read, update, delete user projects",
+      "context": "User Context Store",
+      "priority": 2,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F015",
+      "name": "Projects in AI Context",
+      "description": "Pass active projects to AI for context-aware coaching",
+      "context": "Coaching Engine",
+      "priority": 2,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F016",
+      "name": "Challenge Data & Types",
+      "description": "22 challenge definitions with metadata",
+      "context": "Challenge Engine",
+      "priority": 2,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F017",
+      "name": "Challenge State Machine",
+      "description": "Track challenge lifecycle: available → active → completed",
+      "context": "Challenge Engine",
+      "priority": 2,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F018",
+      "name": "Challenges Screen",
+      "description": "View available, active, and completed challenges",
+      "context": "Challenge Engine",
+      "priority": 2,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F019",
+      "name": "Challenge Introduction Flow",
+      "description": "AI introduces and guides user through challenge start",
+      "context": "Challenge Engine",
+      "priority": 2,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F020",
+      "name": "Challenge Nudges",
+      "description": "AI mentions active challenge in check-ins",
+      "context": "Challenge Engine",
+      "priority": 3,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F021",
+      "name": "Values Challenge (C1)",
+      "description": "Full implementation of Challenge 1",
+      "context": "Challenge Engine",
+      "priority": 2,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F022",
+      "name": "Impact Challenge (C2)",
+      "description": "Full implementation of Challenge 2",
+      "context": "Challenge Engine",
+      "priority": 2,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F023",
+      "name": "Prime Time Challenge (C4)",
+      "description": "BPT tracking challenge with energy logging",
+      "context": "Challenge Engine",
+      "priority": 3,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F024",
+      "name": "Energy Logging",
+      "description": "Log energy levels 1-10 throughout the day",
+      "context": "Engagement Tracker",
+      "priority": 3,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F025",
+      "name": "BPT Analysis",
+      "description": "Calculate biological prime time from energy data",
+      "context": "Insights Engine",
+      "priority": 3,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F026",
+      "name": "Parking Lot",
+      "description": "Park items for later review",
+      "context": "Parking Lot Manager",
+      "priority": 3,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F027",
+      "name": "Hot Spots",
+      "description": "Weekly ratings for 7 life areas",
+      "context": "Engagement Tracker",
+      "priority": 3,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F028",
+      "name": "Streak Tracking",
+      "description": "Count consecutive days with check-ins",
+      "context": "Engagement Tracker",
+      "priority": 3,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F029",
+      "name": "Try Mode",
+      "description": "Guest experience without auth, migrate on signup",
+      "context": "User Identity",
+      "priority": 3,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F030",
+      "name": "Fallback Responses",
+      "description": "Graceful handling when AI is unavailable",
+      "context": "Coaching Engine",
+      "priority": 2,
+      "status": "complete",
+      "passes": true
+    },
+    {
+      "id": "F031",
+      "name": "Chat History Persistence",
+      "description": "Save and load conversation history",
+      "context": "User Context Store",
+      "priority": 2,
+      "status": "complete",
+      "passes": true
+    }
+  ],
+  "summary": {
+    "total": 31,
+    "priority_1": 7,
+    "priority_2": 15,
+    "priority_3": 9,
+    "completed": 31
+  }
+}

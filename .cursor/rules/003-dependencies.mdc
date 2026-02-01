@@ -1,0 +1,98 @@
+---
+description: Dependency management - NEVER downgrade to fix errors
+alwaysApply: true
+---
+
+# Dependency Management
+
+## THE CARDINAL RULE
+
+**It is FORBIDDEN to downgrade a dependency version to work around a problem.**
+
+This is non-negotiable. Downgrading:
+- Introduces security vulnerabilities
+- Removes features you may need
+- Creates hidden technical debt
+- Masks the real problem
+
+## When You Encounter a Dependency Error
+
+Follow this sequence:
+
+1. **Read the FULL error message** - It usually tells you what's wrong
+2. **Check the dependency's changelog** - Look for breaking changes
+3. **Search for the error** - Others have likely encountered it
+4. **Update YOUR code** to work with the new version
+5. **If truly stuck** - Ask for help, document the issue
+
+NEVER just try `npm install package@older-version`. That is not a solution.
+
+## Dependency Installation Rules
+
+### Use Exact Versions
+
+```json
+// CORRECT
+"dependencies": {
+  "react": "18.2.0",
+  "next": "14.0.4"
+}
+
+// FORBIDDEN
+"dependencies": {
+  "react": "^18.2.0",  // No caret
+  "next": "~14.0.4"   // No tilde
+}
+```
+
+### Document Why
+
+When adding a new dependency, add a comment in package.json or a DEPENDENCIES.md:
+
+```markdown
+## Dependencies
+
+### react-query
+- **Why:** Server state management, caching, background refetching
+- **Added:** 2024-01-15
+- **Alternatives considered:** SWR (less features), Redux (overkill)
+```
+
+### Security Audit
+
+Before adding ANY new dependency:
+1. Check when it was last updated
+2. Check download counts (popularity = more eyes on security)
+3. Run `npm audit` after installation
+4. Check the dependency's dependencies (transitive risk)
+
+## Lock Files
+
+- ALWAYS commit `package-lock.json` or `yarn.lock`
+- NEVER delete lock files to "fix" issues
+- Run `npm ci` in CI/CD (uses lock file exactly)
+
+## FORBIDDEN
+
+- Downgrading dependency versions
+- Using `*` or `latest` as version
+- Deleting lock files
+- Installing without reviewing what's being added
+- Ignoring security audit warnings
+
+## When Upgrading
+
+1. Read the changelog
+2. Update one major dependency at a time
+3. Run all tests after each upgrade
+4. Commit each upgrade separately
+
+## Why This Matters
+
+Dependencies are other people's code running in your application.
+
+**Specific risks of poor dependency management:**
+- Security breaches from outdated packages (90% of breaches involve known vulnerabilities)
+- "Works on my machine" from inconsistent versions
+- Mysterious bugs from transitive dependency conflicts
+- Downgrade "fixes" that hide the real problem until production

@@ -1,0 +1,353 @@
+---
+description: Claru state machine definitions - ENFORCE VALID TRANSITIONS
+globs: ["**/*.ts", "**/*.tsx"]
+alwaysApply: true
+---
+
+# Claru State Machines
+
+These state machines are defined in the technical architecture. ALWAYS enforce valid transitions.
+
+## CoachingSession State Machine
+
+```
+States: created → in_progress → plan_confirmed → completed
+                            ↘ abandoned
+
+Transitions:
+- created → in_progress: ReceiveUserInput
+- in_progress → in_progress: ReceiveUserInput (if turn < max)
+- in_progress → plan_confirmed: UserConfirmsPlan
+- in_progress → abandoned: Timeout (30 min)
+- plan_confirmed → completed: SaveAndClose
+```
+
+### Implementation
+
+```typescript
+type SessionState = 'created' | 'in_progress' | 'plan_confirmed' | 'completed' | 'abandoned';
+
+const SESSION_TRANSITIONS: Record<SessionState, SessionState[]> = {
+  created: ['in_progress'],
+  in_progress: ['in_progress', 'plan_confirmed', 'abandoned'],
+  plan_confirmed: ['completed'],
+  completed: [],
+  abandoned: [],
+};
+
+const MAX_TURNS = {
+  morning_checkin: 15,
+  evening_checkin: 10,
+  adhoc: 10,
+};
+
+function canTransition(from: SessionState, to: SessionState): boolean {
+  return SESSION_TRANSITIONS[from].includes(to);
+}
+
+async function transitionSession(
+  session: CoachingSession,
+  to: SessionState,
+  data?: Partial<CoachingSession>
+): Promise<CoachingSession> {
+  if (!canTransition(session.state, to)) {
+    throw new InvalidTransitionError(
+      `Cannot transition from ${session.state} to ${to}`
+    );
+  }
+
+  // Guard: Check turn limit before allowing in_progress → in_progress
+  if (session.state === 'in_progress' && to === 'in_progress') {
+    if (session.turnCount >= MAX_TURNS[session.flow]) {
+      throw new TurnLimitExceeded(
+        `Session exceeded ${MAX_TURNS[session.flow]} turns`
+      );
+    }
+  }
+
+  const { data: updated, error } = await supabase
+    .from('coaching_sessions')
+    .update({ state: to, ...data })
+    .eq('id', session.id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return updated;
+}
+```
+
+### Usage
+
+```typescript
+// CORRECT: Using state machine
+async function handleUserInput(sessionId: string, input: string) {
+  const session = await getSession(sessionId);
+  
+  // Transition with validation
+  const updated = await transitionSession(session, 'in_progress', {
+    turn_count: session.turnCount + 1,
+  });
+  
+  return generateResponse(updated, input);
+}
+
+// WRONG: Direct state update without validation
+async function handleUserInput(sessionId: string, input: string) {
+  await supabase
+    .from('coaching_sessions')
+    .update({ state: 'in_progress', turn_count: session.turnCount + 1 })
+    .eq('id', sessionId);
+  // No validation of valid transition!
+}
+```
+
+---
+
+## DailyNote State Machine
+
+```
+States: created → plan_set → reflection_added → completed
+
+Transitions:
+- created → plan_set: SavePlan
+- plan_set → reflection_added: SaveReflection
+- reflection_added → completed: MarkComplete
+```
+
+### Implementation
+
+```typescript
+type NoteState = 'created' | 'plan_set' | 'reflection_added' | 'completed';
+
+const NOTE_TRANSITIONS: Record<NoteState, NoteState[]> = {
+  created: ['plan_set'],
+  plan_set: ['reflection_added'],
+  reflection_added: ['completed'],
+  completed: [],
+};
+
+async function transitionNote(
+  note: DailyNote,
+  to: NoteState,
+  data?: Partial<DailyNote>
+): Promise<DailyNote> {
+  if (!NOTE_TRANSITIONS[note.state].includes(to)) {
+    throw new InvalidTransitionError(
+      `Cannot transition note from ${note.state} to ${to}`
+    );
+  }
+
+  const { data: updated, error } = await supabase
+    .from('daily_notes')
+    .update({ state: to, ...data })
+    .eq('id', note.id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return updated;
+}
+```
+
+### Usage
+
+```typescript
+// CORRECT: Save plan with state transition
+async function savePlan(noteId: string, plan: Plan) {
+  const note = await getNote(noteId);
+  return transitionNote(note, 'plan_set', { plan });
+}
+
+// CORRECT: Save reflection with state transition
+async function saveReflection(noteId: string, reflection: Reflection) {
+  const note = await getNote(noteId);
+  return transitionNote(note, 'reflection_added', { reflection });
+}
+```
+
+---
+
+## UserChallenge State Machine
+
+```
+States: available → offered → active → data_collected → analyzed → completed
+                         ↘ declined (→ offered after 7 days)
+
+Transitions:
+- available → offered: DetectTrigger
+- offered → active: UserAccepts
+- offered → declined: UserDeclines
+- declined → offered: CooldownExpires (7 days)
+- active → data_collected: MinimumDataReached
+- data_collected → analyzed: RunAnalysis
+- analyzed → completed: IntegrateLearning
+```
+
+### Implementation
+
+```typescript
+type ChallengeStatus = 
+  | 'available' 
+  | 'offered' 
+  | 'declined' 
+  | 'active' 
+  | 'data_collected' 
+  | 'analyzed' 
+  | 'completed';
+
+const CHALLENGE_TRANSITIONS: Record<ChallengeStatus, ChallengeStatus[]> = {
+  available: ['offered'],
+  offered: ['active', 'declined'],
+  declined: ['offered'], // After 7-day cooldown
+  active: ['data_collected'],
+  data_collected: ['analyzed'],
+  analyzed: ['completed'],
+  completed: [],
+};
+
+const DECLINE_COOLDOWN_DAYS = 7;
+
+async function transitionChallenge(
+  challenge: UserChallenge,
+  to: ChallengeStatus,
+  data?: Partial<UserChallenge>
+): Promise<UserChallenge> {
+  // Special case: declined → offered requires cooldown check
+  if (challenge.status === 'declined' && to === 'offered') {
+    const daysSinceDecline = getDaysSince(challenge.updated_at);
+    if (daysSinceDecline < DECLINE_COOLDOWN_DAYS) {
+      throw new CooldownNotExpired(
+        `Must wait ${DECLINE_COOLDOWN_DAYS - daysSinceDecline} more days`
+      );
+    }
+  }
+
+  if (!CHALLENGE_TRANSITIONS[challenge.status].includes(to)) {
+    throw new InvalidTransitionError(
+      `Cannot transition challenge from ${challenge.status} to ${to}`
+    );
+  }
+
+  const { data: updated, error } = await supabase
+    .from('user_challenges')
+    .update({ status: to, ...data })
+    .eq('id', challenge.id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return updated;
+}
+```
+
+---
+
+## ParkedItem State Machine
+
+```
+States: parked → under_review → reactivated | deleted
+                            ↘ parked (keep)
+
+Transitions:
+- parked → under_review: WeeklyReview or Resurface
+- under_review → reactivated: UserReactivates
+- under_review → parked: UserKeeps
+- under_review → deleted: UserDeletes
+```
+
+### Implementation
+
+```typescript
+type ParkedStatus = 'parked' | 'under_review' | 'reactivated' | 'deleted';
+
+const PARKED_TRANSITIONS: Record<ParkedStatus, ParkedStatus[]> = {
+  parked: ['under_review'],
+  under_review: ['reactivated', 'parked', 'deleted'],
+  reactivated: [], // Terminal
+  deleted: [], // Terminal
+};
+
+async function transitionParkedItem(
+  item: ParkedItem,
+  to: ParkedStatus
+): Promise<ParkedItem> {
+  if (!PARKED_TRANSITIONS[item.status].includes(to)) {
+    throw new InvalidTransitionError(
+      `Cannot transition parked item from ${item.status} to ${to}`
+    );
+  }
+
+  const updates: Partial<ParkedItem> = { status: to };
+  
+  if (to === 'under_review') {
+    updates.last_reviewed_at = new Date().toISOString();
+  }
+
+  const { data: updated, error } = await supabase
+    .from('parked_items')
+    .update(updates)
+    .eq('id', item.id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return updated;
+}
+```
+
+---
+
+## FORBIDDEN Patterns
+
+NEVER do these:
+
+```typescript
+// FORBIDDEN: Direct state update without validation
+await supabase
+  .from('coaching_sessions')
+  .update({ state: 'completed' }) // What if it was 'created'?
+  .eq('id', sessionId);
+
+// FORBIDDEN: Skipping states
+await transitionSession(session, 'completed'); // Can't skip plan_confirmed!
+
+// FORBIDDEN: Invalid transition
+const session = { state: 'completed' };
+await transitionSession(session, 'in_progress'); // Can't go backwards!
+
+// FORBIDDEN: Ignoring turn limits
+while (true) {
+  await handleTurn(session, input); // No turn limit check!
+}
+
+// FORBIDDEN: Ignoring cooldown
+await transitionChallenge(declinedChallenge, 'offered'); // Cooldown not checked!
+```
+
+## State Machine Errors
+
+Define clear error types:
+
+```typescript
+class InvalidTransitionError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'InvalidTransitionError';
+  }
+}
+
+class TurnLimitExceeded extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'TurnLimitExceeded';
+  }
+}
+
+class CooldownNotExpired extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'CooldownNotExpired';
+  }
+}
+```

@@ -1,0 +1,206 @@
+---
+description: Error handling patterns - never swallow errors silently
+alwaysApply: true
+---
+
+# Error Handling
+
+## The Golden Rule
+
+**Never swallow errors silently.** Every error must be:
+1. Logged with context
+2. Handled appropriately
+3. Communicated to the user (if user-facing)
+
+## Error Handling Pattern
+
+```typescript
+try {
+  const result = await riskyOperation(userId, data);
+  return result;
+} catch (error) {
+  // 1. Log with context
+  logger.error('Failed to complete operation', {
+    operation: 'riskyOperation',
+    userId,
+    data: sanitize(data), // Remove sensitive info
+    error: error instanceof Error ? error.message : String(error),
+    stack: error instanceof Error ? error.stack : undefined,
+  });
+
+  // 2. Handle appropriately
+  if (error instanceof ValidationError) {
+    // Recoverable - return user-friendly message
+    throw new UserError('Please check your input and try again');
+  }
+  
+  if (error instanceof NetworkError) {
+    // Transient - could retry
+    throw new RetryableError('Service temporarily unavailable');
+  }
+
+  // 3. Unknown error - don't expose internals
+  throw new InternalError('Something went wrong. Please try again.');
+}
+```
+
+## Error Types
+
+Define clear error types for your application:
+
+```typescript
+// Base application error
+class AppError extends Error {
+  constructor(
+    message: string,
+    public code: string,
+    public statusCode: number = 500,
+    public isOperational: boolean = true
+  ) {
+    super(message);
+    this.name = this.constructor.name;
+  }
+}
+
+// User-caused errors (400s)
+class ValidationError extends AppError {
+  constructor(message: string) {
+    super(message, 'VALIDATION_ERROR', 400);
+  }
+}
+
+// Not found (404)
+class NotFoundError extends AppError {
+  constructor(resource: string) {
+    super(`${resource} not found`, 'NOT_FOUND', 404);
+  }
+}
+
+// Server errors (500s)
+class InternalError extends AppError {
+  constructor(message: string = 'Internal server error') {
+    super(message, 'INTERNAL_ERROR', 500);
+  }
+}
+```
+
+## Logging Requirements
+
+### What to Log
+
+```typescript
+// GOOD - Contextual logging
+logger.error('Payment processing failed', {
+  orderId: order.id,
+  userId: user.id,
+  amount: order.total,
+  paymentMethod: order.paymentMethod,
+  error: error.message,
+  attemptNumber: retryCount,
+});
+
+// BAD - Useless logging
+logger.error('Error occurred');
+logger.error(error);
+```
+
+### What NOT to Log
+
+- Passwords or tokens
+- Full credit card numbers
+- Personal health information
+- Raw user input (sanitize first)
+
+## FORBIDDEN Patterns
+
+```typescript
+// FORBIDDEN: Empty catch
+try {
+  await operation();
+} catch (e) {
+  // This hides bugs
+}
+
+// FORBIDDEN: Console.log in production
+try {
+  await operation();
+} catch (e) {
+  console.log(e); // Use proper logging
+}
+
+// FORBIDDEN: Generic messages only
+throw new Error('Error'); // What error?!
+
+// FORBIDDEN: Exposing internal details to users
+res.status(500).json({ 
+  error: error.stack // Security risk!
+});
+```
+
+## Async Error Handling
+
+### In Express/API routes
+
+```typescript
+// Use async wrapper
+const asyncHandler = (fn: Function) => (req: Request, res: Response, next: NextFunction) => {
+  Promise.resolve(fn(req, res, next)).catch(next);
+};
+
+app.get('/users/:id', asyncHandler(async (req, res) => {
+  const user = await getUserById(req.params.id);
+  if (!user) {
+    throw new NotFoundError('User');
+  }
+  res.json(user);
+}));
+```
+
+### In React components
+
+```typescript
+// Use error boundaries for UI errors
+class ErrorBoundary extends React.Component {
+  state = { hasError: false };
+  
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+  
+  componentDidCatch(error, errorInfo) {
+    logger.error('React error boundary caught error', {
+      error: error.message,
+      componentStack: errorInfo.componentStack,
+    });
+  }
+  
+  render() {
+    if (this.state.hasError) {
+      return <ErrorFallback />;
+    }
+    return this.props.children;
+  }
+}
+```
+
+## User-Facing Error Messages
+
+| Internal Error | User Message |
+|---------------|--------------|
+| `DatabaseConnectionError` | "We're having trouble connecting. Please try again." |
+| `ValidationError: email` | "Please enter a valid email address." |
+| `RateLimitError` | "You're doing that too fast. Please wait a moment." |
+| `AuthenticationError` | "Please check your credentials and try again." |
+| Unknown | "Something went wrong. Please try again or contact support." |
+
+Never expose stack traces, SQL errors, or internal system details to users.
+
+## Why This Matters
+
+Error handling is the difference between "the app crashed" and "we know what went wrong."
+
+**Specific benefits:**
+- Context-rich logs let you debug production issues in minutes, not hours
+- Proper error propagation prevents silent failures that corrupt data
+- User-friendly messages maintain trust when things go wrong
+- Structured error types enable automated alerting and categorization

@@ -1,0 +1,95 @@
+---
+description: State which rules apply before starting work (scope based on task complexity)
+globs: **/*
+alwaysApply: true
+---
+
+# Rule Transparency
+
+## Task Classification
+
+Before starting, classify the task:
+
+| Type | Examples | Rule Check |
+|------|----------|------------|
+| **Simple** | UI porting, styling, copy changes, file moves | Skip to relevant rules only |
+| **Medium** | New component, hook, API route | Check related rules |
+| **Complex** | New feature, architecture change, DB schema | Full checklist |
+
+## Simple Tasks (UI/Styling/Porting)
+
+For simple tasks, just note the 1-3 relevant rules:
+
+```
+Task type: Simple (UI porting)
+Relevant rules: 006-port-ui.mdc, 002-documentation.mdc
+```
+
+Then proceed immediately.
+
+## Medium/Complex Tasks
+
+Review the full checklist:
+
+| Rule | Check |
+|------|-------|
+| **001-tdd.mdc** | Am I writing tests first? |
+| **002-documentation.mdc** | Do files need headers? Do functions need docstrings? |
+| **003-dependencies.mdc** | Am I adding dependencies? Using exact versions? |
+| **004-git.mdc** | Will I need to commit? Following commit message format? |
+| **005-error-handling.mdc** | Am I handling errors properly? Logging with context? |
+| **006-continuous-improvement.mdc** | Did a mistake reveal a rule gap? |
+| **006-port-ui.mdc** | Does UI already exist in old repo to port? |
+| **supabase.mdc** | Am I using database? RLS policies? Server client? |
+| **typescript.mdc** | Strict types? Zod validation? |
+| **bounded-contexts.mdc** | Which context owns this? Am I crossing boundaries? |
+| **domain-language.mdc** | Am I using correct terms (Project, Top 3, etc.)? |
+| **nextjs-app-router.mdc** | Server vs Client components? Route handlers? |
+| **state-machines.mdc** | Does this entity have lifecycle states? |
+| **ai-claude.mdc** | Am I calling AI? Logging usage? Rate limiting? |
+| **ai-coaching-behavior.mdc** | Am I modifying coaching prompts? |
+| **deepgram-voice.mdc** | Am I touching voice features? |
+
+## Output Format (Medium/Complex)
+
+```
+Task type: Complex (new feature)
+
+## Rules I'm Applying:
+- [rule-name.mdc]: [one sentence on how it applies]
+...
+
+## Rules Verified Not Applicable:
+- [rule-name.mdc]: [why it doesn't apply]
+```
+
+## Example: Simple Task
+
+```
+Task type: Simple (port Projects screen from Vite to Next.js)
+Relevant rules: 006-port-ui.mdc (check old repo first), 002-documentation.mdc (add file headers)
+```
+
+## Example: Complex Task
+
+```
+Task type: Complex (build Projects API with CRUD)
+
+## Rules I'm Applying:
+- 001-tdd.mdc: Writing tests first for CRUD operations
+- 002-documentation.mdc: File headers and docstrings required
+- 005-error-handling.mdc: Proper error handling with user-friendly messages
+- supabase.mdc: Using server client with RLS, user_id scoping
+- typescript.mdc: Strict types with Zod validation
+- bounded-contexts.mdc: Projects belong to User Context Store
+
+## Rules Verified Not Applicable:
+- ai-claude.mdc: Not calling AI in this feature
+- deepgram-voice.mdc: No voice features
+```
+
+## Why This Matters
+
+- Reduces overhead on simple tasks
+- Still ensures complex features get proper review
+- Saves context/tokens on straightforward work

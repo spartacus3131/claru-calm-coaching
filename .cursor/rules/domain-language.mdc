@@ -1,0 +1,183 @@
+---
+description: Claru ubiquitous language - USE THESE TERMS EXACTLY
+globs: ["**/*.ts", "**/*.tsx", "**/*.md"]
+alwaysApply: true
+---
+
+# Claru Domain Language
+
+## MANDATORY: Use These Terms Exactly
+
+These terms are defined in the PRD. Use them consistently in code, comments, UI, and documentation.
+
+### Core Concepts
+
+| Term | Definition | Use In Code |
+|------|------------|-------------|
+| **Brain Dump** | Unstructured capture of everything on user's mind | `rawDump`, `brainDump` |
+| **Top 3** | The three most important outcomes for today | `top3`, `topThree` |
+| **Daily Note** | Single document per day containing dump, plan, reflection | `DailyNote`, `dailyNote` |
+| **Check-In** | Structured conversation with AI coach (morning or evening) | `checkIn`, `CheckIn` |
+| **Challenge** | One of 22 structured productivity exercises | `Challenge`, `challenge` |
+| **Carryover** | Incomplete Top 3 items from yesterday | `carryover`, `carryoverItems` |
+| **Project** | User-defined container for related work | `Project`, `project` |
+
+### Coaching Concepts
+
+| Term | Definition | Use In Code |
+|------|------------|-------------|
+| **Biological Prime Time (BPT)** | User's peak energy hours | `biologicalPrimeTime`, `bpt` |
+| **Rule of 3** | Practice of identifying exactly 3 priorities | `ruleOfThree` |
+| **Streak** | Consecutive days with completed check-in | `streak`, `currentStreak` |
+| **Parked Item** | Task intentionally deferred for later | `ParkedItem`, `parkedItem` |
+| **Energy Level** | 1-10 self-reported energy score | `energyLevel` |
+
+### Session/Flow Concepts
+
+| Term | Definition | Use In Code |
+|------|------------|-------------|
+| **Coaching Session** | Active conversation with the AI coach | `CoachingSession` |
+| **Conversation Turn** | One user input + AI response pair | `ConversationTurn` |
+| **Morning Check-In** | AM flow: dump → structure → prioritize → confirm | `morning_checkin` |
+| **Evening Check-In** | PM flow: review → reflect → release → preview | `evening_checkin` |
+
+## Naming Conventions
+
+### Database Tables
+
+USE snake_case matching these terms:
+
+```sql
+-- CORRECT
+daily_notes
+coaching_sessions
+conversation_turns
+parked_items
+energy_logs
+user_challenges
+
+-- WRONG
+notes
+sessions
+turns
+parking_lot
+energy
+challenges
+```
+
+### TypeScript Types
+
+USE PascalCase matching these terms:
+
+```typescript
+// CORRECT
+interface DailyNote { ... }
+interface CoachingSession { ... }
+interface ParkedItem { ... }
+type CoachingFlow = 'morning_checkin' | 'evening_checkin';
+
+// WRONG
+interface Note { ... }
+interface Session { ... }
+interface DeferredTask { ... }
+```
+
+### Variables
+
+USE camelCase matching these terms:
+
+```typescript
+// CORRECT
+const dailyNote = await getNote(userId, today);
+const topThree = note.plan?.top3;
+const carryoverItems = getCarryover(userId);
+
+// WRONG
+const note = await getNote(userId, today);
+const priorities = note.plan?.items;
+const leftoverTasks = getCarryover(userId);
+```
+
+### API Routes
+
+USE kebab-case matching bounded contexts:
+
+```
+CORRECT:
+/api/coaching/session
+/api/coaching/turn
+/api/users/profile
+/api/challenges/energy-log
+/api/parking/items
+
+WRONG:
+/api/sessions
+/api/chat
+/api/profile
+/api/energy
+/api/deferred
+```
+
+### UI Text
+
+USE the exact terms in user-facing copy:
+
+```typescript
+// CORRECT
+"Let's do your morning check-in"
+"What are your Top 3 for today?"
+"Time for your brain dump"
+"These items will carry over to tomorrow"
+
+// WRONG
+"Let's start your session"
+"What are your priorities?"
+"Tell me what's on your mind"
+"These tasks will be moved"
+```
+
+## FORBIDDEN Synonyms
+
+DO NOT use these synonyms. They cause confusion.
+
+| WRONG | CORRECT |
+|-------|---------|
+| priorities | Top 3 |
+| tasks | items (in Top 3 context) |
+| session | check-in (user-facing) |
+| deferred | parked |
+| notes | daily note |
+| energy score | energy level |
+| habits | challenges |
+| goals | intentions |
+| backlog | parking lot |
+
+## Code Examples
+
+```typescript
+// CORRECT: Using domain language
+async function getMorningContext(userId: string): Promise<MorningContext> {
+  const dailyNote = await getDailyNote(userId, yesterday);
+  const carryoverItems = getIncompleteTopThree(dailyNote);
+  const activeChallenge = await getActiveChallenge(userId);
+  
+  return {
+    carryover: carryoverItems,
+    challenge: activeChallenge,
+    streak: await getStreak(userId),
+  };
+}
+
+// WRONG: Using generic terms
+async function getContext(userId: string) {
+  const note = await getNote(userId, yesterday);
+  const leftover = getIncompleteTasks(note);
+  const habit = await getActiveHabit(userId);
+  
+  return {
+    tasks: leftover,
+    habit: habit,
+    days: await getDayCount(userId),
+  };
+}
+```

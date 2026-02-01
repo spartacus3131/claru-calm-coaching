@@ -1,0 +1,216 @@
+---
+description: Next.js 14 App Router patterns for Claru
+globs: ["**/*.ts", "**/*.tsx", "app/**/*"]
+alwaysApply: true
+---
+
+# Next.js 14 App Router Rules
+
+## File Structure
+
+ALWAYS organize files by feature/bounded context, not by type:
+
+```
+CORRECT:
+/app/api/coaching/turn/route.ts
+/app/api/coaching/session/route.ts
+/app/(dashboard)/check-in/page.tsx
+
+WRONG:
+/app/api/routes/coachingTurn.ts
+/app/api/routes/coachingSession.ts
+/pages/check-in.tsx
+```
+
+## Route Handlers
+
+ALWAYS use the App Router route handler pattern:
+
+```typescript
+// CORRECT: app/api/coaching/turn/route.ts
+export async function POST(request: Request) {
+  const body = await request.json();
+  // ... handle request
+  return Response.json({ data });
+}
+
+// WRONG: pages/api pattern
+export default function handler(req, res) {
+  // This is the old Pages Router pattern - NEVER use
+}
+```
+
+## Server vs Client Components
+
+ALWAYS default to Server Components. Only use "use client" when you need:
+- useState, useEffect, or other hooks
+- Browser APIs (window, document)
+- Event handlers (onClick, onChange)
+- Third-party client-only libraries
+
+```typescript
+// CORRECT: Server Component (default)
+async function CheckInPage() {
+  const notes = await getRecentNotes(); // Direct DB call
+  return <NotesList notes={notes} />;
+}
+
+// CORRECT: Client Component (when needed)
+"use client";
+function VoiceCapture() {
+  const [transcript, setTranscript] = useState('');
+  // Uses hooks, needs client
+}
+```
+
+## Data Fetching
+
+ALWAYS fetch data in Server Components, not in useEffect:
+
+```typescript
+// CORRECT: Server Component data fetching
+async function DashboardPage() {
+  const user = await getUser();
+  const notes = await getRecentNotes(user.id);
+  return <Dashboard user={user} notes={notes} />;
+}
+
+// WRONG: Client-side fetching for initial data
+"use client";
+function DashboardPage() {
+  const [notes, setNotes] = useState([]);
+  useEffect(() => {
+    fetch('/api/notes').then(r => r.json()).then(setNotes);
+  }, []);
+}
+```
+
+## Server Actions
+
+USE Server Actions for mutations instead of API routes when possible:
+
+```typescript
+// CORRECT: Server Action
+"use server";
+async function updateNote(formData: FormData) {
+  const noteId = formData.get('noteId');
+  const content = formData.get('content');
+  await supabase.from('daily_notes').update({ content }).eq('id', noteId);
+  revalidatePath('/notes');
+}
+
+// In component:
+<form action={updateNote}>
+  <input name="noteId" value={note.id} type="hidden" />
+  <textarea name="content" />
+  <button type="submit">Save</button>
+</form>
+```
+
+## Streaming Responses
+
+For AI responses, ALWAYS use streaming:
+
+```typescript
+// CORRECT: Streaming AI response
+import { streamText } from 'ai';
+import { anthropic } from '@ai-sdk/anthropic';
+
+export async function POST(request: Request) {
+  const { messages } = await request.json();
+  
+  const result = await streamText({
+    model: anthropic('claude-sonnet-4-5-20250514'),
+    messages,
+  });
+  
+  return result.toDataStreamResponse();
+}
+```
+
+## Runtime Selection
+
+USE Node.js runtime for AI/coaching routes (need longer execution):
+
+```typescript
+// app/api/coaching/turn/route.ts
+export const runtime = 'nodejs';
+export const maxDuration = 60; // seconds
+```
+
+USE Edge runtime for simple, fast routes:
+
+```typescript
+// app/api/health/route.ts
+export const runtime = 'edge';
+```
+
+## Error Handling
+
+ALWAYS use error.tsx for route error boundaries:
+
+```typescript
+// app/(dashboard)/check-in/error.tsx
+"use client";
+
+export default function CheckInError({
+  error,
+  reset,
+}: {
+  error: Error;
+  reset: () => void;
+}) {
+  return (
+    <div>
+      <h2>Something went wrong</h2>
+      <button onClick={reset}>Try again</button>
+    </div>
+  );
+}
+```
+
+## Loading States
+
+ALWAYS use loading.tsx for route loading states:
+
+```typescript
+// app/(dashboard)/check-in/loading.tsx
+export default function CheckInLoading() {
+  return <CheckInSkeleton />;
+}
+```
+
+## Metadata
+
+ALWAYS export metadata for pages:
+
+```typescript
+// app/(dashboard)/check-in/page.tsx
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Morning Check-in | Claru',
+  description: 'Start your day with intention',
+};
+```
+
+## FORBIDDEN Patterns
+
+NEVER use these patterns:
+
+```typescript
+// FORBIDDEN: getServerSideProps (Pages Router)
+export async function getServerSideProps() {}
+
+// FORBIDDEN: getStaticProps (Pages Router)
+export async function getStaticProps() {}
+
+// FORBIDDEN: _app.tsx or _document.tsx
+// Use app/layout.tsx instead
+
+// FORBIDDEN: pages/ directory
+// Use app/ directory only
+
+// FORBIDDEN: API routes in pages/api/
+// Use app/api/ route handlers
+```

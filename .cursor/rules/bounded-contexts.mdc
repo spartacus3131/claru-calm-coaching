@@ -1,0 +1,312 @@
+---
+description: Claru bounded context boundaries - ENFORCE SEPARATION
+globs: ["**/*.ts", "**/*.tsx"]
+alwaysApply: true
+---
+
+# Claru Bounded Contexts
+
+Claru has 9 bounded contexts. Each has clear responsibilities. NEVER violate boundaries.
+
+## Context Overview
+
+| Context | Type | Responsibility |
+|---------|------|----------------|
+| **Coaching Engine** | CORE | AI conversation, response generation |
+| **User Context Store** | Supporting | Daily notes, user history |
+| **Challenge Engine** | Supporting | Challenge lifecycle, BPT tracking |
+| **Parking Lot Manager** | Supporting | Deferred items management |
+| **Insights Engine** | Supporting | Patterns, weekly reports |
+| **Engagement Tracker** | Supporting | Streaks, habit strength |
+| **Capture Service** | Supporting | Quick capture from any source |
+| **User Identity** | Generic | Auth, profiles |
+| **Notifications** | Generic | Scheduling, delivery |
+
+## File Organization
+
+ALWAYS organize code by bounded context:
+
+```
+/src
+├── /app/api
+│   ├── /coaching      ← Coaching Engine
+│   ├── /users         ← User Context Store + User Identity
+│   ├── /challenges    ← Challenge Engine
+│   ├── /parking       ← Parking Lot Manager
+│   ├── /insights      ← Insights Engine
+│   ├── /engagement    ← Engagement Tracker
+│   ├── /capture       ← Capture Service
+│   └── /notifications ← Notifications
+├── /modules
+│   ├── /coaching      ← Coaching Engine domain logic
+│   ├── /user-context  ← User Context Store domain logic
+│   ├── /challenges    ← Challenge Engine domain logic
+│   ├── /parking       ← Parking Lot Manager domain logic
+│   ├── /insights      ← Insights Engine domain logic
+│   ├── /engagement    ← Engagement Tracker domain logic
+│   ├── /capture       ← Capture Service domain logic
+│   └── /notifications ← Notifications domain logic
+```
+
+## Context Boundaries
+
+### Coaching Engine (CORE)
+
+**Owns:**
+- CoachingSession entity
+- ConversationTurn entity
+- AI response generation
+- Persona and guardrails
+- Work classification
+
+**MUST NOT:**
+- Store data long-term (sends to User Context Store)
+- Track streaks (Engagement Tracker does this)
+- Manage challenges (Challenge Engine does this)
+
+```typescript
+// CORRECT: Coaching Engine emits event, doesn't store
+async function completeSession(session: CoachingSession) {
+  const plan = extractPlan(session);
+  
+  // Emit to User Context Store
+  await eventBus.emit('PlanConfirmed', {
+    userId: session.userId,
+    date: session.date,
+    plan,
+  });
+  
+  // Emit to Engagement Tracker
+  await eventBus.emit('CheckInCompleted', {
+    userId: session.userId,
+    flow: session.flow,
+  });
+}
+
+// WRONG: Coaching Engine storing directly
+async function completeSession(session: CoachingSession) {
+  await supabase.from('daily_notes').update({ plan }); // Wrong context!
+  await supabase.from('engagement_records').update({ streak }); // Wrong context!
+}
+```
+
+### User Context Store
+
+**Owns:**
+- DailyNote entity
+- UserProfile entity
+- User history queries
+
+**Consumes from:**
+- Coaching Engine: PlanConfirmed, ReflectionAdded events
+- Challenge Engine: ChallengeLearning events
+
+```typescript
+// CORRECT: User Context Store handles its own data
+// modules/user-context/handlers.ts
+export async function handlePlanConfirmed(event: PlanConfirmedEvent) {
+  await supabase
+    .from('daily_notes')
+    .upsert({
+      user_id: event.userId,
+      date: event.date,
+      plan: event.plan,
+      state: 'plan_set',
+    });
+}
+```
+
+### Challenge Engine
+
+**Owns:**
+- UserChallenge entity
+- EnergyLog entity
+- ChallengeLearning entity
+- Challenge state machine
+
+**MUST NOT:**
+- Generate AI responses (Coaching Engine does this)
+- Store daily notes (User Context Store does this)
+
+```typescript
+// CORRECT: Challenge Engine manages challenge state
+async function completeChallenge(challengeId: string, userId: string) {
+  const learning = analyzeChallengeData(challengeId);
+  
+  await supabase
+    .from('user_challenges')
+    .update({ status: 'completed' })
+    .eq('id', challengeId);
+  
+  // Emit learning to User Context Store
+  await eventBus.emit('ChallengeLearningDerived', {
+    userId,
+    learningType: 'biological_prime_time',
+    value: learning.bpt,
+  });
+}
+```
+
+### Parking Lot Manager
+
+**Owns:**
+- ParkedItem entity
+- Parking/reactivation logic
+- Weekly review surfacing
+
+**Consumes from:**
+- Coaching Engine: ItemParked events
+
+```typescript
+// CORRECT: Parking Lot manages parked items
+async function parkItem(item: ParkItemRequest) {
+  await supabase.from('parked_items').insert({
+    user_id: item.userId,
+    text: item.text,
+    reason: item.reason,
+    status: 'parked',
+  });
+}
+```
+
+### Insights Engine
+
+**Owns:**
+- WeeklyReport entity
+- UserPattern entity
+- Pattern detection logic
+- Correlation analysis
+
+**Reads from (but doesn't own):**
+- User Context Store: daily_notes
+- Engagement Tracker: engagement_records
+- Challenge Engine: energy_logs
+
+```typescript
+// CORRECT: Insights Engine reads, doesn't write to other contexts
+async function generateWeeklyReport(userId: string) {
+  // Read from other contexts (allowed)
+  const notes = await supabase.from('daily_notes').select().eq('user_id', userId);
+  const energy = await supabase.from('energy_logs').select().eq('user_id', userId);
+  
+  // Write to own tables only
+  await supabase.from('weekly_reports').insert({
+    user_id: userId,
+    metrics: calculateMetrics(notes, energy),
+    insights: deriveInsights(notes, energy),
+  });
+}
+```
+
+### Engagement Tracker
+
+**Owns:**
+- EngagementRecord entity
+- DailyEngagement entity
+- Streak calculation
+- Habit strength scoring
+
+**Consumes from:**
+- Coaching Engine: CheckInCompleted events
+
+### Capture Service
+
+**Owns:**
+- CaptureItem entity
+- Quick capture processing
+- Source normalization (text, voice, widget)
+
+**Emits to:**
+- Coaching Engine: for processing during check-in
+- Parking Lot: for items marked as "park"
+
+### User Identity (Generic)
+
+**Owns:**
+- User authentication (via Supabase Auth)
+- UserProfile basic info
+
+**Used by:** All other contexts
+
+### Notifications (Generic)
+
+**Owns:**
+- DeviceToken entity
+- ScheduledNotification entity
+- Delivery logic
+
+**Consumes from:**
+- Engagement Tracker: reminder triggers
+- Challenge Engine: BPT prompts
+
+## Inter-Context Communication
+
+USE events for cross-context communication:
+
+```typescript
+// Event definitions
+type DomainEvent =
+  | { type: 'PlanConfirmed'; userId: string; date: string; plan: Plan }
+  | { type: 'CheckInCompleted'; userId: string; flow: CoachingFlow }
+  | { type: 'ItemParked'; userId: string; item: ParkedItem }
+  | { type: 'ChallengeLearningDerived'; userId: string; learning: Learning };
+
+// Simple event bus (can be replaced with real message queue later)
+class EventBus {
+  private handlers: Map<string, Function[]> = new Map();
+
+  emit(event: DomainEvent) {
+    const handlers = this.handlers.get(event.type) || [];
+    handlers.forEach(h => h(event));
+  }
+
+  on(type: string, handler: Function) {
+    const handlers = this.handlers.get(type) || [];
+    handlers.push(handler);
+    this.handlers.set(type, handlers);
+  }
+}
+```
+
+## FORBIDDEN Patterns
+
+NEVER do these:
+
+```typescript
+// FORBIDDEN: Coaching Engine writing to daily_notes
+// modules/coaching/session.ts
+await supabase.from('daily_notes').update({ plan });
+
+// FORBIDDEN: Insights Engine writing to engagement_records
+// modules/insights/reports.ts
+await supabase.from('engagement_records').update({ streak });
+
+// FORBIDDEN: Challenge Engine generating AI responses
+// modules/challenges/bpt.ts
+const response = await streamText({ model: anthropic(...) });
+
+// FORBIDDEN: Directly importing from another context's internals
+import { _internalHelper } from '@/modules/coaching/_lib/internal';
+
+// FORBIDDEN: Circular dependencies between contexts
+// coaching imports from insights, insights imports from coaching
+```
+
+## Allowed Cross-Context Reads
+
+Some contexts MAY read from others (but not write):
+
+| Context | May Read From |
+|---------|--------------|
+| Coaching Engine | User Context Store, Challenge Engine |
+| Insights Engine | User Context Store, Engagement Tracker, Challenge Engine |
+| Notifications | Engagement Tracker, Challenge Engine |
+
+```typescript
+// ALLOWED: Coaching Engine reading user context
+async function buildCoachingContext(userId: string) {
+  const note = await supabase.from('daily_notes').select().eq('user_id', userId);
+  const challenge = await supabase.from('user_challenges').select().eq('user_id', userId);
+  // Use for context, don't write back
+}
+```

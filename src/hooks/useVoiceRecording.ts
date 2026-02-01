@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { backend } from '@/backend';
 
 export function useVoiceRecording() {
   const [isRecording, setIsRecording] = useState(false);
@@ -12,7 +12,8 @@ export function useVoiceRecording() {
   // Live mic level metering
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
-  const meterDataRef = useRef<Uint8Array | null>(null);
+  // Match WebAudio libdefs: Uint8Array backed by ArrayBuffer (not SharedArrayBuffer).
+  const meterDataRef = useRef<Uint8Array<ArrayBuffer> | null>(null);
   const meterRafRef = useRef<number | null>(null);
   const lastLevelRef = useRef(0);
 
@@ -45,7 +46,7 @@ export function useVoiceRecording() {
       analyser.fftSize = 512;
       analyser.smoothingTimeConstant = 0.85;
 
-      const data = new Uint8Array(analyser.fftSize);
+      const data = new Uint8Array(analyser.fftSize) as Uint8Array<ArrayBuffer>;
       const source = ctx.createMediaStreamSource(stream);
       source.connect(analyser);
 
@@ -155,15 +156,7 @@ export function useVoiceRecording() {
 
               // Transcribe audio
               console.log('Sending to transcribe...');
-              const transcribeResponse = await supabase.functions.invoke('transcribe', {
-                body: { audio: base64Audio },
-              });
-
-              if (transcribeResponse.error) {
-                throw new Error(transcribeResponse.error.message || 'Transcription failed');
-              }
-
-              const transcription = transcribeResponse.data.text;
+              const transcription = await backend.ai.transcribe(base64Audio);
               console.log('Transcription:', transcription);
 
               if (!transcription || transcription.trim() === '') {

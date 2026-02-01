@@ -4,7 +4,7 @@ import { TypingIndicator } from '@/components/chat/TypingIndicator';
 import { QuickReplies } from '@/components/chat/QuickReplies';
 import { ChatComposer } from '@/components/chat/ChatComposer';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { supabase } from '@/integrations/supabase/client';
+import { backend } from '@/backend';
 import { useChatMessages } from '@/hooks/useChatMessages';
 import { useDailyNote } from '@/hooks/useDailyNote';
 import { Loader2, Info } from 'lucide-react';
@@ -111,16 +111,12 @@ export function ChatScreen({ autoMessage, autoFoundation, onAutoMessageSent }: C
 
         console.log('[handleSend] Sending to Edge Function with foundationDetails:', foundationDetails ? 'yes' : 'no');
 
-        const { data, error } = await supabase.functions.invoke('coach-reply', {
-          body: {
-            message: content,
-            conversationHistory,
-            mode: checkInMode,
-            foundationDetails,
-          },
+        const data = await backend.ai.coachReply({
+          message: content,
+          conversationHistory,
+          mode: checkInMode,
+          foundationDetails,
         });
-
-        if (error) throw error;
 
         console.log('[handleSend] Edge Function response _debug:', data._debug);
 

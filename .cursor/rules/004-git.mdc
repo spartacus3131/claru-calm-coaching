@@ -1,0 +1,115 @@
+---
+description: Git commit practices and workflow
+alwaysApply: true
+---
+
+# Git Practices
+
+## Commit Message Format
+
+```
+<type>(<scope>): <description>
+
+[optional body]
+
+[optional footer]
+```
+
+### Types
+
+| Type | When to Use |
+|------|-------------|
+| `feat` | New feature |
+| `fix` | Bug fix |
+| `refactor` | Code restructuring (no feature/fix) |
+| `test` | Adding or updating tests |
+| `docs` | Documentation only |
+| `style` | Formatting, whitespace (no code change) |
+| `chore` | Build process, dependencies, tooling |
+
+### Examples
+
+```bash
+# Good
+feat(auth): add password reset flow
+fix(api): handle null response from user endpoint
+test(checkout): add edge cases for discount calculation
+refactor(dashboard): extract chart components
+docs(readme): add deployment instructions
+
+# Bad
+Fixed stuff
+WIP
+updates
+minor changes
+```
+
+## Commit Rules
+
+### Before Every Commit
+
+1. Run ALL tests - they must pass
+2. Run linter - no errors
+3. Review your changes with `git diff --staged`
+4. Verify no console.logs or debug code
+
+### Commit Frequency
+
+- Commit after each completed unit of work
+- Each commit should be atomic (one logical change)
+- If you can't describe it in one line, it's too big
+
+### NEVER Commit
+
+- Failing tests
+- Console.log statements
+- Commented-out code
+- .env files or secrets
+- node_modules or build artifacts
+- Merge conflicts markers
+
+## Branch Strategy
+
+```
+main (production)
+  └── develop (integration)
+        └── feature/auth-password-reset
+        └── feature/dashboard-charts
+        └── fix/api-null-handling
+```
+
+### Branch Naming
+
+```bash
+# Good
+feature/user-authentication
+fix/checkout-discount-bug
+refactor/extract-api-client
+
+# Bad
+my-branch
+new-stuff
+test
+```
+
+## Pull Request Checklist
+
+Before requesting review:
+
+- [ ] Tests pass locally
+- [ ] Tests written for new functionality
+- [ ] Code follows project style
+- [ ] Documentation updated if needed
+- [ ] No console.logs or debug code
+- [ ] Commit messages follow convention
+- [ ] PR description explains the change
+
+## Why This Matters
+
+Git history is documentation that never goes out of date.
+
+**Specific benefits:**
+- Good commit messages explain WHY changes were made (code shows what)
+- Atomic commits make `git bisect` possible—find bugs in minutes not hours
+- Consistent conventions make automation possible (changelogs, releases)
+- Clean history helps onboard new team members and AI tools
