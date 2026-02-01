@@ -15,19 +15,27 @@ import { Input } from '@/components/ui/input';
 import { useParkingLot } from '@/hooks/useParkingLot';
 
 export function ParkingLotContent() {
-  const { items, loading, addItem, toggleItem, deleteItem } = useParkingLot();
+  const { items, isLoading, parkItem, updateItem, deleteItem, reactivateItem } = useParkingLot();
   const [newItem, setNewItem] = useState('');
   const [isAdding, setIsAdding] = useState(false);
 
   const handleAddItem = async () => {
     if (!newItem.trim()) return;
-    await addItem(newItem.trim());
+    await parkItem({ text: newItem.trim() });
     setNewItem('');
     setIsAdding(false);
   };
 
-  const activeItems = items.filter(i => !i.isCompleted);
-  const completedItems = items.filter(i => i.isCompleted);
+  const handleToggleItem = async (id: string, currentStatus: string) => {
+    if (currentStatus === 'parked') {
+      await updateItem(id, { status: 'reactivated' });
+    } else {
+      await reactivateItem(id);
+    }
+  };
+
+  const activeItems = items.filter(i => i.status === 'parked');
+  const completedItems = items.filter(i => i.status === 'reactivated');
 
   return (
     <div className="flex-1 overflow-y-auto pb-safe">
@@ -41,7 +49,7 @@ export function ParkingLotContent() {
           </p>
         </div>
 
-        {loading ? (
+        {isLoading ? (
           <div className="flex justify-center py-8">
             <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
           </div>
@@ -94,12 +102,12 @@ export function ParkingLotContent() {
                     className="flex items-center gap-3 p-3 rounded-lg bg-card border border-border/50"
                   >
                     <button
-                      onClick={() => toggleItem(item.id)}
+                      onClick={() => handleToggleItem(item.id, item.status)}
                       className="text-muted-foreground hover:text-primary"
                     >
                       <Circle className="w-5 h-5" />
                     </button>
-                    <span className="flex-1 text-sm text-foreground">{item.content}</span>
+                    <span className="flex-1 text-sm text-foreground">{item.text}</span>
                     <button
                       onClick={() => deleteItem(item.id)}
                       className="text-muted-foreground hover:text-destructive"
@@ -122,12 +130,12 @@ export function ParkingLotContent() {
                       className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border/30"
                     >
                       <button
-                        onClick={() => toggleItem(item.id)}
+                        onClick={() => handleToggleItem(item.id, item.status)}
                         className="text-primary"
                       >
                         <CheckCircle className="w-5 h-5" />
                       </button>
-                      <span className="flex-1 text-sm text-muted-foreground line-through">{item.content}</span>
+                      <span className="flex-1 text-sm text-muted-foreground line-through">{item.text}</span>
                       <button
                         onClick={() => deleteItem(item.id)}
                         className="text-muted-foreground hover:text-destructive"

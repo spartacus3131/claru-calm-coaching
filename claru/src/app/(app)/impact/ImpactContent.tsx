@@ -15,7 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DailyNotePanel } from '@/components/notes/DailyNotePanel';
 import { ChallengeDetailDrawer } from '@/components/challenges/ChallengeDetailDrawer';
 import { FOUNDATIONS, PART_INFO, getFoundationsByPart } from '@/data/challenges';
-import type { Challenge, ChallengePart } from '@/types/claru';
+import type { Challenge, ChallengePart, Foundation } from '@/types/claru';
 import { cn } from '@/lib/utils';
 
 export function ImpactContent() {

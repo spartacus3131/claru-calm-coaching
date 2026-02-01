@@ -22,10 +22,14 @@ import {
   DrawerTitle,
   DrawerDescription,
 } from '@/components/ui/drawer';
+import type { Challenge } from '@/types/claru';
 import type { ChallengeWithStatus } from '@/hooks/useChallenges';
 
+// Accept either base Challenge or ChallengeWithStatus (with user progress)
+type DrawerChallenge = Challenge | ChallengeWithStatus;
+
 interface ChallengeDetailDrawerProps {
-  challenge: ChallengeWithStatus | null;
+  challenge: DrawerChallenge | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onStart?: () => void;
@@ -43,7 +47,6 @@ export function ChallengeDetailDrawer({
     id,
     title,
     description,
-    userStatus,
     time,
     energy,
     value,
@@ -55,6 +58,8 @@ export function ChallengeDetailDrawer({
     citation,
   } = challenge;
 
+  // userStatus only exists on ChallengeWithStatus
+  const userStatus = 'userStatus' in challenge ? challenge.userStatus : undefined;
   const isCompleted = userStatus === 'completed';
   const isActive = userStatus === 'active';
 

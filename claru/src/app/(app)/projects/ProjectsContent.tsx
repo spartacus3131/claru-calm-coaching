@@ -43,8 +43,8 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-import { useProjects, type CreateProjectInput, type UpdateProjectInput } from '@/hooks/useProjects';
-import type { Project, ProjectType, ProjectStatus } from '@/types/projects';
+import { useProjects } from '@/hooks/useProjects';
+import type { Project, ProjectType, ProjectStatus, CreateProjectInput, UpdateProjectInput } from '@/types/projects';
 
 const STATUS_CONFIG: Record<ProjectStatus, { label: string; color: string }> = {
   'active': { label: 'Active', color: 'bg-green-500/20 text-green-600 border-green-500/30' },
