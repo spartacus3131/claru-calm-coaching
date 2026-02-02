@@ -60,6 +60,25 @@ export async function POST(request: Request) {
       adminBatch: extracted.adminBatch || [],
     };
 
+    // Build morning_prompts from extracted data
+    const morningPrompts = {
+      weighingOnMe: extracted.morningPrompts.weighingOnMe || '',
+      avoiding: extracted.morningPrompts.avoiding || '',
+      meetings: extracted.morningPrompts.meetings || '',
+      followUps: extracted.morningPrompts.followUps || '',
+      win: extracted.morningPrompts.win || '',
+    };
+
+    // Convert Top 3 to the format expected by the Daily Note panel
+    const top3ForPanel = extracted.top3.map(item => ({
+      text: item.text,
+      completed: item.completed || false,
+    }));
+    // Pad to 3 items
+    while (top3ForPanel.length < 3) {
+      top3ForPanel.push({ text: '', completed: false });
+    }
+
     const { data, error } = await supabase
       .from('daily_notes')
       .upsert(
@@ -69,6 +88,8 @@ export async function POST(request: Request) {
           state: 'plan_set',
           raw_dump: extracted.rawDump,
           plan: planData,
+          morning_prompts: morningPrompts,
+          top3: top3ForPanel,
         },
         {
           onConflict: 'user_id,date',

@@ -67,7 +67,7 @@ Focus block: 9:00 AM - 11:00 AM`,
       expect(result.adminBatch).toContain('Schedule dentist');
     });
 
-    it('extracts raw dump from user messages', () => {
+    it('extracts structured summary from AI for raw dump', () => {
       const messages: Message[] = [
         createMessage({
           role: 'user',
@@ -75,14 +75,77 @@ Focus block: 9:00 AM - 11:00 AM`,
         }),
         createMessage({
           role: 'assistant',
-          content: 'Got it. Let me organize that for you.',
+          content: `Got it. Here's what I'm capturing:
+
+- Roadmap work (deep focus)
+- Dentist at 2pm (commitment)
+- Call mom (follow-up)
+
+What's really weighing on you right now?`,
         }),
       ];
 
       const result = extractPlanFromConversation(messages);
 
+      // Should use AI's structured summary, not raw user message
+      expect(result.rawDump).toContain('Roadmap work');
+      expect(result.rawDump).toContain('Dentist');
+      expect(result.structuredSummary).toBeDefined();
+    });
+
+    it('falls back to user messages when no structured summary', () => {
+      const messages: Message[] = [
+        createMessage({
+          role: 'user',
+          content: 'Today I need to work on the roadmap',
+        }),
+        createMessage({
+          role: 'assistant',
+          content: 'Got it.',
+        }),
+      ];
+
+      const result = extractPlanFromConversation(messages);
+
+      // Should fall back to user messages
       expect(result.rawDump).toContain('roadmap');
-      expect(result.rawDump).toContain('dentist');
+    });
+
+    it('extracts weighing on me from conversation', () => {
+      const messages: Message[] = [
+        createMessage({
+          role: 'assistant',
+          content: "What's really weighing on you right now?",
+        }),
+        createMessage({
+          role: 'user',
+          content: "Actually, the budget meeting tomorrow is stressing me out. I'm not prepared.",
+        }),
+      ];
+
+      const result = extractPlanFromConversation(messages);
+
+      expect(result.morningPrompts.weighingOnMe).toContain('budget meeting');
+    });
+
+    it('extracts meetings from structured output', () => {
+      const messages: Message[] = [
+        createMessage({
+          role: 'assistant',
+          content: `Here's what I'm capturing:
+
+**Meetings:**
+- Team standup at 10am
+- Client call at 2pm
+
+**Deep Focus:**
+- Write the spec`,
+        }),
+      ];
+
+      const result = extractPlanFromConversation(messages);
+
+      expect(result.morningPrompts.meetings).toContain('standup');
     });
 
     it('returns empty result for empty conversation', () => {
