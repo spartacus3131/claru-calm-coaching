@@ -19,6 +19,8 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
 interface VoiceRecorderProps {
+  /** Called when recording stops AND user should submit (Enter key) */
+  onStopAndSubmit?: (text: string) => void;
   /** Called when transcript updates (real-time) */
   onTranscript?: (text: string) => void;
   /** Called when user stops recording with final transcript */
@@ -43,6 +45,7 @@ interface VoiceRecorderProps {
 
 export function VoiceRecorder({
   onComplete,
+  onStopAndSubmit,
   disabled,
   isListening,
   isConnecting,
@@ -67,7 +70,7 @@ export function VoiceRecorder({
     }
   };
 
-  // Enter key to stop recording and submit
+  // Enter key to stop recording AND submit in one action
   useEffect(() => {
     if (!isListening || isConnecting) return;
 
@@ -77,12 +80,18 @@ export function VoiceRecorder({
 
       e.preventDefault();
       e.stopPropagation();
-      void handleToggleRecording();
+      stop();
+      // If we have transcript and a submit handler, submit directly
+      if (transcript?.trim() && onStopAndSubmit) {
+        onStopAndSubmit(transcript.trim());
+      } else if (transcript && onComplete) {
+        onComplete(transcript);
+      }
     };
 
     document.addEventListener('keydown', onKeyDown, true);
     return () => document.removeEventListener('keydown', onKeyDown, true);
-  }, [isListening, isConnecting, transcript]);
+  }, [isListening, isConnecting, transcript, onComplete, onStopAndSubmit, stop]);
 
   // Show errors as toast
   useEffect(() => {

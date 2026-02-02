@@ -39,6 +39,15 @@ export function ChatComposer({ onSend, disabled }: ChatComposerProps) {
     voice.clear();
   }, [voice]);
 
+  // Handle Enter during voice recording - stop and submit in one action
+  const handleVoiceStopAndSubmit = useCallback((text: string) => {
+    voice.clear();
+    setMessage('');
+    if (text.trim() && !disabled) {
+      onSend(text.trim());
+    }
+  }, [voice, disabled, onSend]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (message.trim() && !disabled) {
@@ -77,6 +86,7 @@ export function ChatComposer({ onSend, disabled }: ChatComposerProps) {
         {voiceEnabled && (
           <VoiceRecorder
             onComplete={handleVoiceComplete}
+            onStopAndSubmit={handleVoiceStopAndSubmit}
             disabled={disabled}
             isListening={voice.isListening}
             isConnecting={voice.isConnecting}
